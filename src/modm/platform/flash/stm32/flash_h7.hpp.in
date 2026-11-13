@@ -1,0 +1,144 @@
+/*
+ * Copyright (c) 2020, 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "../device.hpp"
+#include <cstddef>
+#include <cstdint>
+
+namespace modm::platform
+{
+
+/// Flash controller of the STM32H7 (except STM32H7R/S).
+///
+/// The sectors are numbered continuously over both banks.
+/// @ingroup modm_platform_flash
+class Flash
+{
+public:
+	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
+	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
+	/// Smallest page or sector of all flash organizations
+	static constexpr size_t MinPageSize{ {{ min_page }} };
+	/// Largest page or sector of all flash organizations
+	static constexpr size_t MaxPageSize{ {{ max_page }} };
+	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
+	/// Value of every byte after erasing
+	static constexpr uint8_t ErasedValue{ 0xff };
+	static constexpr uintptr_t Bank1Addr{ 0x{{ "%0x" | format(bank1_start) }} };
+	static constexpr uintptr_t Bank2Addr{ 0x{{ "%0x" | format(bank2_start) }} };
+	static constexpr size_t SectorSize{ 1ul << {{ shift }} };
+	static constexpr uint16_t SectorsPerBank{ {{ sectors_per_bank }} };
+	static constexpr size_t FlashWordWords{ FLASH_NB_32BITWORD_IN_FLASHWORD };
+	static constexpr size_t FlashWordSize{ FlashWordWords * sizeof(uint32_t) };
+	struct alignas(4) MaxWordType { uint32_t data[FlashWordWords]; };
+	/// Smallest unit that can be programmed in bytes
+	static constexpr size_t WriteSize{ sizeof(MaxWordType) };
+
+public:
+	static void
+	enable() {}
+
+	static void
+	disable() {}
+
+	static bool
+	isLocked()
+	{
+%% if bank2
+		return (FLASH->CR1 & FLASH_CR_LOCK) or (FLASH->CR2 & FLASH_CR_LOCK);
+%% else
+		return FLASH->CR1 & FLASH_CR_LOCK;
+%% endif
+	}
+
+	static bool
+	isBusy()
+	{
+%% if bank2
+		return (FLASH->SR1 & (FLASH_SR_BSY | FLASH_SR_QW)) or (FLASH->SR2 & (FLASH_SR_BSY | FLASH_SR_QW));
+%% else
+		return FLASH->SR1 & (FLASH_SR_BSY | FLASH_SR_QW);
+%% endif
+	}
+
+	static bool
+	unlock();
+
+	static void
+	lock();
+
+	static uint16_t
+	getSector(uint8_t *ptr)
+	{ return getPage(uintptr_t(ptr)); }
+
+	static uint16_t
+	getSector(uintptr_t addr)
+	{ return getPage(addr); }
+
+	static uint16_t
+	getPage(uint8_t *ptr)
+	{ return getPage(uintptr_t(ptr)); }
+
+	/// @return the page or sector of the absolute address addr
+	static uint16_t
+	getPage(uintptr_t addr)
+	{
+%% if bank2
+		if (addr >= Bank2Addr) return SectorsPerBank + ((addr - Bank2Addr) >> {{ shift }});
+%% endif
+		return (addr - Bank1Addr) >> {{ shift }};
+	}
+
+	static uint8_t*
+	getAddr(uint16_t sector)
+	{ return Origin + getOffset(sector); }
+
+	static uint32_t
+	getOffset(uint16_t sector)
+	{
+%% if bank2
+		if (sector >= SectorsPerBank)
+			return (Bank2Addr - OriginAddr) + uint32_t(sector - SectorsPerBank) * SectorSize;
+%% endif
+		return (Bank1Addr - OriginAddr) + uint32_t(sector) * SectorSize;
+	}
+
+	static size_t
+	getSize(uint16_t)
+	{ return SectorSize; }
+
+	/// @return error flags, zero on success
+	static uint32_t
+	erase(uint16_t sector);
+
+	/// The flash word must be erased and aligned to its size.
+	/// @return error flags, zero on success
+	static uint32_t
+	program(uintptr_t addr, MaxWordType data);
+
+	/// Programs size bytes of erased flash at addr with data.
+	/// addr and size must be multiples of WriteSize. On flash with ECC the
+	/// target must read as erased without ECC error, so that a word damaged
+	/// by a reset during programming returns an error instead of faulting.
+	/// @return error flags, zero on success, all bits set if misaligned or
+	///         the target is not erased
+	static uint32_t
+	program(uintptr_t addr, const void *data, size_t size);
+
+	/// Copies size bytes from the flash at addr into buffer without faulting on
+	/// a flash word with a double ECC error, e.g. after a reset during programming.
+	/// @return error flags, zero on success
+	static uint32_t
+	read(uintptr_t addr, void *buffer, size_t size);
+};
+
+} // namespace modm::platform

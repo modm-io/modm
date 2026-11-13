@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2020, 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "../device.hpp"
+#include <cstddef>
+#include <cstdint>
+
+namespace modm::platform
+{
+
+/// Flash controller of the STM32L5, STM32U3 and STM32U5.
+///
+/// The pages are numbered continuously over both banks.
+/// @ingroup modm_platform_flash
+class Flash
+{
+public:
+	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
+	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
+	/// Smallest page or sector of all flash organizations
+	static constexpr size_t MinPageSize{ {{ min_page }} };
+	/// Largest page or sector of all flash organizations
+	static constexpr size_t MaxPageSize{ {{ max_page }} };
+	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
+	/// Value of every byte after erasing
+	static constexpr uint8_t ErasedValue{ 0xff };
+%% if words == 2
+	using MaxWordType = uint64_t;
+%% else
+	struct alignas(4) MaxWordType { uint32_t data[{{ words }}]; };
+%% endif
+	/// Smallest unit that can be programmed in bytes
+	static constexpr size_t WriteSize{ sizeof(MaxWordType) };
+
+%% if bker
+	/// Start of the second bank and its first page number in dual-bank mode
+	static constexpr uintptr_t Bank2Addr{ 0x{{ "%0x" | format(bank2_start) }} };
+	static constexpr uint16_t PagesPerBank{ {{ sectors_per_bank }} };
+%% endif
+	/// @return true if the device runs in dual-bank mode
+	static bool
+	isDualBank()
+	{
+%% if dual_option
+		return {{ dual_option }};
+%% else
+		return false;
+%% endif
+	}
+
+	static uint8_t
+	getPageShift()
+	{
+%% if shift != shift_single
+		return isDualBank() ? {{ shift }} : {{ shift_single }};
+%% else
+		return {{ shift }};
+%% endif
+	}
+
+public:
+	static void
+	enable() {}
+
+	static void
+	disable() {}
+
+	static bool
+	isLocked()
+	{ return FLASH->{{reg}}CR & FLASH_{{reg}}CR_{{bit}}LOCK; }
+
+	static bool
+	isBusy();
+
+	static bool
+	unlock();
+
+	static void
+	lock()
+	{ FLASH->{{reg}}CR |= FLASH_{{reg}}CR_{{bit}}LOCK; }
+
+	static uint16_t
+	getSector(uint8_t *ptr)
+	{ return getPage(uintptr_t(ptr)); }
+
+	static uint16_t
+	getSector(uintptr_t addr)
+	{ return getPage(addr); }
+
+	static uint16_t
+	getPage(uint8_t *ptr)
+	{ return getPage(uintptr_t(ptr)); }
+
+	/// @return the page or sector of the absolute address addr
+	static uint16_t
+	getPage(uintptr_t addr)
+	{
+%% if bker
+		if (isDualBank() and addr >= Bank2Addr)
+			return PagesPerBank + ((addr - Bank2Addr) >> getPageShift());
+%% endif
+		return (addr - OriginAddr) >> getPageShift();
+	}
+
+	static uint8_t*
+	getAddr(uint16_t page)
+	{ return Origin + getOffset(page); }
+
+	static uint32_t
+	getOffset(uint16_t page)
+	{
+%% if bker
+		if (isDualBank() and page >= PagesPerBank)
+			return (Bank2Addr - OriginAddr) + (uint32_t(page - PagesPerBank) << getPageShift());
+%% endif
+		return uint32_t(page) << getPageShift();
+	}
+
+	static size_t
+	getSize(uint16_t)
+	{ return 1ul << getPageShift(); }
+
+	/// @return error flags, zero on success
+	static uint32_t
+	erase(uint16_t page);
+
+	/// The {{ "double" if words == 2 else "quad" }}-word must be erased and {{ words * 4 }}-byte aligned.
+	/// @return error flags, zero on success
+	static uint32_t
+	program(uintptr_t addr, MaxWordType data);
+%% if burst
+
+	/// Bytes programmed at once by programBurst()
+	static constexpr size_t BurstSize{ 128 };
+
+	/// Programs 128 erased bytes aligned to 128 bytes about 2.5x faster than
+	/// single words.
+	/// @return error flags, zero on success
+	static uint32_t
+	programBurst(uintptr_t addr, const uint32_t *data);
+%% endif
+
+	/// Programs size bytes of erased flash at addr with data.
+	/// addr and size must be multiples of WriteSize. On flash with ECC the
+	/// target must read as erased without ECC error, so that a word damaged
+	/// by a reset during programming returns an error instead of faulting.
+	/// @return error flags, zero on success, all bits set if misaligned or
+	///         the target is not erased
+	static uint32_t
+	program(uintptr_t addr, const void *data, size_t size);
+
+	/// Copies size bytes from the flash at addr into buffer without faulting on
+	/// a flash word with a double ECC error, e.g. after a reset during programming.
+	/// @return error flags, zero on success
+	static uint32_t
+	read(uintptr_t addr, void *buffer, size_t size);
+};
+
+} // namespace modm::platform

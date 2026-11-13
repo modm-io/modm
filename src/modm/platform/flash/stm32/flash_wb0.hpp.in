@@ -1,0 +1,115 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "../device.hpp"
+#include <cstddef>
+#include <cstdint>
+
+namespace modm::platform
+{
+
+/// Command based flash controller of the STM32WB0 and STM32WL3.
+/// @ingroup modm_platform_flash
+class Flash
+{
+public:
+	static constexpr uintptr_t OriginAddr{ 0x{{ "%0x" | format(start) }} };
+	static constexpr size_t Size{ 0x{{ "%0x" | format(size) }} };
+	/// Smallest page or sector of all flash organizations
+	static constexpr size_t MinPageSize{ {{ min_page }} };
+	/// Largest page or sector of all flash organizations
+	static constexpr size_t MaxPageSize{ {{ max_page }} };
+	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
+	/// Value of every byte after erasing
+	static constexpr uint8_t ErasedValue{ 0xff };
+	static constexpr size_t PageSize{ 1ul << {{ shift }} };
+	using MaxWordType = uint32_t;
+	/// Smallest unit that can be programmed in bytes
+	static constexpr size_t WriteSize{ sizeof(MaxWordType) };
+
+public:
+	static void
+	enable() {}
+
+	static void
+	disable() {}
+
+	/// The controller has no lock
+	static bool
+	isLocked()
+	{ return false; }
+
+	static bool
+	isBusy()
+	{ return (FLASH->IRQRAW & FLASH_IRQRAW_CMDSTART_RIS) and not (FLASH->IRQRAW & FLASH_IRQRAW_CMDDONE_RIS); }
+
+	static bool
+	unlock()
+	{ return true; }
+
+	static void
+	lock() {}
+
+	static uint16_t
+	getSector(uint8_t *ptr)
+	{ return getPage(uintptr_t(ptr)); }
+
+	static uint16_t
+	getSector(uintptr_t addr)
+	{ return getPage(addr); }
+
+	static uint16_t
+	getPage(uint8_t *ptr)
+	{ return getPage(uintptr_t(ptr)); }
+
+	/// @return the page or sector of the absolute address addr
+	static uint16_t
+	getPage(uintptr_t addr)
+	{ return (addr - OriginAddr) >> {{ shift }}; }
+
+	static uint8_t*
+	getAddr(uint16_t page)
+	{ return Origin + getOffset(page); }
+
+	static uint32_t
+	getOffset(uint16_t page)
+	{ return uint32_t(page) << {{ shift }}; }
+
+	static size_t
+	getSize(uint16_t)
+	{ return PageSize; }
+
+	/// @return error flags, zero on success
+	static uint32_t
+	erase(uint16_t page);
+
+	/// @return error flags, zero on success
+	static uint32_t
+	program(uintptr_t addr, MaxWordType data);
+
+	/// Programs size bytes of erased flash at addr with data.
+	/// addr and size must be multiples of WriteSize. On flash with ECC the
+	/// target must read as erased without ECC error, so that a word damaged
+	/// by a reset during programming returns an error instead of faulting.
+	/// @return error flags, zero on success, all bits set if misaligned or
+	///         the target is not erased
+	static uint32_t
+	program(uintptr_t addr, const void *data, size_t size);
+
+	/// Copies size bytes from the flash at addr into buffer without faulting on
+	/// a flash word with a double ECC error, e.g. after a reset during programming.
+	/// @return error flags, zero on success
+	static uint32_t
+	read(uintptr_t addr, void *buffer, size_t size);
+};
+
+} // namespace modm::platform

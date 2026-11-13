@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2016-2018, Niklas Hauser
+# Copyright (c) 2016-2018, 2020, 2026, Niklas Hauser
 # Copyright (c) 2017, Fabian Greif
 #
 # This file is part of the modm project.
@@ -11,113 +11,163 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+# The STM32 families share nine different flash controllers. Each one has its
+# own template, the families only differ in geometry and register names.
+_CLUSTERS = {
+    "f1": ["f0", "f1", "f3"],
+    "f4": ["f2", "f4", "f7"],
+    "l0": ["l0", "l1"],
+    "l4": ["c0", "g0", "g4", "l4", "u0", "wb", "wl"],
+    "u5": ["l5", "u3", "u5"],
+    "h5": ["h5"],
+    "h7": ["h7"],
+}
+_H7RS = ["r3", "r7", "s3", "s7"]
+
+def cluster(target):
+    if target.family == "h7" and target.name in _H7RS:
+        return "h7rs"
+    # WB0x and WL3x use the command based controller of the BlueNRG
+    if target.family == "wb" and target.name.startswith("0"):
+        return "wb0"
+    if target.family == "wl" and target.name.startswith("3"):
+        return "wb0"
+    return next((c for c, f in _CLUSTERS.items() if target.family in f), None)
+
 def init(module):
     module.name = ":platform:flash"
-    module.description = "Flash Memory"
-
-_H7RS = ["r3", "r7", "s3", "s7"]
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     device = options[":target"]
-    if device.identifier.family not in ["g0","g4", "f1", "f4", "h7"]:
-        return False
-    # Exclude H745/H747/H755/H757 dual-core devices and H7RS with a different controller.
-    if device.identifier.family == "h7" and device.identifier.name in _H7RS:
-        return False
     if not device.has_driver("flash:stm32*"):
         return False
+    if cluster(device.identifier) is None:
+        return False
 
-    module.depends(":cmsis:device", ":platform:rcc",
-                   ":platform:cortex-m",
-                   ":architecture:register")
+    module.depends(":cmsis:device", ":platform:cortex-m",
+                   ":architecture:register", ":architecture:fiber", ":architecture:atomic")
+    module.add_query(EnvironmentQuery(name="write_size", factory=write_size))
     return True
+
+def write_size(env):
+    """
+    The smallest number of bytes that can be programmed at once, the value of
+    `Flash::WriteSize` for configuring storage libraries in the preprocessor.
+
+    :returns: write size in bytes
+    """
+    target = env[":target"].identifier
+    name = cluster(target)
+    if name == "u5": return 16 if target.family == "u5" else 8
+    if name == "h7": return 16 if target.name in ["a3", "b0", "b3"] else 32
+    return {"f1": 2, "f4": 1, "l0": 4, "l4": 8, "h5": 16, "h7rs": 16, "wb0": 4}[name]
+
+# ----------------------------------------------------------------------------
+def _layouts(device):
+    """
+    The flash organizations of the device file, one per value of the dual-bank
+    option bits, as (C++ condition, [(bank start, [sector size, ...]), ...]).
+    """
+    layouts = []
+    for layout in device.get_driver("flash").get("layout", []):
+        conditions = [f"(*(volatile uint32_t *){o['register']} & {o['mask']}) == {o['value']}"
+                      for o in layout.get("option", [])]
+        banks = [(int(b["start"], 0), [int(s["size"]) for s in b["sectors"]
+                                       for _ in range(int(s["count"]))])
+                 for b in layout["bank"]]
+        layouts.append((" and ".join(conditions) or "true", banks))
+    if not layouts:
+        raise ValueError(f"The device file of {device.partname} has no flash layout!")
+    return layouts
+
+def _shift(sizes):
+    assert len(set(sizes)) == 1, "Pages of different sizes"
+    return sizes[0].bit_length() - 1
+
+def _geometry(layouts):
+    """
+    Splits the layouts into the single-bank and dual-bank organization.
+    :returns: (condition of the dual-bank mode or None, single banks, dual banks)
+    """
+    single = next((banks for _, banks in layouts if len(banks) == 1), None)
+    dual = [(c, banks) for c, banks in layouts if len(banks) == 2]
+    assert len(dual) <= 1 and len(layouts) <= 2, "Unknown flash organization"
+    if not dual: return None, single, None
+    condition, dual = dual[0]
+    return ("true" if single is None else condition), single, dual
 
 def build(env):
     target = env[":target"].identifier
-    memory_properties = env.query(":platform:cortex-m:memories")
-    flash = memory_properties["cont_flash"]
-    physical_flash = [m for m in memory_properties["physical_memories"] if m["name"].startswith("flash")]
-    usable_flash = [m for m in memory_properties["memories"] if m["name"].startswith("flash")]
-    flash_start = flash["start"]
-    flash_size = flash["size"]
+    name = cluster(target)
+    layouts = _layouts(env[":target"])
+    option, single, dual = _geometry(layouts)
+    banks = dual or single
+    start = banks[0][0]
+    # The banks may not be continuous, e.g. the STM32G4 with 256 kB and the STM32H7 with 1 MB
+    size = sum(s for _, b in banks for s in b)
 
-    dual_bank = False
-    h7_ab = False
+    subs = {"start": start, "size": size, "family": target.family,
+            "min_page": min(s for _, banks in layouts for _, b in banks for s in b),
+            "max_page": max(s for _, banks in layouts for _, b in banks for s in b)}
+    # Uniform pages or sectors of both organizations, the dual-bank mode is selected at runtime
+    if name != "f4":
+        subs.update({
+            "shift": _shift([s for _, b in banks for s in b]),
+            "shift_single": _shift(single[0][1]) if single else _shift(banks[0][1]),
+            "dual_option": option,
+            "bker": option is not None,
+            "sectors_per_bank": len(banks[0][1]),
+            "bank1_start": banks[0][0],
+            "bank2_start": banks[-1][0],
+            "bank2": dual is not None,
+        })
+    else:
+        shifts = lambda b: [s.bit_length() - 1 for s in b[0][1]] if b else None
+        # Both banks of the F2/F4/F7 have the same sectors
+        subs.update({"single": shifts(single), "dual": shifts(dual), "dual_option": option,
+                     "has_dcache": target.family == "f7"})
+    if name == "u5":
+        subs.update({"words": 4 if target.family == "u5" else 2, "burst": target.family != "l5",
+                     "reg": "" if target.family == "u3" else "NS",
+                     "bit": "NS" if target.family == "l5" else ""})
+    if name == "h7":
+        # H7A3/H7B0/H7B3: 128-bit flash word without PSIZE, the others use
+        # 64-bit parallelism, which needs VDD >= 1.8V (DS12110 Table 140)
+        ab = target.name in ["a3", "b0", "b3"]
+        subs.update({"ab": ab, "psize": "" if ab else "FLASH_CR_PSIZE"})
+
+    # Priority 0 interrupts may run during flash operations if the core has
+    # BASEPRI and the vector table is in RAM. Otherwise all interrupts are masked
+    # and the SysTick handler in RAM is called by the flash driver. The
+    # half-page programming of the L1 always masks all interrupts.
+    core = env[":target"].get_driver("core")["type"]
+    subs["basepri"] = (not (core.startswith("cortex-m0") or core == "cortex-m23" or name == "l0") and
+                       env.get(":platform:cortex-m:vector_table_location", "rom") == "ram")
+    # The NMI of double ECC errors is redirected in the RAM vector table
+    subs["vtor_ram"] = env.get(":platform:cortex-m:vector_table_location", "rom") == "ram"
+    subs["clock"] = env.has_module(":platform:clock")
+    subs["tick"] = (not subs["basepri"] and subs["clock"] and
+                    not env.has_module(":freertos"))
+
+    # Typical times in microseconds of programming a unit, a burst and erasing
+    # a page or sector, from the datasheets. A fiber sleeps this long during an
+    # operation on the other bank, before it polls the flash.
     family = target.family
-    busy_bit = "FLASH_SR_BSY"
-    ftype = "page"
-    bank1_start = flash_start
-    bank2_start = flash_start
-    sectors_per_bank = 0
-    h7_erase_psize = "0"
-    if target.family in ["f4"]:
-        block_shift = 17
-        ftype = "sector"
-    elif target.family in ["f1"]:
-        if target.name in  ["05", "07"] or int(flash["size"]) >= 262144:
-            block_shift = 11
-        else:
-            block_shift = 10
-    elif target.family in ["g0"]:
-        busy_bit = "FLASH_SR_BSY1"
-        block_shift = 11
-        if target.name[0] in ["b", "c"]:
-            dual_bank = "FLASH_OPTR_DUAL_BANK"
-    elif target.family in ["g4"]:
-        block_shift = 11
-        # Only Cat3 devices have dual bank, so g47x or g48x
-        if target.name[0] in ["7", "8"]:
-            dual_bank = "FLASH_OPTR_DBANK"
-            block_shift = "(FLASH->OPTR & FLASH_OPTR_DBANK ? 11 : 12)"
-    elif target.family in ["h7"]:
-        ftype = "sector"
-        busy_bit = "(FLASH_SR_BSY | FLASH_SR_QW)"
-        # H7A3/H7B0/H7B3: 8 KB sectors; all other H7: 128 KB sectors
-        h7_ab = target.name in ["a3", "b0", "b3"]
-        if h7_ab:
-            block_shift = 13
-        else:
-            block_shift = 17
-        # Dual-bank devices have separate CR1/SR1 and CR2/SR2 registers
-        if target.name in ["42", "43", "53", "a3", "b3"]:
-            dual_bank = True
-        flash1 = next((m for m in physical_flash if m["name"] != "flash2"), None)
-        flash2 = next((m for m in physical_flash if m["name"] == "flash2"), None)
-        if dual_bank:
-            if flash1 is None or flash2 is None:
-                raise RuntimeError("H7 dual-bank flash requires explicit flash1 and flash2 regions")
-            bank1_start = flash1["start"]
-            bank2_start = flash2["start"]
-            sectors_per_bank = (flash1["size"] >> block_shift)
-        else:
-            flash1 = flash1 or physical_flash[0]
-            bank2_start = bank1_start = flash1["start"]
-            sectors_per_bank = (flash1["size"] >> block_shift)
+    if name == "l4":
+        subs.update({"t_prog": 85 if family == "g0" else 82, "t_erase": 22_000})
+    elif name == "u5":
+        times = {"u5": (118, 8 * 48, 1_500), "u3": (73, 16 * 42, 11_800), "l5": (82, 0, 22_000)}[family]
+        subs.update(zip(("t_prog", "t_burst", "t_erase"), times))
+    elif name == "h5":
+        subs.update({"t_prog": 31, "t_erase": 2_000})
+    elif name == "h7":
+        # The H7A3/H7B0/H7B3 datasheet only lists the maximum times
+        subs.update({"t_prog": 20, "t_erase": 2_200} if subs["ab"] else {"t_prog": 100, "t_erase": 1_000_000})
+    elif name == "f4":
+        subs.update({"t_prog": 16})
 
-        h7_flash_end = max(m["start"] + m["size"] for m in usable_flash)
-        flash_size = h7_flash_end - flash_start
-
-        if not h7_ab:
-            if target.name in ["42", "43", "50", "53"]:
-                h7_erase_psize = "FLASH_CR_PSIZE_1"
-            else:
-                h7_erase_psize = "FLASH_CR_PSIZE"
-
-    env.substitutions = {
-        "start": flash_start,
-        "size": flash_size,
-        "type": ftype,
-        "shift": block_shift,
-        "has_sectors": ftype == "sector",
-        "busy_bit": busy_bit,
-        "family": family,
-        "dual_bank": dual_bank,
-        "bank1_start": bank1_start,
-        "bank2_start": bank2_start,
-        "sectors_per_bank": sectors_per_bank,
-        "h7_erase_psize": h7_erase_psize,
-        "h7_ab": h7_ab,
-    }
+    env.substitutions = subs
     env.outbasepath = "modm/src/modm/platform/flash"
-    env.template("flash.hpp.in")
-    env.template("flash.cpp.in")
+    env.template(f"flash_{name}.hpp.in", "flash.hpp")
+    env.template(f"flash_{name}.cpp.in", "flash.cpp")

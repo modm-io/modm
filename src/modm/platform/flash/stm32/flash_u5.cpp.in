@@ -1,0 +1,431 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "flash.hpp"
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <algorithm>
+#include <cstring>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/fiber.hpp>
+
+%% set eccd = "ECCDR" if family == "u3" else "ECCR"
+%% set eccc = "ECCCR" if family == "u3" else "ECCR"
+%% macro cr(name)
+FLASH_{{reg}}CR_{{bit}}{{name}}
+%%- endmacro
+%% macro sr(name)
+FLASH_{{reg}}SR_{{bit}}{{name}}
+%%- endmacro
+
+extern "C" const uint8_t __rom_start[], __rom_end[];
+
+
+%% if tick
+extern "C" void SysTick_Handler();
+%% endif
+
+%% if not vtor_ram
+extern "C" void Undefined_Handler();
+%% endif
+
+namespace
+{
+
+%% if bker
+/// @return true if the program image is outside of [start, end), so that other
+///         fibers can run from flash during an operation in this range
+bool
+outsideImage(uintptr_t start, uintptr_t end)
+{
+	return uintptr_t(__rom_end) <= start or end <= uintptr_t(__rom_start);
+}
+%% endif
+
+constexpr uint32_t Errors =
+		{{ sr("OPERR") }} | {{ sr("PROGERR") }} | {{ sr("WRPERR") }} |
+		{{ sr("PGAERR") }} | {{ sr("SIZERR") }} | {{ sr("PGSERR") }};
+
+constexpr uint32_t Busy = {{ sr("BSY") }}
+#ifdef {{ sr("WDW") }}
+		| {{ sr("WDW") }}
+#endif
+		;
+
+constexpr uint32_t Operation = {{ cr("PG") }} | {{ cr("PER") }} | {{ cr("PNB_Msk") }} | {{ cr("BKER") }}{{ " | " ~ cr("BWR") if burst }};
+/// Not a CR bit: the operation is on the bank the program does not run from, so
+/// interrupts are not masked and other fibers run during an erase
+constexpr uint32_t Other = 1ul << 31;
+static_assert(not (Operation & Other));
+
+%% if basepri
+/// Interrupts with handlers in flash stall during an operation on the bank of
+/// the program and block all other interrupts, so only priority 0 interrupts,
+/// whose vectors and handlers must be in RAM, may run.
+struct Mask : modm::atomic::LockPriority
+{
+	modm_always_inline Mask() : LockPriority(1) {}
+};
+%% else
+/// Interrupts with handlers in flash stall during an operation on the bank of
+/// the program and block all other interrupts, so no interrupt may run.
+using Mask = modm::atomic::Lock;
+%% endif
+
+%% if tick
+/// Calls the SysTick handler in RAM, since no interrupt may run
+modm_always_inline void
+tick()
+{
+	if ((SysTick->CTRL & SysTick_CTRL_TICKINT_Msk) and (SCB->ICSR & SCB_ICSR_PENDSTSET_Msk))
+	{
+		SCB->ICSR = SCB_ICSR_PENDSTCLR_Msk;
+		SysTick_Handler();
+	}
+}
+%% endif
+
+
+/// Sets the operation in CR, writes [words, end) back-to-back to dst or starts
+/// an erase without words, and waits until the operation finished.
+/// @return error flags, zero on success
+template< bool other >
+modm_always_inline uint32_t
+operate(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, [[maybe_unused]] uint32_t typical)
+{
+	while (FLASH->{{reg}}SR & Busy) ;
+	FLASH->{{reg}}SR = Errors | {{ sr("EOP") }};
+	FLASH->{{reg}}CR = (FLASH->{{reg}}CR & ~Operation) | (cr & Operation);
+	if (words != end)
+	{
+		modm::atomic::Lock lock;
+		do *dst++ = *words++;
+		while (words != end);
+	}
+	else FLASH->{{reg}}CR |= {{ cr("STRT") }};
+	__DSB();
+%% if bker
+	// Other fibers run from flash meanwhile, while the operation takes the
+	// typical time, and until it finished
+	if constexpr (other)
+	{
+%% if clock
+		modm::this_fiber::sleep_for(std::chrono::microseconds(typical));
+%% endif
+		modm::this_fiber::poll([&] { return not (FLASH->{{reg}}SR & Busy); });
+	}
+	else
+%% endif
+	while (FLASH->{{reg}}SR & Busy) {{ "tick();" if tick else ";" }}
+	const uint32_t err = FLASH->{{reg}}SR & Errors;
+	FLASH->{{reg}}SR = Errors | {{ sr("EOP") }};
+	FLASH->{{reg}}CR &= ~Operation;
+	return err;
+}
+
+/// The only code that runs while the bank of the program is busy, therefore in
+/// RAM with interrupts masked
+modm_ramcode uint32_t
+runMasked(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, uint32_t typical)
+{
+	const Mask mask;
+	return operate<false>(dst, words, end, cr, typical);
+}
+
+uint32_t
+run(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, uint32_t typical)
+{
+%% if bker
+	// The other bank does not stall the program, so the operation runs from flash
+	// without masking interrupts
+	if (cr & Other) return operate<true>(dst, words, end, cr, typical);
+%% endif
+	return runMasked(dst, words, end, cr, typical);
+}
+
+/// Invalidates the instruction cache, which caches data reads too and is not
+/// updated by erasing or programming
+void
+flushCaches()
+{
+	if (ICACHE->CR & ICACHE_CR_EN)
+	{
+		while (ICACHE->SR & ICACHE_SR_BUSYF) ;
+		ICACHE->CR |= ICACHE_CR_CACHEINV;
+		while (ICACHE->SR & ICACHE_SR_BUSYF) ;
+	}
+}
+
+/// @return Other if addr is in the bank the program does not run from
+uint32_t
+otherBank([[maybe_unused]] uintptr_t addr)
+{
+%% if bker
+	using Flash = modm::platform::Flash;
+	if (not Flash::isDualBank()) return 0;
+	const uintptr_t bank = addr >= Flash::Bank2Addr ? Flash::Bank2Addr : Flash::OriginAddr;
+	return outsideImage(bank, bank + (uint32_t(Flash::PagesPerBank) << Flash::getPageShift())) ? Other : 0;
+%% else
+	return 0;
+%% endif
+}
+
+
+volatile uint32_t ecc_error;
+%% if vtor_ram
+void (*nmi_handler)();
+%% else
+volatile bool ecc_reading;
+%% endif
+
+uintptr_t ecc_begin, ecc_end;
+
+/// @return true if the ECC register value is about a flash word in [ecc_begin, ecc_end).
+///         Prefetches and cache line fills also read neighbouring flash words.
+bool
+eccInRange(uint32_t eccr)
+{
+	using Flash = modm::platform::Flash;
+	// Byte offset of the flash word in its bank
+%% if bker
+	const uintptr_t word = ((eccr & FLASH_{{ eccd }}_BK_ECC_Msk) ? Flash::Bank2Addr : Flash::OriginAddr) +
+			(eccr & FLASH_{{ eccd }}_ADDR_ECC_Msk);
+%% else
+	const uintptr_t word = Flash::OriginAddr + (eccr & FLASH_{{ eccd }}_ADDR_ECC_Msk);
+%% endif
+	return word < ecc_end and ecc_begin < word + Flash::WriteSize;
+}
+
+/// Remembers and clears a double ECC error within the range being read, forwards
+/// any other NMI
+void
+eccNmiHandler()
+{
+	// Writing the register back clears the ECC flags
+	bool ecc{false};
+	uint32_t error{0};
+	if (const uint32_t eccr = FLASH->{{ eccd }}; eccr & FLASH_{{ eccd }}_ECCD)
+	{
+		FLASH->{{ eccd }} = eccr;
+		ecc = true;
+		if (eccInRange(eccr)) error |= eccr;
+	}
+	if (not ecc) return {{ "nmi_handler()" if vtor_ram else "Undefined_Handler()" }};
+	ecc_error = ecc_error | error;
+	// The instruction cache caches data reads too and may hold the faulty word
+	flushCaches();
+}
+
+/// @return true if [addr, addr + size) reads as erased without any ECC error
+bool
+targetErased(uintptr_t addr, size_t size)
+{
+	using Flash = modm::platform::Flash;
+	uint8_t chunk[64];
+	for (size_t offset{0}; offset < size; offset += sizeof(chunk))
+	{
+		const size_t length = std::min(sizeof(chunk), size - offset);
+		if (Flash::read(addr + offset, chunk, length)) return false;
+		// A partially programmed word may be "corrected" to erased
+		if (const uint32_t eccr = FLASH->{{ eccc }}; (eccr & FLASH_{{ eccc }}_ECCC) and eccInRange(eccr)) return false;
+		for (size_t ii{0}; ii < length; ii++)
+			if (chunk[ii] != Flash::ErasedValue) return false;
+	}
+	return true;
+}
+
+/// @return true if all bytes have the erased value. Programming them does not
+/// change the content, but on the L4 and U5 controllers a unit programmed with
+/// all ones fails to program again, although it still reads as erased.
+bool
+isErased(const uint8_t *data, size_t size)
+{
+	for (; size; size--)
+		if (*data++ != modm::platform::Flash::ErasedValue) return false;
+	return true;
+}
+
+%% if burst
+/// @return true if any unit of a burst has only erased bytes
+bool
+anyErased(const uint8_t *data)
+{
+	using Flash = modm::platform::Flash;
+	for (size_t offset{0}; offset < Flash::BurstSize; offset += Flash::WriteSize)
+		if (isErased(data + offset, Flash::WriteSize)) return true;
+	return false;
+}
+
+%% endif
+} // namespace
+
+%% if not vtor_ram
+/// The vector table is in flash, so the NMI cannot be redirected while reading:
+/// a double ECC error during Flash::read() is recorded, every other NMI goes to
+/// the default handler. With the vector table in RAM, the application may
+/// define its own NMI_Handler.
+extern "C" void
+NMI_Handler()
+{
+	if (ecc_reading) eccNmiHandler();
+	else Undefined_Handler();
+}
+%% endif
+
+namespace modm::platform
+{
+
+bool
+Flash::isBusy()
+{ return FLASH->{{reg}}SR & Busy; }
+
+bool
+Flash::unlock()
+{
+	if (isLocked())
+	{
+		FLASH->{{reg}}KEYR = 0x45670123;
+		FLASH->{{reg}}KEYR = 0xCDEF89AB;
+	}
+	return not isLocked();
+}
+
+uint32_t
+Flash::erase(uint16_t page)
+{
+	uint32_t cr = {{ cr("PER") }};
+%% if bker
+	if (isDualBank())
+	{
+		const uintptr_t bank = page >= PagesPerBank ? Bank2Addr : OriginAddr;
+		if (outsideImage(bank, bank + (uint32_t(PagesPerBank) << getPageShift()))) cr |= Other;
+		if (page >= PagesPerBank)
+		{
+			// The pages of the second bank are numbered from zero again
+			page -= PagesPerBank;
+			cr |= {{ cr("BKER") }};
+		}
+	}
+%% endif
+	cr |= (uint32_t(page) << {{ cr("PNB_Pos") }}) & {{ cr("PNB_Msk") }};
+	const uint32_t err = run(nullptr, nullptr, nullptr, cr, {{ t_erase }});
+	flushCaches();
+	return err;
+}
+
+/// Programs one unit without invalidating the instruction cache, which buffers
+/// do only once at the end, since every invalidation makes the following code
+/// fetches from flash slow
+static uint32_t
+programUnit(uintptr_t addr, const Flash::MaxWordType &data)
+{
+%% if words == 2
+	const uint32_t words[2]{uint32_t(data), uint32_t(data >> 32)};
+%% else
+	const uint32_t *words = data.data;
+%% endif
+	return run(reinterpret_cast<volatile uint32_t *>(addr), words, words + {{ words }},
+			   {{ cr("PG") }} | otherBank(addr), {{ t_prog }});
+}
+
+uint32_t
+Flash::program(uintptr_t addr, MaxWordType data)
+{
+	const uint32_t err = programUnit(addr, data);
+	flushCaches();
+	return err;
+}
+%% if burst
+
+uint32_t
+Flash::programBurst(uintptr_t addr, const uint32_t *data)
+{
+	// The caller invalidates the instruction cache
+	return run(reinterpret_cast<volatile uint32_t *>(addr), data, data + BurstSize / 4,
+			   {{ cr("PG") }} | {{ cr("BWR") }} | otherBank(addr), {{ t_burst }});
+}
+%% endif
+
+uint32_t
+Flash::program(uintptr_t addr, const void *data, size_t size)
+{
+	if ((addr | size) & (WriteSize - 1)) return uint32_t(-1);
+	// A word damaged by a reset during programming never reads back correctly
+	if (not targetErased(addr, size)) return uint32_t(-1);
+	const uint8_t *src = static_cast<const uint8_t *>(data);
+	while (size)
+	{
+		size_t step;
+		uint32_t error;
+%% if burst
+		// A burst would program erased units too
+		if (not (addr & (BurstSize - 1)) and size >= BurstSize and not anyErased(src))
+		{
+			uint32_t burst[BurstSize / 4];
+			std::memcpy(burst, src, BurstSize);
+			error = programBurst(addr, burst);
+			step = BurstSize;
+		}
+		else
+%% endif
+		{
+			MaxWordType word;
+			std::memcpy(&word, src, sizeof(word));
+			error = isErased(src, sizeof(word)) ? 0 : programUnit(addr, word);
+			step = sizeof(word);
+		}
+		if (error)
+		{
+			flushCaches();
+			return error;
+		}
+		modm::this_fiber::yield();
+		addr += step;
+		src += step;
+		size -= step;
+	}
+	flushCaches();
+	return 0;
+}
+
+uint32_t
+Flash::read(uintptr_t addr, void *buffer, size_t size)
+{
+	// A double ECC error raises an NMI, which is handled while reading
+%% if vtor_ram
+	auto *const vectors = reinterpret_cast<void(**)()>(SCB->VTOR);
+	nmi_handler = vectors[2];
+%% endif
+	ecc_error = 0;
+	ecc_begin = addr;
+	ecc_end = addr + size;
+	// The ECC flags must be cleared before reading, writing them back clears them
+	FLASH->{{ eccd }} = FLASH->{{ eccd }};
+%% if family == "u3"
+	FLASH->ECCCR = FLASH->ECCCR;
+%% endif
+%% if vtor_ram
+	vectors[2] = eccNmiHandler;
+%% else
+	ecc_reading = true;
+%% endif
+	__DSB();
+	std::memcpy(buffer, reinterpret_cast<const void *>(addr), size);
+	__DSB();
+	__ISB();
+%% if vtor_ram
+	vectors[2] = nmi_handler;
+%% else
+	ecc_reading = false;
+%% endif
+	return ecc_error;
+}
+
+} // namespace modm::platform

@@ -33,7 +33,7 @@ main()
 	static_assert(sizeof(pattern) % sizeof(Flash::MaxWordType) == 0);
 
 	// The last page or sector exists on every device, no matter how large its Flash is
-	const uint16_t page = Flash::getPage(Flash::Size - 1);
+	const uint16_t page = Flash::getPage(Flash::OriginAddr + Flash::Size - 1);
 	const uint8_t *const base = Flash::getAddr(page);
 	MODM_LOG_INFO << "Using page " << page << " at " << base << " of size "
 	              << Flash::getSize(page) << modm::endl;

@@ -1,0 +1,308 @@
+/*
+ * Copyright (c) 2020, 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "flash.hpp"
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <algorithm>
+#include <cstring>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/fiber.hpp>
+
+extern "C" const uint8_t __rom_start[], __rom_end[];
+
+
+%% if tick
+extern "C" void SysTick_Handler();
+%% endif
+
+namespace
+{
+
+%% if bank2
+/// @return true if the program image is outside of [start, end), so that other
+///         fibers can run from flash during an operation in this range
+bool
+outsideImage(uintptr_t start, uintptr_t end)
+{
+	return uintptr_t(__rom_end) <= start or end <= uintptr_t(__rom_start);
+}
+%% endif
+
+constexpr uint32_t Errors = FLASH_SR_WRPERR | FLASH_SR_PGSERR | FLASH_SR_STRBERR |
+#ifdef FLASH_SR_OPERR
+		FLASH_SR_OPERR |
+#endif
+		FLASH_SR_INCERR;
+constexpr uint32_t Busy = FLASH_SR_BSY | FLASH_SR_QW | FLASH_SR_WBNE;
+
+constexpr uint32_t Operation = FLASH_CR_PG | FLASH_CR_SER | FLASH_CR_SNB_Msk{{ " | " ~ psize if psize }};
+/// Not CR bits: the operation is on the bank the program does not run from, so
+/// interrupts are not masked and other fibers run during an erase, and which bank
+constexpr uint32_t Other = 1ul << 31;
+constexpr uint32_t Second = 1ul << 30;
+static_assert(not (Operation & (Other | Second)));
+
+%% if basepri
+/// Interrupts with handlers in flash stall during an operation on the bank of
+/// the program and block all other interrupts, so only priority 0 interrupts,
+/// whose vectors and handlers must be in RAM, may run.
+struct Mask : modm::atomic::LockPriority
+{
+	modm_always_inline Mask() : LockPriority(1) {}
+};
+%% else
+/// Interrupts with handlers in flash stall during an operation on the bank of
+/// the program and block all other interrupts, so no interrupt may run.
+using Mask = modm::atomic::Lock;
+%% endif
+
+%% if tick
+/// Calls the SysTick handler in RAM, since no interrupt may run
+modm_always_inline void
+tick()
+{
+	if ((SysTick->CTRL & SysTick_CTRL_TICKINT_Msk) and (SCB->ICSR & SCB_ICSR_PENDSTSET_Msk))
+	{
+		SCB->ICSR = SCB_ICSR_PENDSTCLR_Msk;
+		SysTick_Handler();
+	}
+}
+%% endif
+
+
+/// Sets the operation in CR, writes [words, end) back-to-back to dst or starts
+/// an erase without words, and waits until the operation finished.
+/// @return error flags, zero on success
+template< bool other >
+modm_always_inline uint32_t
+operate(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, [[maybe_unused]] uint32_t typical)
+{
+	// CR, SR and CCR follow each other, those of bank 2 are 0x100 behind bank 1
+%% if bank2
+	volatile uint32_t *const regs = (cr & Second) ? &FLASH->CR2 : &FLASH->CR1;
+%% else
+	volatile uint32_t *const regs = &FLASH->CR1;
+%% endif
+	volatile uint32_t &CR = regs[0], &SR = regs[1], &CCR = regs[2];
+	while (SR & Busy) ;
+	CCR = Errors | FLASH_SR_EOP;
+	CR = cr & Operation;
+	if (words != end)
+	{
+		modm::atomic::Lock lock;
+		__ISB();
+		__DSB();
+		do *dst++ = *words++;
+		while (words != end);
+	}
+	else CR |= FLASH_CR_START;
+	__DSB();
+%% if bank2
+	// Other fibers run from flash meanwhile, while the operation takes the
+	// typical time, and until it finished
+	if constexpr (other)
+	{
+%% if clock
+		modm::this_fiber::sleep_for(std::chrono::microseconds(typical));
+%% endif
+		modm::this_fiber::poll([&] { return not (SR & Busy); });
+	}
+	else
+%% endif
+	while (SR & Busy) {{ "tick();" if tick else ";" }}
+	const uint32_t err = SR & Errors;
+	CCR = Errors | FLASH_SR_EOP;
+	CR = 0;
+	return err;
+}
+
+/// The only code that runs while the bank of the program is busy, therefore in
+/// RAM with interrupts masked
+modm_ramcode uint32_t
+runMasked(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, uint32_t typical)
+{
+	const Mask mask;
+	return operate<false>(dst, words, end, cr, typical);
+}
+
+uint32_t
+run(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, uint32_t typical)
+{
+%% if bank2
+	// The other bank does not stall the program, so the operation runs from flash
+	// without masking interrupts
+	if (cr & Other) return operate<true>(dst, words, end, cr, typical);
+%% endif
+	return runMasked(dst, words, end, cr, typical);
+}
+
+/// @return true if [addr, addr + size) reads as erased without any ECC error
+bool
+targetErased(uintptr_t addr, size_t size)
+{
+	using Flash = modm::platform::Flash;
+	FLASH->CCR1 = FLASH_CCR_CLR_SNECCERR;
+%% if bank2
+	FLASH->CCR2 = FLASH_CCR_CLR_SNECCERR;
+%% endif
+	uint8_t chunk[64];
+	for (size_t offset{0}; offset < size; offset += sizeof(chunk))
+	{
+		const size_t length = std::min(sizeof(chunk), size - offset);
+		if (Flash::read(addr + offset, chunk, length)) return false;
+		// A partially programmed word may be "corrected" to erased
+		if (FLASH->SR1 & FLASH_SR_SNECCERR) return false;
+%% if bank2
+		if (FLASH->SR2 & FLASH_SR_SNECCERR) return false;
+%% endif
+		for (size_t ii{0}; ii < length; ii++)
+			if (chunk[ii] != Flash::ErasedValue) return false;
+	}
+	return true;
+}
+
+/// @return true if all bytes have the erased value. Programming them does not
+/// change the content, but on the L4 and U5 controllers a unit programmed with
+/// all ones fails to program again, although it still reads as erased.
+bool
+isErased(const uint8_t *data, size_t size)
+{
+	for (; size; size--)
+		if (*data++ != modm::platform::Flash::ErasedValue) return false;
+	return true;
+}
+
+} // namespace
+
+namespace modm::platform
+{
+
+bool
+Flash::unlock()
+{
+	if (FLASH->CR1 & FLASH_CR_LOCK)
+	{
+		FLASH->KEYR1 = 0x45670123;
+		FLASH->KEYR1 = 0xCDEF89AB;
+	}
+%% if bank2
+	if (FLASH->CR2 & FLASH_CR_LOCK)
+	{
+		FLASH->KEYR2 = 0x45670123;
+		FLASH->KEYR2 = 0xCDEF89AB;
+	}
+%% endif
+	return not isLocked();
+}
+
+void
+Flash::lock()
+{
+	FLASH->CR1 |= FLASH_CR_LOCK;
+%% if bank2
+	FLASH->CR2 |= FLASH_CR_LOCK;
+%% endif
+}
+
+uint32_t
+Flash::erase(uint16_t sector)
+{
+	const bool second = sector >= SectorsPerBank;
+	const uint32_t snb = second ? sector - SectorsPerBank : sector;
+	uint32_t cr = FLASH_CR_SER {{ "| " ~ psize if psize }}| ((snb << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk);
+%% if bank2
+	const uintptr_t start = second ? Bank2Addr : Bank1Addr;
+	if (outsideImage(start, start + SectorsPerBank * SectorSize)) cr |= Other;
+	if (second) cr |= Second;
+%% endif
+	const uint32_t err = run(nullptr, nullptr, nullptr, cr, {{ t_erase }});
+	SCB_InvalidateDCache_by_Addr(getAddr(sector), SectorSize);
+	return err;
+}
+
+uint32_t
+Flash::program(uintptr_t addr, MaxWordType data)
+{
+	if (addr & (FlashWordSize - 1)) return FLASH_SR_PGSERR;
+	uint32_t cr = FLASH_CR_PG {{ "| " ~ psize if psize }};
+%% if bank2
+	const bool second = addr >= Bank2Addr and Bank2Addr != Bank1Addr;
+	const uintptr_t start = second ? Bank2Addr : Bank1Addr;
+	if (outsideImage(start, start + SectorsPerBank * SectorSize)) cr |= Other;
+	if (second) cr |= Second;
+%% endif
+	const uint32_t err = run(reinterpret_cast<volatile uint32_t *>(addr), data.data, data.data + FlashWordWords, cr, {{ t_prog }});
+	SCB_InvalidateDCache_by_Addr(reinterpret_cast<void *>(addr), FlashWordSize);
+	return err;
+}
+
+uint32_t
+Flash::program(uintptr_t addr, const void *data, size_t size)
+{
+	if ((addr | size) & (WriteSize - 1)) return uint32_t(-1);
+	// A word damaged by a reset during programming never reads back correctly
+	if (not targetErased(addr, size)) return uint32_t(-1);
+	const uint8_t *src = static_cast<const uint8_t *>(data);
+	while (size)
+	{
+		size_t step;
+		uint32_t error;
+		{
+			MaxWordType word;
+			std::memcpy(&word, src, sizeof(word));
+			error = isErased(src, sizeof(word)) ? 0 : program(addr, word);
+			step = sizeof(word);
+		}
+		if (error) return error;
+		modm::this_fiber::yield();
+		addr += step;
+		src += step;
+		size -= step;
+	}
+	return 0;
+}
+
+uint32_t
+Flash::read(uintptr_t addr, void *buffer, size_t size)
+{
+	// A double ECC error raises a bus error, which is ignored at the priority of FAULTMASK
+	FLASH->CCR1 = FLASH_CCR_CLR_DBECCERR;
+%% if bank2
+	FLASH->CCR2 = FLASH_CCR_CLR_DBECCERR;
+%% endif
+	const uint32_t faultmask = __get_FAULTMASK();
+	const uint32_t ccr = SCB->CCR;
+	__set_FAULTMASK(1);
+	SCB->CCR = ccr | SCB_CCR_BFHFNMIGN_Msk;
+	__DSB();
+	__ISB();
+	std::memcpy(buffer, reinterpret_cast<const void *>(addr), size);
+	__DSB();
+	SCB->CCR = ccr;
+	__ISB();
+	__set_FAULTMASK(faultmask);
+	uint32_t error{0};
+	if (FLASH->SR1 & FLASH_SR_DBECCERR)
+	{
+		error |= FLASH_SR_DBECCERR;
+		FLASH->CCR1 = FLASH_CCR_CLR_DBECCERR;
+	}
+%% if bank2
+	if (FLASH->SR2 & FLASH_SR_DBECCERR)
+	{
+		error |= FLASH_SR_DBECCERR;
+		FLASH->CCR2 = FLASH_CCR_CLR_DBECCERR;
+	}
+%% endif
+	return error;
+}
+
+} // namespace modm::platform

@@ -1,0 +1,165 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "flash.hpp"
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <cstring>
+#include <modm/architecture/utils.hpp>
+#include <modm/architecture/interface/fiber.hpp>
+
+%% if tick
+extern "C" void SysTick_Handler();
+%% endif
+
+namespace
+{
+
+constexpr uint32_t Errors =
+#ifdef FLASH_SR_NOTZEROERR
+		FLASH_SR_NOTZEROERR | FLASH_SR_FWWERR |
+#endif
+		FLASH_SR_SIZERR | FLASH_SR_PGAERR | FLASH_SR_WRPERR;
+
+/// Interrupts with handlers in flash stall during an operation on the bank of
+/// the program and block all other interrupts, so no interrupt may run.
+using Mask = modm::atomic::Lock;
+
+%% if tick
+/// Calls the SysTick handler in RAM, since no interrupt may run
+modm_always_inline void
+tick()
+{
+	if ((SysTick->CTRL & SysTick_CTRL_TICKINT_Msk) and (SCB->ICSR & SCB_ICSR_PENDSTSET_Msk))
+	{
+		SCB->ICSR = SCB_ICSR_PENDSTCLR_Msk;
+		SysTick_Handler();
+	}
+}
+%% endif
+
+/// The only code that runs while the flash is busy, therefore in RAM: sets the
+/// operation in PECR, writes [words, end) back-to-back to dst, and waits until
+/// the operation finished. An erase writes a zero word into the page.
+/// @return error flags, zero on success
+modm_ramcode uint32_t
+run(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t pecr)
+{
+	const Mask mask;
+	while (FLASH->SR & FLASH_SR_BSY) ;
+	FLASH->SR = Errors | FLASH_SR_EOP;
+	FLASH->PECR |= pecr;
+	// Any flash read until all words of a half-page are written aborts it, and
+	// the STM32L1 raises a bus error on fetches until it is programmed
+	do *dst++ = *words++;
+	while (words != end);
+	__DSB();
+	while (FLASH->SR & FLASH_SR_BSY) {{ "tick();" if tick else ";" }}
+	const uint32_t err = FLASH->SR & Errors;
+	FLASH->SR = Errors | FLASH_SR_EOP;
+	FLASH->PECR &= ~pecr;
+	return err;
+}
+
+/// @return true if all bytes have the erased value. Programming them does not
+/// change the content, but on the L4 and U5 controllers a unit programmed with
+/// all ones fails to program again, although it still reads as erased.
+bool
+isErased(const uint8_t *data, size_t size)
+{
+	for (; size; size--)
+		if (*data++ != modm::platform::Flash::ErasedValue) return false;
+	return true;
+}
+
+} // namespace
+
+namespace modm::platform
+{
+
+bool
+Flash::unlock()
+{
+	if (FLASH->PECR & FLASH_PECR_PELOCK)
+	{
+		FLASH->PEKEYR = 0x89ABCDEF;
+		FLASH->PEKEYR = 0x02030405;
+	}
+	if (FLASH->PECR & FLASH_PECR_PRGLOCK)
+	{
+		FLASH->PRGKEYR = 0x8C9DAEBF;
+		FLASH->PRGKEYR = 0x13141516;
+	}
+	return not isLocked();
+}
+
+uint32_t
+Flash::erase(uint16_t page)
+{
+	// Writing any word of the page starts the erase
+	const uint32_t zero{0};
+	return run(reinterpret_cast<volatile uint32_t *>(OriginAddr + getOffset(page)), &zero, &zero + 1,
+			   FLASH_PECR_ERASE | FLASH_PECR_PROG);
+}
+
+uint32_t
+Flash::program(uintptr_t addr, MaxWordType data)
+{
+	return run(reinterpret_cast<volatile uint32_t *>(addr), &data, &data + 1, 0);
+}
+
+uint32_t
+Flash::programBurst(uintptr_t addr, const uint32_t *data)
+{
+	return run(reinterpret_cast<volatile uint32_t *>(addr), data, data + BurstSize / 4,
+			   FLASH_PECR_FPRG | FLASH_PECR_PROG);
+}
+
+uint32_t
+Flash::program(uintptr_t addr, const void *data, size_t size)
+{
+	if ((addr | size) & (WriteSize - 1)) return uint32_t(-1);
+	const uint8_t *src = static_cast<const uint8_t *>(data);
+	while (size)
+	{
+		size_t step;
+		uint32_t error;
+		if (not (addr & (BurstSize - 1)) and size >= BurstSize)
+		{
+			uint32_t burst[BurstSize / 4];
+			std::memcpy(burst, src, BurstSize);
+			error = programBurst(addr, burst);
+			step = BurstSize;
+		}
+		else
+		{
+			MaxWordType word;
+			std::memcpy(&word, src, sizeof(word));
+			error = isErased(src, sizeof(word)) ? 0 : program(addr, word);
+			step = sizeof(word);
+		}
+		if (error) return error;
+		modm::this_fiber::yield();
+		addr += step;
+		src += step;
+		size -= step;
+	}
+	return 0;
+}
+
+uint32_t
+Flash::read(uintptr_t addr, void *buffer, size_t size)
+{
+	// This flash has no ECC
+	std::memcpy(buffer, reinterpret_cast<const void *>(addr), size);
+	return 0;
+}
+
+} // namespace modm::platform

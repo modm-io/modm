@@ -97,7 +97,7 @@ check_for_update()
 					// It's not guaranteed that the file is stored in FatFs in *one*
 					// continuous chunk and we cannot access FatFs code in ram_apply!!!
 					Flash::unlock();
-					uint32_t dst_addr{Flash::Size/2};
+					uintptr_t dst_addr{Flash::OriginAddr + Flash::Size/2};
 					for (auto page{Flash::getPage(dst_addr)};
 						 page <= Flash::getPage(dst_addr+fno.fsize);
 						 page++) Flash::erase(page);
@@ -110,7 +110,7 @@ check_for_update()
 						Flash::program(dst_addr, buffer);
 					}
 					// Jump into RAM and copy from last flash page to first pages
-					ram_apply(Flash::getPage(fno.fsize), Flash::Origin + Flash::Size/2, fno.fsize);
+					ram_apply(Flash::getPage(Flash::OriginAddr + fno.fsize), Flash::Origin + Flash::Size/2, fno.fsize);
 				}
 				f_close(&fil);
 			}
