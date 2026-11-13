@@ -154,6 +154,9 @@ def build(env):
 
     ports = {}
     global default_port
+    # TinyUSB numbers the ports by the controllers that exist, so the only
+    # controller of an STM32 with just OTG_HS is TinyUSB port 0, not 1
+    rhport = lambda port: 0 if default_port == 1 else port
     for mode in ["device", "host"]:
         if env.has_module(f":tinyusb:{mode}"):
             port = env.get(f":tinyusb:{mode}:port", default_port)
@@ -161,7 +164,7 @@ def build(env):
             mode = f"OPT_MODE_{mode.upper()}"
             if port == 1 and (speed := env.get("max-speed")) is not None:
                 mode = f"({mode} | OPT_MODE_{speed.upper()}_SPEED)"
-            tusb_config[f"CFG_TUSB_RHPORT{port}_MODE"] = mode
+            tusb_config[f"CFG_TUSB_RHPORT{rhport(port)}_MODE"] = mode
 
     itf_config = env["config"]
     # Enumerate the configurations
@@ -207,7 +210,7 @@ def build(env):
         for port, uirqs in env.query(":platform:usb:irqs")["port_irqs"].items():
             port = {"fs": 0, "hs": 1}[port]
             if port in ports:
-                irqs.extend([(irq, port, ports[port]) for irq in uirqs])
+                irqs.extend([(irq, rhport(port), ports[port]) for irq in uirqs])
     elif target.platform == "nrf":
         irqs = []
         irq_data = env.query(":platform:usb:irqs")
