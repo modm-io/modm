@@ -1,13 +1,13 @@
 <library>
-  <extends>modm:nucleo-f446re</extends>
-  <!-- <extends>modm:nucleo-g071rb</extends> -->
-  <!-- <extends>modm:nucleo-f103rb</extends> -->
-  <!-- <extends>modm:nucleo-g474re</extends> -->
-  <!-- <extends>modm:nucleo-g431rb</extends> -->
+  <extends>modm:nucleo-g474re</extends>
+  <!-- CI: limit 60 -->
+  <options>
+    <!-- The test runs in fibers, the main stack is only used by interrupts -->
+    <option name="modm:platform:cortex-m:main_stack_size">1024</option>
+  </options>
   <modules>
     <module>modm:platform:flash</module>
-    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
     <module>modm:build:scons</module>
-    <module>modm:build:compilation_db</module>
   </modules>
 </library>
