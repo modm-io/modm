@@ -12,9 +12,16 @@
 #pragma once
 
 #include <modm/platform.hpp>
-#include <modm/architecture/interface/clock.hpp>
+#include <modm/architecture.hpp>
+#include <modm/debug.hpp>
 
 using namespace modm::platform;
+%#
+%% if with_logger
+/// @ingroup modm_board_weact_g0b1cb
+#define MODM_BOARD_HAS_LOGGER
+%#
+%% endif
 
 namespace Board
 {
@@ -145,6 +152,10 @@ using Leds = SoftwareGpioPort< Led >;
 
 using Button = GpioInputC13;
 
+%% if with_logger
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+%#
+%% endif
 inline void
 initialize()
 {
