@@ -99,8 +99,15 @@ namespace modm
 			modm::AbstractView<Allocator> *topElement = this->stack.top();
 			this->stack.pop();
 
-			allocator.destroy(topElement);
-			allocator.deallocate(topElement);
+			// Custom allocators provide destroy(T*) and deallocate(T*), see
+			// aruw-mcb's MainMenu. std::allocator has neither in C++20, the
+			// views were allocated with new.
+			if constexpr (requires { allocator.destroy(topElement); allocator.deallocate(topElement); })
+			{
+				allocator.destroy(topElement);
+				allocator.deallocate(topElement);
+			}
+			else delete topElement;
 		}
 
 		virtual void
