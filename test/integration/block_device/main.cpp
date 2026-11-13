@@ -33,6 +33,37 @@ constexpr uint32_t MemorySize = 64;
 #endif
 constexpr uint16_t Iterations = 10;
 
+/// Heap with 8 byte write blocks and 16 byte erase blocks, whose block at 16
+/// cannot be read, like flash with a double ECC error
+struct FaultyHeap : modm::BdHeap<64>
+{
+	static constexpr bd_size_t BlockSizeWrite = 8;
+	static constexpr bd_size_t BlockSizeErase = 16;
+
+	[[nodiscard]] bool
+	read(uint8_t *buffer, bd_address_t address, bd_size_t size)
+	{ return BdHeap::read(buffer, address, size) and (address >= 24 or address + size <= 16); }
+};
+
+/// Erased value, erase blocks and marked reads of the block device interface
+bool
+testErasedAndMarked()
+{
+	static_assert(modm::BdHeap<64>::ErasedValue == 0xff and not modm::BdHeap<64>::ProgramOnce);
+	static FaultyHeap device;
+	uint8_t buffer[40];
+	bool passed = device.initialize() and device.erase(0, 64);
+	// Blocks 0 to 40 are fine, the block at 16 is marked as not erased
+	passed &= modm::readMarked(device, buffer, 4, 40) == 1;
+	for (size_t ii{0}; ii < 40; ii++)
+		passed &= buffer[ii] == ((ii >= 12 and ii < 20) ? 0x00 : 0xff);
+	passed &= modm::readMarked(device, buffer, 32, 33) == -1;
+	const auto block = modm::getEraseBlock(device, 37);
+	passed &= block.address == 32 and block.size == 16;
+	if (not passed) MODM_LOG_ERROR << "Error: erased value or marked read wrong." << modm::endl;
+	return passed;
+}
+
 /**
  * Writes alternating patterns into the block devices that do not need any
  * hardware and compares what it reads back.
@@ -42,6 +73,7 @@ main()
 {
 	Board::initialize();
 	bool passed = true;
+	passed &= testErasedAndMarked();
 
 	{
 		MODM_LOG_INFO << "modm::BdHeap" << modm::endl;
