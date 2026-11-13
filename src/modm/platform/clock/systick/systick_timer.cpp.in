@@ -13,6 +13,7 @@
 
 #include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/platform/device.hpp>
+#include <modm/architecture/utils.hpp>
 
 #include "systick_timer.hpp"
 
@@ -24,15 +25,16 @@ extern "C" void
 %% if has_freertos
 vApplicationTickHook()
 %% else
-SysTick_Handler(void)
+{{ "modm_ramcode " if ramcode }}SysTick_Handler(void)
 %% endif
 {
 	milli_time += systick_step;
 	micro_time += systick_step * 1'000ul;
 }
 
-// pick the lowest possible priority for the SysTick interrupt
-static constexpr uint8_t systick_priority{(1ul << __NVIC_PRIO_BITS) - 1ul};
+// The highest priority, so that no other interrupt can delay the SysTick for
+// longer than its period, which would lose time
+static constexpr uint8_t systick_priority{0};
 
 // ----------------------------------------------------------------------------
 void
@@ -42,7 +44,6 @@ modm::platform::SysTickTimer::enable([[maybe_unused]] uint32_t reload,
 %% if not has_freertos
 	SysTick->CTRL = 0;
 
-	// Lower systick interrupt priority to lowest level
 	NVIC_SetPriority(SysTick_IRQn, systick_priority);
 
 	SysTick->LOAD = reload;

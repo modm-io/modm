@@ -87,6 +87,8 @@ def build(env):
     env.substitutions = {
         "systick_frequency": env.get(":freertos:frequency", freq),
         "has_freertos": env.has_module(":freertos"),
+        # Keeps counting during flash operations, see :platform:flash
+        "ramcode": target.platform == "stm32" and env.has_module(":platform:flash"),
         "lock_free": "m7" in core,
         # e.g. FreeRTOS on RP2040 still needs the tick hook, but not the clocks
         "with_clocks": not env.has_module(":platform:clock.timer"),
