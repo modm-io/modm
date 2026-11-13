@@ -145,7 +145,7 @@ env.Append(MODM_BOSSAC_OPTIONS = "{{ bossac_options }}")
 %% endif
 %% endif
 
-# XPCC generator tool path
+# XPCC generator tool path. DEPRECATED: 2027q4
 env["XPCC_SYSTEM_DESIGN"] = "$BASEPATH/modm/tools/xpcc_generator"
 %% endif
 

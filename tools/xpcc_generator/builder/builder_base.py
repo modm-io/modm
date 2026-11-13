@@ -15,6 +15,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 # -----------------------------------------------------------------------------
 
+# DEPRECATED: 2027q4
+# The XPCC generator is deprecated and will be removed together with XPCC.
 import time
 import codecs		# utf-8 file support
 import sys

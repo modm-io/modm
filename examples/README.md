@@ -70,7 +70,7 @@ The examples are sorted by what they show, not by the board they run on:
 | `can`           | CAN and FDCAN peripherals. |
 | `driver`        | External devices, sorted like `modm:driver`: sensors, displays, radios, LEDs and more. |
 | `ui`            | Graphics, GUI and animations on the displays of the boards. |
-| `communication` | Protocols: AMNB, SAB, XPCC, Ethernet. |
+| `communication` | Protocols: AMNB, SAB, XPCC (deprecated), Ethernet. |
 | `ext`           | External libraries: FreeRTOS, TinyUSB, LVGL, ETL, nanopb and more.       |
 
 The `driver` folder has the same categories as the `modm:driver` modules in

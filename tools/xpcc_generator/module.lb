@@ -12,7 +12,17 @@
 
 def init(module):
     module.name = ":communication:xpcc:generator"
-    module.description = "XPCC Generator"
+    module.description = """\
+# XPCC Generator
+
+Translates the XPCC XML declarations into C++ code. See the SCons build script
+generator documentation for how the generated sources are integrated.
+
+!!! warning "Deprecated"
+    The XPCC generator is deprecated and will be removed in the 2027q4 release
+    together with the `modm:communication:xpcc` module!
+    Please migrate to a modern CAN protocol like DroneCAN or a similar one.
+"""
 
 def prepare(module, options):
     module.add_option(
@@ -31,5 +41,8 @@ def prepare(module, options):
     return True
 
 def build(env):
+    # DEPRECATED: 2027q4
+    env.log.warning("The 'modm:communication:xpcc:generator' module is deprecated and will be removed in 2027q4! "
+                    "Please migrate to a modern CAN protocol like DroneCAN.")
     env.outbasepath = "modm/tools/xpcc_generator"
     env.copy(".")

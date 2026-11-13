@@ -30,13 +30,16 @@ screens these buttons have the following functions:
 - Down: Go to next entry on screen
 - OK: Edit selected entry
 
+`CommunicatingView` and `CommunicatingViewStack` are only available if the
+deprecated `modm:communication:xpcc` module is selected too, and will be removed
+in 2027q4.
+
 !!! warning
     Some classes currently only work with the font `modm::font::FixedWidth5x8`!
 """
 
 def prepare(module, options):
     module.depends(
-        ":communication:xpcc",
         ":container",
         ":processing:timer",
         ":ui:display")
@@ -44,5 +47,8 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/ui/menu"
-    env.copy(".")
-    env.copy("../menu.hpp")
+    # DEPRECATED: 2027q4
+    with_xpcc = env.has_module(":communication:xpcc")
+    env.copy(".", ignore=env.ignore_paths(*([] if with_xpcc else ["*communicating_view*"])))
+    env.substitutions = {"with_xpcc": with_xpcc}
+    env.template("../menu.hpp.in")
