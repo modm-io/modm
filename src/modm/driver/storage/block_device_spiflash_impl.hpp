@@ -91,10 +91,12 @@ modm::BdSpiFlash<Spi, Cs, flashSize>::program(const uint8_t* buffer, bd_address_
 
 	index = 0;
 	while(index < size) {
+		// A page program wraps around at the end of the page
+		const bd_size_t length = std::min<bd_size_t>(size - index, PageSize - (address + index) % PageSize);
 		waitWhileBusy();
 		spiOperation(Instruction::WE);
-		spiOperation(Instruction::PP, address + index, &buffer[index], nullptr, BlockSizeWrite);
-		index += BlockSizeWrite;
+		spiOperation(Instruction::PP, address + index, &buffer[index], nullptr, length);
+		index += length;
 	}
 
 	return true;

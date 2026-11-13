@@ -156,7 +156,9 @@ public:
 
 public:
 	static constexpr bd_size_t BlockSizeRead = 1;
-	static constexpr bd_size_t BlockSizeWrite = 256;
+	static constexpr bd_size_t BlockSizeWrite = 1;
+	/// The largest program operation, programs are split at the page boundaries
+	static constexpr bd_size_t PageSize = 256;
 	static constexpr bd_size_t BlockSizeErase = 4 * 1'024;
 	static constexpr bd_size_t DeviceSize = flashSize;
 	static constexpr bd_size_t ExtendedAddressThreshold = 16 * 1'024 * 1'024;
