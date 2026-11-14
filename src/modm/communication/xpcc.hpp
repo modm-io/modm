@@ -10,6 +10,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 // ----------------------------------------------------------------------------
+// DEPRECATED: 2027q4
+// XPCC moved to https://github.com/modm-io/xpcc, please migrate to <xpcc.hpp>.
 
 #include "xpcc/communicatable.hpp"
 #include "xpcc/abstract_component.hpp"

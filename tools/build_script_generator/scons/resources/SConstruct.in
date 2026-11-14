@@ -56,7 +56,7 @@ for image in env.FindFiles("{{ image_source }}", ".pbm"):
     sources.append(source)
 %% endif
 %% if has_xpcc_generator
-# Generating XPCC sources
+# Generating XPCC sources. DEPRECATED: 2027q4
 env.Append(CPPPATH=abspath("{{ generator_path }}"))
 ignored.append("{{ generator_path }}")
 sources += env.XpccCommunication(

@@ -25,8 +25,10 @@
 namespace modm
 {
 	/// @ingroup modm_ui_menu
+	/// @deprecated Moved to https://github.com/modm-io/xpcc, will be removed in 2027q4.
+	// DEPRECATED: 2027q4
 	template<typename Allocator = std::allocator<IAbstractView> >
-	class CommunicatingView : public xpcc::Communicatable
+	class [[deprecated("Moved to xpcc::CommunicatingView in https://github.com/modm-io/xpcc, will be removed in 2027q4.")]] CommunicatingView : public xpcc::Communicatable
 	{
 	public:
 		constexpr CommunicatingView(modm::CommunicatingViewStack<Allocator>* /*stack*/)
