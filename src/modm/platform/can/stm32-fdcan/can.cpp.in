@@ -492,7 +492,7 @@ modm::platform::Fdcan{{ id }}::isReadyToSend()
 %% if options["buffer.tx"] > 0
 	return txQueue.isNotFull();
 %% else
-	return isHardwareTxQueueFull();
+	return not isHardwareTxQueueFull();
 %% endif
 }
 
