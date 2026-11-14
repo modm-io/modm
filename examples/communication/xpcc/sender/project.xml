@@ -1,5 +1,5 @@
 <library>
-  <!-- XPCC is deprecated and will be removed in 2027q4 together with this example. -->
+  <!-- XPCC moved to https://github.com/modm-io/xpcc, this example will be removed in 2027q4. -->
   <options>
     <option name="modm:target">atmega644-20au</option>
     <option name="modm:platform:core:f_cpu">14.7456M</option>

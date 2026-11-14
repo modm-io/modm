@@ -11,7 +11,7 @@
  */
 // ----------------------------------------------------------------------------
 // DEPRECATED: 2027q4
-// XPCC is deprecated, please migrate to a modern CAN protocol like DroneCAN.
+// XPCC moved to https://github.com/modm-io/xpcc, please migrate to <xpcc.hpp>.
 
 #include "xpcc/communicatable.hpp"
 #include "xpcc/abstract_component.hpp"

@@ -772,8 +772,11 @@ The generated files are available as a top-level `#include <protofile.pb.hpp>`.
 ## XPCC Generator Tool
 
 !!! warning "Deprecated"
-    The XPCC generator is deprecated and will be removed in the 2027q4 release!
-    Please migrate to a modern CAN protocol like DroneCAN or a similar one.
+    XPCC moved into the [modm-io/xpcc](https://github.com/modm-io/xpcc)
+    repository and this module will be removed in the 2027q4 release!
+    Add the xpcc repository to your project and use the `xpcc:generator` module
+    instead, see its README for how to migrate. For new projects please use a
+    modern CAN protocol like DroneCAN.
 
 The `modm:communication:xpcc:generator` module contains the Python tools to
 translate the XPCC XML declarations into various language implementations.

@@ -43,7 +43,8 @@ def prepare(module, options):
 def build(env):
     # DEPRECATED: 2027q4
     env.log.warning("The 'modm:communication:xpcc' module is deprecated and will be removed in 2027q4! "
-                    "Please migrate to a modern CAN protocol like DroneCAN.")
+                    "XPCC moved to https://github.com/modm-io/xpcc, please add it to your "
+                    "repositories and use the 'xpcc:communication' module instead.")
     env.outbasepath = "modm/src/modm/communication/xpcc"
 
     ignore = ["*.in", "*backend/tipc*"]
