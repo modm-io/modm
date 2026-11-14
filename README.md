@@ -87,9 +87,9 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 
 ## Microcontrollers
 
-modm can create a HAL for <!--allcount-->4251<!--/allcount--> devices of these vendors:
+modm can create a HAL for <!--allcount-->4745<!--/allcount--> devices of these vendors:
 
-- STMicroelectronics STM32: <!--stmcount-->3473<!--/stmcount--> devices.
+- STMicroelectronics STM32: <!--stmcount-->3967<!--/stmcount--> devices.
 - Microchip SAM: <!--samcount-->355<!--/samcount--> devices.
 - Microchip AVR: <!--avrcount-->388<!--/avrcount--> devices.
 - Nordic nRF: <!--nrfcount-->34<!--/nrfcount--> devices.
@@ -110,7 +110,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <table>
 <tr>
 <th align="center"></th>
-<th align="center" colspan="18">STM32</th>
+<th align="center" colspan="20">STM32</th>
 <th align="center" colspan="4">SAM</th>
 <th align="center" colspan="1">RP</th>
 <th align="center" colspan="3">NRF</th>
@@ -118,6 +118,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <th align="left">Peripheral</th>
 <th align="center">C0</th>
+<th align="center">C5</th>
 <th align="center">F0</th>
 <th align="center">F1</th>
 <th align="center">F2</th>
@@ -126,6 +127,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <th align="center">F7</th>
 <th align="center">G0</th>
 <th align="center">G4</th>
+<th align="center">G5</th>
 <th align="center">H5</th>
 <th align="center">H7</th>
 <th align="center">L0</th>
@@ -148,6 +150,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <th align="center">Tiny</th>
 </tr><tr>
 <td align="left">ADC</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -190,6 +194,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✅</td>
@@ -212,6 +218,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="left">Comparator</td>
 <td align="center">✕</td>
 <td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✅</td>
@@ -219,6 +226,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -242,6 +250,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <td align="left">DAC</td>
 <td align="center">✕</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -290,6 +300,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✅</td>
@@ -304,12 +316,14 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <td align="left">Ethernet</td>
 <td align="center">✕</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">○</td>
@@ -353,6 +367,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -366,6 +382,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <td align="left">External Memory</td>
 <td align="center">✕</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -373,6 +390,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">✕</td>
+<td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -425,8 +443,12 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 </tr><tr>
 <td align="left">I<sup>2</sup>C</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -476,6 +498,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
@@ -490,6 +514,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <td align="left">Power</td>
 <td align="center">○</td>
+<td align="center">○</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
@@ -498,6 +523,7 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
+<td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">✕</td>
@@ -521,10 +547,12 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 </tr><tr>
 <td align="left">Random Generator</td>
 <td align="center">✕</td>
+<td align="center">✅</td>
 <td align="center">✕</td>
 <td align="center">✕</td>
 <td align="center">✅</td>
 <td align="center">✕</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -553,7 +581,9 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="left">RTC</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -582,6 +612,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 </tr><tr>
 <td align="left">SPI</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -639,11 +671,15 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">○</td>
 <td align="center">○</td>
 </tr><tr>
 <td align="left">Timer</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -703,9 +739,13 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 </tr><tr>
 <td align="left">Unique ID</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -757,6 +797,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">○</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -768,6 +810,8 @@ Please [discover modm's peripheral drivers for your specific device][discover].
 <td align="center">✕</td>
 </tr><tr>
 <td align="left">Watchdog</td>
+<td align="center">✅</td>
+<td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
 <td align="center">✅</td>
@@ -853,88 +897,90 @@ We have out-of-box support for many development boards including documentation.
 <td align="center"><a href="https://modm.io/reference/config/modm-nrf52840-dk">NRF52840-DK</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nrf5340-dk">NRF5340-DK</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-c031c6">NUCLEO-C031C6</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f031k6">NUCLEO-F031K6</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-c5a3zg">NUCLEO-C5A3ZG</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f031k6">NUCLEO-F031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f042k6">NUCLEO-F042K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f072rb">NUCLEO-F072RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f091rc">NUCLEO-F091RC</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f103rb">NUCLEO-F103RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f103rb">NUCLEO-F103RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f207zg">NUCLEO-F207ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f303k8">NUCLEO-F303K8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f303re">NUCLEO-F303RE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f334r8">NUCLEO-F334R8</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f334r8">NUCLEO-F334R8</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f401re">NUCLEO-F401RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f411re">NUCLEO-F411RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f429zi">NUCLEO-F429ZI</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f439zi">NUCLEO-F439ZI</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f439zi">NUCLEO-F439ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f446re">NUCLEO-F446RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f446ze">NUCLEO-F446ZE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f722ze">NUCLEO-F722ZE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f746zg">NUCLEO-F746ZG</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f746zg">NUCLEO-F746ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-f767zi">NUCLEO-F767ZI</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g070rb">NUCLEO-G070RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g071rb">NUCLEO-G071RB</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g0b1re">NUCLEO-G0B1RE</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g0b1re">NUCLEO-G0B1RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431kb">NUCLEO-G431KB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g431rb">NUCLEO-G431RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g474re">NUCLEO-G474RE</a></td>
-<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h503rb">NUCLEO-H503RB</a></td>
 </tr><tr>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-g564re">NUCLEO-G564RE</a></td>
+<td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h503rb">NUCLEO-H503RB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h533re">NUCLEO-H533RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h563zi">NUCLEO-H563ZI</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h723zg">NUCLEO-H723ZG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h743zi">NUCLEO-H743ZI</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h743zi2">NUCLEO-H743ZI2</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h753zi">NUCLEO-H753ZI</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h7a3zi-q">NUCLEO-H7A3ZI-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-h7s3l8">NUCLEO-H7S3L8</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l031k6">NUCLEO-L031K6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l053r8">NUCLEO-L053R8</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l152re">NUCLEO-L152RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l432kc">NUCLEO-L432KC</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l452re">NUCLEO-L452RE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l476rg">NUCLEO-L476RG</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l496zg-p">NUCLEO-L496ZG-P</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l4r5zi">NUCLEO-L4R5ZI</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-l552ze-q">NUCLEO-L552ZE-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u083rc">NUCLEO-U083RC</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u385rg-q">NUCLEO-U385RG-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u575zi-q">NUCLEO-U575ZI-Q</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-nucleo-u5a5zj-q">NUCLEO-U5A5ZJ-Q</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-olimexino-stm32">OLIMEXINO-STM32</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-rp-pico">Raspberry Pi Pico</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-mini">SAMD21-MINI</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-samd21-xplained-pro">SAMD21-XPLAINED-PRO</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-same54-xplained-pro">SAME54-XPLAINED-PRO</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-same70-xplained">SAME70-XPLAINED</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-samg55-xplained-pro">SAMG55-XPLAINED-PRO</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-samv71-xplained-ultra">SAMV71-XPLAINED-ULTRA</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-srxe">Smart Response XE</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32_f4ve">STM32-F4VE</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-stm32f030_demo">STM32F030-DEMO</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-thingplus-rp2040">THINGPLUS-RP2040</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-c011f6">WEACT-C011F6</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-g030f6">WEACT-G030F6</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-g0b1cb">WEACT-G0B1CB</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h503cb">WEACT-H503CB</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h523ce">WEACT-H523CE</a></td>
+</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h562rg">WEACT-H562RG</a></td>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-h7r3z8">WEACT-H7R3Z8</a></td>
-</tr><tr>
 <td align="center"><a href="https://modm.io/reference/config/modm-weact-u585ci">WEACT-U585CI</a></td>
 </tr>
 </table>
