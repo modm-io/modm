@@ -246,6 +246,9 @@ def validate(env):
 def build(env):
     env.substitutions["target"] = env[":target"].identifier
     env.substitutions.update(bprops)
+    # Differential ADC inputs are called INPx/INNx
+    env.substitutions["adc_polarity"] = any(sig["driver"] == "adc" and sig["name"].startswith(("inp", "inn"))
+            for gpio in env[":target"].get_driver("gpio")["gpio"] for sig in gpio.get("signal", []) if "name" in sig)
     env.outbasepath = "modm/src/modm/platform/gpio"
 
     env.template("data.hpp.in", filters={"to_adc_channel": lambda name: "".join(filter(str.isdigit, name))})

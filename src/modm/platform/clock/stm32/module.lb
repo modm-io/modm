@@ -62,7 +62,10 @@ def build(env):
     p["tim_ids"] = instances("tim")
     p["lptim_ids"] = instances("lptim")
     p["adc_ids"] = instances("adc")
-    if t.family == "h7" and t.name[0] in ["r", "s"]:
+    p["dac_ids"] = instances("dac")
+    if t.family == "h7" and t.name[0] == "p":
+        env.template("rcc_h7p.hpp.in", "rcc.hpp")
+    elif t.family == "h7" and t.name[0] in ["r", "s"]:
         env.template("rcc_h7rs.hpp.in", "rcc.hpp")
     else:
         env.template(f"rcc_{t.family}.hpp.in", "rcc.hpp")
@@ -133,6 +136,9 @@ def build(env):
             per = "Usb"
         if t.family == "u3" and per == "USB1":
             per = "Usb"
+        # H7P: UART9 has the enable bit RCC_APB2ENR_USART9EN
+        if per.startswith("USART") and per.capitalize() not in all_peripherals and ("U" + per[2:]).capitalize() in all_peripherals:
+            per = "U" + per[2:]
         if per.capitalize() not in all_peripherals:
             continue
         if "EN" in mode:

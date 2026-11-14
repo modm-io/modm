@@ -51,12 +51,15 @@ def build(env):
                     mappings.setdefault((kind.capitalize(), peripheral, name), int(request["position"]))
             for instance in driver["instance"]:
                 name = f"{kind.capitalize()}{instance}"
-                channels = sorted(int(m.group(1)) for v in vectors
-                                  if (m := re.fullmatch(rf"{name.upper()}_Channel(\d+)", v)))
-                assert channels == list(range(len(channels))), f"{name} has missing channel IRQs"
-                controllers.append({"name": name, "kind": kind.capitalize(), "channels": len(channels)})
+                # HAL2 headers name the channels CHx instead of Channelx
+                matches = [m for v in vectors if (m := re.fullmatch(rf"{name.upper()}_(Channel|CH)(\d+)", v))]
+                channels = sorted(int(m.group(2)) for m in matches)
+                assert channels and channels == list(range(len(channels))), f"{name} has missing channel IRQs"
+                controllers.append({"name": name, "kind": kind.capitalize(), "channels": len(channels),
+                                    "channel": matches[0].group(1)})
 
     env.substitutions = {
+        "target": device.identifier,
         "controllers": controllers,
         "kinds": [kind.capitalize() for kind in requests],
         "mappings": [(*key, request) for key, request in sorted(mappings.items())],

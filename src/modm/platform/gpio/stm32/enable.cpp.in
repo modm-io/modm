@@ -26,7 +26,9 @@ modm_gpio_enable(void)
 %% elif target.family in ["f1"]
 %%	set clock_tree = "APB2"
 %%	set prefix = "IOP"
-%% elif target.family in ["l4", "l5", "g4", "h5", "u3", "u5"]
+%% elif target.family in ["g5"]
+%%  set clock_tree = "AHB4"
+%% elif target.family in ["c5", "g4", "h5", "l4", "l5", "u3", "u5"]
 %%  set clock_tree = 'AHB2'
 %% elif target.family in ["c0", "g0", "l0", "u0"]
 %%  set clock_tree = 'IOP'
@@ -35,7 +37,7 @@ modm_gpio_enable(void)
 %% set enr="ENR1" if target.family in ["u3", "u5"] else "ENR"
 %% set rstr="RSTR1" if target.family in ["u3", "u5"] else "RSTR"
 
-%% if target.family in ["h7"] and target.name[0] in ["r", "s"]
+%% if target.family in ["h7"] and target.name[0] in ["p", "r", "s"]
 	// Enable I/O compensation cell
 	SBS->CCCSR |= SBS_CCCSR_COMP_EN;
 %% elif target.family in ["h7"]

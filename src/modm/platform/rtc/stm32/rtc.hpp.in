@@ -153,9 +153,8 @@ private:
 	static inline uint32_t cache_date{};
 %% if with_ssr
 %#
-	/// Function points for efficient implementations of the SSR <=> millisecond conversion
+	/// Function pointer for an efficient implementation of the SSR to millisecond conversion
 	static inline uint32_t (*t2ms)(uint32_t) = [](uint32_t) { return 0ul; };
-	static inline uint32_t (*ms2t)(uint32_t) = [](uint32_t) { return 0ul; };
 %% endif
 %#
 	static constexpr uint16_t epoch{1970};

@@ -57,6 +57,9 @@ class Instance(Module):
         # The U0 CMSIS header has no SMBus registers for any instance
         properties["smbus"] = not ((self.instance == 2 and target["family"] in ["f0", "g0", "l0"]) or
                                    target["family"] in ["u0"])
+        # HAL2 headers call the error interrupt I2Cx_ERR
+        vectors = [v["name"] for v in device.get_driver("core")["vector"]]
+        properties["er"] = "ERR" if f"I2C{self.instance}_ERR" in vectors else "ER"
         shared_irq = get_shared_irqs(device).get(self.instance)
         properties["shared_irq"] = shared_irq
         if shared_irq:

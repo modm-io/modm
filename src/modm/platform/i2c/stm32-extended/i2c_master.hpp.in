@@ -103,8 +103,8 @@ public:
 		NVIC_SetPriority(I2C{{ id }}_IRQn, isrPriority);
 		NVIC_EnableIRQ(I2C{{ id }}_IRQn);
 %% else
-		NVIC_SetPriority(I2C{{ id }}_ER_IRQn, isrPriority);
-		NVIC_EnableIRQ(I2C{{ id }}_ER_IRQn);
+		NVIC_SetPriority(I2C{{ id }}_{{ er }}_IRQn, isrPriority);
+		NVIC_EnableIRQ(I2C{{ id }}_{{ er }}_IRQn);
 		NVIC_SetPriority(I2C{{ id }}_EV_IRQn, isrPriority);
 		NVIC_EnableIRQ(I2C{{ id }}_EV_IRQn);
 %% endif

@@ -63,8 +63,6 @@ Rtc::initialize(bool forced)
 		// Otherwise just do the division
 		default: t2ms = [](uint32_t ticks) -> uint32_t { return ((c_prediv_s - ticks) * 1000u) / (c_prediv_s + 1); }; break;
 	}
-	// other way around for setting the SSR register
-	ms2t = [](uint32_t ms) -> uint32_t { return c_prediv_s - ((c_prediv_s + 1) * ms) / 1000u; };
 %% endif
 %#
 	enable();
@@ -110,11 +108,8 @@ Rtc::setDateTime(const modm::DateTime &dateTime)
 	RTC->TR = ((toBcd(dateTime.hours().count()) << RTC_TR_HU_Pos) & (RTC_TR_HT_Msk | RTC_TR_HU_Msk)) |
 			  ((toBcd(dateTime.minutes().count()) << RTC_TR_MNU_Pos) & (RTC_TR_MNT_Msk | RTC_TR_MNU_Msk)) |
 			  ((toBcd(dateTime.seconds().count()) << RTC_TR_SU_Pos) & (RTC_TR_ST_Msk | RTC_TR_SU_Msk));
-%% if with_ssr
 %#
-	RTC->SSR = ms2t(dateTime.subseconds().count());
-%% endif
-%#
+	// RTC_SSR is read-only: the subsecond counter restarts when leaving the init mode
 	RTC_ICSR &= ~RTC_ICSR_INIT;
 	lock();
 	modm::this_fiber::poll([]{ return RTC_ICSR & RTC_ICSR_RSF; });

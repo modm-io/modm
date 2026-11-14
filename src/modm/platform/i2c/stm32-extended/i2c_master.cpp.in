@@ -24,7 +24,7 @@ MODM_ISR(I2C{{ id }}_EV)
 	modm::platform::I2cMaster{{ id }}::irq();
 }
 
-MODM_ISR(I2C{{ id }}_ER)
+MODM_ISR(I2C{{ id }}_{{ er }})
 {
 	modm::platform::I2cMaster{{ id }}::irq();
 }

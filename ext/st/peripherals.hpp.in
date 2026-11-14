@@ -22,7 +22,9 @@ Peripheral
 %% for per in all_peripherals
 	{{ per }},
 %% endfor
+%% if "Sys" in all_peripherals
 	Syscfg = Sys,
+%% endif
 };
 
 }

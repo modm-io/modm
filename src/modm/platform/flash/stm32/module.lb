@@ -27,6 +27,9 @@ _H7RS = ["r3", "r7", "s3", "s7"]
 def cluster(target):
     if target.family == "h7" and target.name in _H7RS:
         return "h7rs"
+    # The H7P has a new flash controller, C5 and G5 are not supported either
+    if target.family == "h7" and target.name.startswith("p"):
+        return None
     # WB0x and WL3x use the command based controller of the BlueNRG
     if target.family == "wb" and target.name.startswith("0"):
         return "wb0"

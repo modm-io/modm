@@ -227,7 +227,7 @@ def prepare(module, options):
     if not device.has_driver("adc:stm32-f3") and not device.has_driver("adc:stm32-h7"):
         return False
     # FIXME: The ADC of the STM32H7R/S is not ported yet
-    if device.identifier.family == "h7" and device.identifier.name[0] in ["r", "s"]:
+    if device.identifier.family == "h7" and device.identifier.name[0] in ["p", "r", "s"]:
         return False
 
     module.depends(

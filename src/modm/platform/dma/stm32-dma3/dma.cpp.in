@@ -16,7 +16,7 @@ using namespace modm::platform;
 
 %% for controller in controllers
 %% for channel in range(controller.channels)
-MODM_ISR({{ controller.name | upper }}_Channel{{ channel }})
+MODM_ISR({{ controller.name | upper }}_{{ controller.channel }}{{ channel }})
 {
 	{{ controller.name }}::Channel{{ channel }}::interruptHandler();
 }

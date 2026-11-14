@@ -22,6 +22,8 @@ def get_target_properties(target):
         properties["dual_channel"] = target.name in ["72", "73", "82", "83"]
     elif target["family"] == "l4":
         properties["dual_channel"] = target.name not in ["51", "52", "62"]
+    elif target["family"] in ["c5", "g5"]:
+        properties["dual_channel"] = False
     else:
         properties["dual_channel"] = True
     return properties

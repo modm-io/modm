@@ -27,5 +27,5 @@ def build(env):
     # FIXME: Use IWDG2 for second core on STM32H7x5
     target = env[":target"].identifier
     # H7R/S has a single IWDG
-    env.substitutions = {"core": 1 if target.family == "h7" and target.name[0] not in ["r", "s"] else ""}
+    env.substitutions = {"core": 1 if target.family == "h7" and target.name[0] not in ["p", "r", "s"] else ""}
     env.template("iwdg.hpp.in")

@@ -57,7 +57,8 @@ Rcc::setFlashLatency()
 	static_assert(Core_Hz <= fl.max_frequency, "CPU Frequency is too high for this core voltage!");
 
 %% if not target.string.startswith("stm32f100")
-	uint32_t acr = FLASH->ACR & ~FLASH_ACR_LATENCY;
+%% set acr = "ACCR" if (target.family == "h7" and target.name[0] == "p") else "ACR"
+	uint32_t acr = FLASH->{{acr}} & ~FLASH_{{acr}}_LATENCY;
 	// set flash latency
 	acr |= fl.latency;
 %% if target.family in ["f2", "f4", "l4", "g4"]
@@ -80,9 +81,9 @@ Rcc::setFlashLatency()
 %% elif target.family in ["u3", "u5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTEN;
-%% elif target.family == "h7" and target.name[0] in ["r", "s"]
+%% elif target.family == "h7" and target.name[0] in ["p", "r", "s"]
 	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2, 6-7 WS: 3
-	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);
+	acr = (acr & ~FLASH_{{acr}}_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_{{acr}}_WRHIGHFREQ_Pos);
 %% elif target.family == "h7" and target.name >= "a3"
 	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2, 6 WS: 3 (RM0455 Table 16)
 	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);
@@ -94,18 +95,19 @@ Rcc::setFlashLatency()
 %% elif target.family == "h7"
 	// programming delay equals the number of wait states (RM0468 Table 16)
 	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | (fl.latency << FLASH_ACR_WRHIGHFREQ_Pos);
-%% elif target.family == "h5"
-	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2 (RM0481 Table 48)
+%% elif target.family in ["c5", "g5", "h5"]
+	// programming delay: 0-1 WS: 0, 2-3 WS: 1, 4-5 WS: 2, 6 WS: 3
+	// (RM0481 Table 48, RM0522, G5 from LL_FLASH_PROGRAM_DELAY_x)
 	acr = (acr & ~FLASH_ACR_WRHIGHFREQ) | ((fl.latency / 2) << FLASH_ACR_WRHIGHFREQ_Pos);
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTEN;
-%% elif target.family not in ["h7", "l5", "h5"]
+%% elif target.family not in ["c5", "g5", "h7", "l5", "h5"]
 	// enable flash prefetch
 	acr |= FLASH_ACR_PRFTBE;
 %% endif
-	FLASH->ACR = acr;
+	FLASH->{{acr}} = acr;
 	// wait until the new latency is used before changing the clock
-	while ((FLASH->ACR & FLASH_ACR_LATENCY) != fl.latency) ;
+	while ((FLASH->{{acr}} & FLASH_{{acr}}_LATENCY) != fl.latency) ;
 	__DSB(); __ISB();
 %% endif
 

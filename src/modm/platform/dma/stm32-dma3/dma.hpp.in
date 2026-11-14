@@ -84,7 +84,7 @@ public:
 		reg()
 		{
 %% for controller in controllers
-			if constexpr (C == Controller::{{ controller.name }}) return {{ controller.name | upper }}_Channel0 + uint8_t(ChannelID);
+			if constexpr (C == Controller::{{ controller.name }}) return {{ controller.name | upper }}_{{ controller.channel }}0 + uint8_t(ChannelID);
 %% endfor
 		}
 
@@ -93,7 +93,7 @@ public:
 %% for controller in controllers
 			if constexpr (C == Controller::{{ controller.name }}) return std::array{
 				%% for channel in range(controller.channels)
-				{{ controller.name | upper }}_Channel{{ channel }}_IRQn,
+				{{ controller.name | upper }}_{{ controller.channel }}{{ channel }}_IRQn,
 				%% endfor
 			}[uint8_t(ChannelID)];
 %% endfor
@@ -128,7 +128,9 @@ public:
 			{
 				// The source is the memory: move the fields from the destination to the source position
 				reg()->CTR1 = (memory >> DMA_CTR1_DDW_LOG2_Pos) | (peripheral << DMA_CTR1_DDW_LOG2_Pos);
+%% if target.family != "c5"
 				ctr2 |= DMA_CTR2_DREQ;
+%% endif
 			}
 			else
 			{
@@ -136,6 +138,10 @@ public:
 				if (direction == DataTransferDirection::MemoryToMemory) ctr2 |= DMA_CTR2_SWREQ;
 			}
 			reg()->CTR2 = ctr2;
+%% if target.family == "c5"
+			// The C5 LPDMA has no DREQ bit, the peripheral request defines the direction
+			memorySource = (direction == DataTransferDirection::MemoryToPeripheral);
+%% endif
 			reg()->CCR = (reg()->CCR & InterruptMask) | uint32_t(priority);
 			circular = (circularMode == CircularMode::Enabled);
 		}
@@ -172,7 +178,7 @@ public:
 		{
 			const uint32_t ctr2 = reg()->CTR2;
 			if (ctr2 & DMA_CTR2_SWREQ) return DataTransferDirection::MemoryToMemory;
-			if (ctr2 & DMA_CTR2_DREQ) return DataTransferDirection::MemoryToPeripheral;
+			if (memoryIsSource()) return DataTransferDirection::MemoryToPeripheral;
 			return DataTransferDirection::PeripheralToMemory;
 		}
 
@@ -327,8 +333,16 @@ public:
 		static bool
 		memoryIsSource()
 		{
+%% if target.family == "c5"
+			return memorySource;
+%% else
 			return reg()->CTR2 & DMA_CTR2_DREQ;
+%% endif
 		}
+%% if target.family == "c5"
+
+		static inline bool memorySource{false};
+%% endif
 
 		static inline bool circular{false};
 		static inline Node node{};
