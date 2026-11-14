@@ -25,6 +25,10 @@ namespace modm
  *
  * Access to storage devices like flash chips
  *
+ * `read()`, `program()` and `erase()` are atomic for fibers: devices whose
+ * operations yield, e.g. while waiting for a flash chip, lock themselves, and
+ * devices that share hardware lock it together.
+ *
  * @author	Raphael Lehmann
  * @ingroup	modm_architecture_block_device
  */

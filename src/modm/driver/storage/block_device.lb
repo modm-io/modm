@@ -43,7 +43,7 @@ class BlockDeviceMirror(Module):
         module.description = "Mirroring Block Device"
 
     def prepare(self, module, options):
-        module.depends(":architecture:block.device")
+        module.depends(":architecture:block.device", ":architecture:fiber")
         return True
 
     def build(self, env):
@@ -62,7 +62,8 @@ Microchip SST26VF064B 64MBit flash chip in SOIJ-8, WDFN-8 or SOIC-16.
 """
 
     def prepare(self, module, options):
-        module.depends(":architecture:block.device", ":architecture:spi.device", ":architecture:register")
+        module.depends(":architecture:block.device", ":architecture:spi.device", ":architecture:register",
+                       ":architecture:fiber")
         return True
 
     def build(self, env):
@@ -77,7 +78,7 @@ class BlockDeviceSpiStackFlash(Module):
         module.description = "SpiStack homogeneous flash memory"
 
     def prepare(self, module, options):
-        module.depends(":architecture:block.device")
+        module.depends(":architecture:block.device", ":architecture:fiber")
         return True
 
     def build(self, env):

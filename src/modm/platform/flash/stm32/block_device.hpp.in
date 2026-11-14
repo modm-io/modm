@@ -12,9 +12,16 @@
 #pragma once
 #include "flash.hpp"
 #include <modm/architecture/interface/block_device.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 
 namespace modm::platform
 {
+
+namespace detail
+{
+/// All BdFlash share the flash controller
+inline constinit modm::fiber::mutex bd_flash_mutex;
+}
 
 /**
  * The internal flash from `Offset` to `Offset + Size` as block device, the
@@ -25,6 +32,8 @@ namespace modm::platform
  * after an erase. `read()` fails on words with a double ECC error, e.g. after a
  * power loss during programming, `readMarked()` finds them. The erase blocks
  * are the pages or sectors, on the F2/F4/F7 they have different sizes.
+ * `read()`, `program()` and `erase()` are atomic for fibers, also between
+ * instances with different ranges.
  *
  * @ingroup modm_platform_flash
  */
@@ -56,6 +65,7 @@ public:
 	read(uint8_t *buffer, bd_address_t address, bd_size_t size)
 	{
 		if (not isInside(address, size)) return false;
+		std::lock_guard lock{detail::bd_flash_mutex};
 		return Flash::read(Origin + address, buffer, size) == 0;
 	}
 
@@ -63,6 +73,7 @@ public:
 	program(const uint8_t *buffer, bd_address_t address, bd_size_t size)
 	{
 		if (not isInside(address, size) or (address | size) % BlockSizeWrite) return false;
+		std::lock_guard lock{detail::bd_flash_mutex};
 		if (not Flash::unlock()) return false;
 		// Refuses targets that are not erased and skips units of erased bytes
 		const uint32_t error = Flash::program(Origin + address, buffer, size);
@@ -75,6 +86,7 @@ public:
 	{
 		if (not isInside(address, size) or not isPageStart(address) or
 			not isPageStart(address + size)) return false;
+		std::lock_guard lock{detail::bd_flash_mutex};
 		if (not Flash::unlock()) return false;
 		uint32_t error{};
 		const uint16_t last = Flash::getPage(Origin + address + size - 1);

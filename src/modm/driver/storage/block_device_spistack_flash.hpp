@@ -18,6 +18,7 @@
 
 #include <modm/architecture/interface/block_device.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 
 namespace modm
 {
@@ -114,6 +115,8 @@ public:
 	static constexpr bool ProgramOnce = SpiBlockDevice::ProgramOnce;
 
 private:
+	/// Makes read(), program() and erase() atomic for fibers
+	modm::fiber::mutex mutex;
 	std::ldiv_t dv;
 	uint32_t index;
 	uint8_t currentDie;
