@@ -105,7 +105,6 @@ jobs:
         if: always()
         run: |
           python3 tools/scripts/authors.py --handles --count --shoutout --since 2017-01-01
-          python3 tools/xpcc_generator/builder/system_layout.py examples/communication/xpcc/xml/communication.xml -o /tmp
           python3 tools/font_creator/font_export.py tools/font_creator/fonts/all_caps_3x5.font /tmp/all_caps_converted
 
   stm32-unittests:

@@ -137,7 +137,7 @@ jobs:
           # assembly. Fibers only use inline assembly.
           (cd examples && python ../tools/scripts/examples_compile.py gpio/blinky core/hard_fault core/fiber ext/lvgl_l4 --target '^stm32(f103c8|f746|l452|u575)')
           # Paths in generated build scripts, where a backslash is an escape
-          # character: Nanopb and image sources. See AVR for XPCC.
+          # character: Nanopb and image sources.
           (cd examples && python ../tools/scripts/examples_compile.py ext/nanopb ui/gui_f4_stm32_f4ve)
           # Many object files: LVGL, CMSIS-DSP and Ethernet exceed the command
           # line length of cmd.exe when archiving, FreeRTOS and TinyUSB do not.
@@ -148,9 +148,9 @@ jobs:
       - name: Compile AVR Examples
         if: always()
         shell: bash
-        # Includes the XPCC generator, image sources and CMake.
+        # Includes image sources and CMake.
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py communication/xpcc driver/display/dogm128/image timer/timer_avr)
+          (cd examples && python ../tools/scripts/examples_compile.py driver/display/dogm128/image timer/timer_avr)
           (cd examples && python ../tools/scripts/examples_compile.py . --target '^at' --split 4 --part 0)
 
       - name: Compile NRF Examples
