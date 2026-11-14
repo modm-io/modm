@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":zms"
+    module.description = FileReader("zms.md")
+
+def prepare(module, options):
+    module.add_option(
+        NumericOption(name="lookup_cache", minimum=0, maximum=1024, default=32,
+                      description="Entries of the ID lookup cache in each `zms_fs`, 8 bytes each"))
+    module.depends(":architecture:block.device", ":math:utils")
+    return True
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/zms")
+    env.outbasepath = "modm/ext/zms"
+    # ZMS from modm-ext/zephyr-partial with our power-loss fixes
+    env.copy("../zephyr/LICENSE", "LICENSE")
+    zms = env.copy("../zephyr/zms/zms.c", "zms.c", patch="zms.c.patch")
+    # Zephyr does not compile without warnings with modm's flags
+    env.collect(":build:ccflags", "-Wno-sign-compare", "-Wno-unused-parameter", "-Wno-undef",
+                operations=zms)
+    env.copy("../zephyr/zms/zms_priv.h", "zms_priv.h")
+    env.copy("../zephyr/zms/zephyr/kvss/zms.h", "zephyr/kvss/zms.h")
+    # the Zephyr headers ZMS needs, replaced by small shims
+    env.copy("zms_port.cpp")
+    if env.has_module(":debug"):
+        env.copy("zms_log.cpp")
+    env.copy("shim/zephyr", "zephyr")
+    env.substitutions = {"lookup_cache": env["lookup_cache"],
+                         "flash": env.has_module(":platform:flash") and
+                                  env[":target"].identifier.platform == "stm32"}
+    env.template("zms_config.h.in")
+    env.template("zms.hpp.in")

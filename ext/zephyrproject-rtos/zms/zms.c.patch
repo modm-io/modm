@@ -1,0 +1,342 @@
+diff --git a/zms.c b/zms.c
+--- a/zms.c
++++ b/zms.c
+@@ -307,8 +307,26 @@ static int zms_flash_rd(struct zms_fs *fs, uint64_t addr, void *data, size_t len
+ static int zms_flash_ate_wrt(struct zms_fs *fs, const struct zms_ate *entry)
+ {
+ 	int rc;
++	const size_t block = fs->flash_parameters->write_block_size;
++	size_t pos = 0;
+ 
+-	rc = zms_flash_al_wrt(fs, fs->ate_wra, entry, sizeof(struct zms_ate));
++	/* With write blocks smaller than an ATE, a power loss can leave only some
++	 * blocks of it programmed. The first block holds the CRC8 and the cycle
++	 * counter, so program it last: an incomplete ATE then needs a matching
++	 * CRC8 and cycle counter of all ones to look valid, not only a CRC8.
++	 */
++	if (block < sizeof(struct zms_ate)) {
++		pos = sizeof(struct zms_ate) - block;
++	}
++	while (1) {
++		rc = zms_flash_al_wrt(fs, fs->ate_wra + pos, (const uint8_t *)entry + pos,
++				      sizeof(struct zms_ate) - pos < block ?
++				      sizeof(struct zms_ate) - pos : block);
++		if (rc || !pos) {
++			break;
++		}
++		pos -= block;
++	}
+ 	if (rc) {
+ 		goto end;
+ 	}
+@@ -567,8 +585,14 @@ static bool zms_close_ate_valid(struct zms_fs *fs, const struct zms_ate *entry)
+  */
+ static bool zms_empty_ate_valid(struct zms_fs *fs, const struct zms_ate *entry)
+ {
++	/* An interrupted erase leaves a random empty ATE behind, whose len and id
++	 * are all ones like the valid one: check the constant metadata as well,
++	 * not only the CRC8.
++	 */
+ 	return (zms_ate_valid_different_sector(fs, entry, entry->cycle_cnt) &&
+-		(entry->len == 0xffff) && (entry->id == ZMS_HEAD_ID));
++		(entry->len == 0xffff) && (entry->id == ZMS_HEAD_ID) &&
++		(ZMS_GET_MAGIC_NUMBER(entry->metadata) == ZMS_MAGIC_NUMBER) &&
++		(ZMS_GET_ATE_FORMAT(entry->metadata) == ZMS_DEFAULT_ATE_FORMAT));
+ }
+ 
+ /* zms_gc_done_ate_valid validates a garbage collector done ATE
+@@ -694,6 +718,7 @@ static int zms_wipe_partition(struct zms_fs *fs)
+  */
+ static int zms_recover_last_ate(struct zms_fs *fs, uint64_t *addr, uint64_t *data_wra)
+ {
++	uint64_t data_end_offset;
+ 	uint64_t data_end_addr;
+ 	uint64_t ate_end_addr;
+ 	struct zms_ate end_ate;
+@@ -701,8 +726,11 @@ static int zms_recover_last_ate(struct zms_fs *fs, uint64_t *addr, uint64_t *dat
+ 
+ 	LOG_DBG("Recovering last ate from sector %llu", SECTOR_NUM(*addr));
+ 
+-	/* skip close and empty ATE */
+-	*addr -= 2 * fs->ate_size;
++	/* addr is the close ATE, the first ATE of the sector is right below it.
++	 * Skipping two ATEs here missed the data of the first ATE, which is the
++	 * first entry moved by the garbage collector.
++	 */
++	*addr -= fs->ate_size;
+ 
+ 	ate_end_addr = *addr;
+ 	data_end_addr = *addr & ADDR_SECT_MASK;
+@@ -714,18 +742,36 @@ static int zms_recover_last_ate(struct zms_fs *fs, uint64_t *addr, uint64_t *dat
+ 		if (rc) {
+ 			return rc;
+ 		}
+-		if (zms_ate_valid(fs, &end_ate)) {
+-			/* Found a valid ATE.
+-			 * Unconditionally update ATE write address.
+-			 * Only update data end address for entry with data.
+-			 */
+-			if (end_ate.len > ZMS_DATA_IN_ATE_SIZE) {
+-				data_end_addr &= ADDR_SECT_MASK;
+-				data_end_addr += end_ate.offset + zms_al_size(fs, end_ate.len);
+-				*data_wra = data_end_addr;
+-			}
++		if (!zms_ate_valid(fs, &end_ate)) {
++			goto continue_ate_scan;
++		}
++		if (end_ate.len <= ZMS_DATA_IN_ATE_SIZE) {
++			/* Found a valid ATE without external data */
+ 			*addr = ate_end_addr;
++			goto continue_ate_scan;
++		}
++
++		/* External data is allocated upwards while ATEs are allocated
++		 * downwards. Reject an otherwise valid-looking ATE if its data
++		 * allocation violates either of those boundaries.
++		 */
++		data_end_offset = (uint64_t)end_ate.offset + zms_al_size(fs, end_ate.len);
++		if ((end_ate.offset < SECTOR_OFFSET(data_end_addr)) ||
++		    (data_end_offset > (SECTOR_OFFSET(ate_end_addr) - fs->ate_size))) {
++			LOG_WRN("Ignoring ATE with invalid data range: offset %u, len %u",
++				end_ate.offset, end_ate.len);
++			goto continue_ate_scan;
+ 		}
++
++		/* Data written behind the last ATE by an interrupted write can look like
++		 * a valid ATE: only accept it with a valid data range.
++		 */
++		*addr = ate_end_addr;
++		/* Only update data end address for entry with data. */
++		data_end_addr &= ADDR_SECT_MASK;
++		data_end_addr += data_end_offset;
++		*data_wra = data_end_addr;
++continue_ate_scan:
+ 		ate_end_addr -= fs->ate_size;
+ 	}
+ 
+@@ -835,7 +881,12 @@ static int zms_sector_close(struct zms_fs *fs)
+ 
+ 	zms_ate_crc8_update(&close_ate);
+ 
+-	(void)zms_flash_ate_wrt(fs, &close_ate);
++	if (zms_flash_ate_wrt(fs, &close_ate)) {
++		/* The close ATE was damaged by a power loss, so it is rebuilt when read.
++		 * Do not write the first ATE of the next sector into its close ATE.
++		 */
++		fs->ate_wra -= fs->ate_size;
++	}
+ 
+ 	zms_sector_advance(fs, &fs->ate_wra);
+ 
+@@ -1020,6 +1071,72 @@ static int zms_get_full_sector_cycle(struct zms_fs *fs, uint64_t addr, uint32_t
+ 	return -ENOENT;
+ }
+ 
++/* A power loss while closing a sector leaves a damaged close ATE behind, which
++ * cannot be programmed again on flash with ECC. Only zms_sector_close() writes
++ * this location, so the sector is full: rebuild the close ATE, which points to
++ * the last valid ATE of the sector.
++ */
++static int zms_rebuild_close_ate(struct zms_fs *fs, uint64_t close_addr,
++				 const struct zms_ate *empty_ate, struct zms_ate *close_ate)
++{
++	struct zms_ate ate;
++	uint64_t addr;
++	uint64_t data_end = close_addr & ADDR_SECT_MASK;
++	uint64_t last = 0;
++	int rc;
++
++	if (!(flash_params_get_erase_cap(fs->flash_parameters) & FLASH_ERASE_C_EXPLICIT) ||
++	    !flash_params_erase_value_readable(fs->flash_parameters) ||
++	    zms_close_ate_valid(fs, close_ate) || !zms_empty_ate_valid(fs, empty_ate)) {
++		return 0;
++	}
++	rc = zms_flash_cmp_const(fs, close_addr, fs->flash_parameters->erase_value, fs->ate_size);
++	if (rc <= 0) {
++		/* erased: the sector is not closed */
++		return rc;
++	}
++
++	/* Like zms_recover_last_ate() with the cycle counter of this sector, but
++	 * including the delete ATE that can be written where the data ends
++	 */
++	for (addr = close_addr - fs->ate_size; (addr >= data_end) && SECTOR_OFFSET(addr);
++	     addr -= fs->ate_size) {
++		rc = zms_flash_ate_rd(fs, addr, &ate);
++		if (rc) {
++			return rc;
++		}
++		if (!zms_ate_valid_different_sector(fs, &ate, empty_ate->cycle_cnt)) {
++			continue;
++		}
++		if (ate.len > ZMS_DATA_IN_ATE_SIZE) {
++			uint64_t end = (close_addr & ADDR_SECT_MASK) + ate.offset +
++				       zms_al_size(fs, ate.len);
++
++			if ((ate.offset < SECTOR_OFFSET(data_end)) || (end > addr - fs->ate_size)) {
++				continue;
++			}
++			data_end = end;
++		}
++		last = addr;
++	}
++	if (!last) {
++		/* Closed without any valid ATE, e.g. only a damaged gc_done ATE:
++		 * point to the first ATE, walking from there finds nothing.
++		 */
++		last = close_addr - fs->ate_size;
++	}
++
++	LOG_INF("Rebuilding the damaged close ATE at %llx", close_addr);
++	memset(close_ate, 0xff, sizeof(struct zms_ate));
++	close_ate->id = ZMS_HEAD_ID;
++	close_ate->len = 0U;
++	close_ate->offset = (uint32_t)SECTOR_OFFSET(last);
++	close_ate->cycle_cnt = empty_ate->cycle_cnt;
++	zms_ate_crc8_update(close_ate);
++
++	return 0;
++}
++
+ static int zms_get_sector_header(struct zms_fs *fs, uint64_t addr, struct zms_ate *empty_ate,
+ 				 struct zms_ate *close_ate)
+ {
+@@ -1039,7 +1156,7 @@ static int zms_get_sector_header(struct zms_fs *fs, uint64_t addr, struct zms_at
+ 		return rc;
+ 	}
+ 
+-	return 0;
++	return zms_rebuild_close_ate(fs, close_addr, empty_ate, close_ate);
+ }
+ 
+ /**
+@@ -1194,6 +1311,18 @@ static int zms_gc(struct zms_fs *fs)
+ 			continue;
+ 		}
+ 
++		/* An interrupted write can leave a valid-looking ATE with wrong data
++		 * (corrected by the ECC), which the mount ignores. Its data must lie
++		 * in the sector below the ATE, otherwise it cannot be moved.
++		 */
++		if ((gc_ate.len > ZMS_DATA_IN_ATE_SIZE) &&
++		    ((uint64_t)gc_ate.offset + zms_al_size(fs, gc_ate.len) >
++		     SECTOR_OFFSET(gc_prev_addr))) {
++			LOG_WRN("Ignoring ATE with invalid data range: offset %u, len %u",
++				gc_ate.offset, gc_ate.len);
++			continue;
++		}
++
+ #ifdef CONFIG_ZMS_LOOKUP_CACHE
+ 		wlk_addr = zms_lookup_cache_addr(fs, gc_ate.id);
+ 
+@@ -1443,6 +1572,27 @@ static int zms_init(struct zms_fs *fs)
+ 			/* bad flash read */
+ 			goto end;
+ 		}
++	} else if (!zms_empty_ate_valid(fs, &empty_ate)) {
++		/* The erase of the sector after the last closed one was interrupted.
++		 * Without a valid empty ATE it holds no valid entries.
++		 */
++		if (fs->mount_flags & ZMS_MOUNT_FLAG_NO_FORMAT) {
++			LOG_ERR("No valid empty ATE found in the open sector");
++			rc = -ENOTSUP;
++			goto end;
++		}
++		rc = zms_flash_erase_sector(fs, addr);
++		if (rc) {
++			goto end;
++		}
++		rc = zms_add_empty_ate(fs, addr, 0);
++		if (rc) {
++			goto end;
++		}
++		rc = zms_get_sector_cycle(fs, addr, &fs->sector_cycle);
++		if (rc) {
++			goto end;
++		}
+ 	}
+ 
+ 	/* addr contains address of closing ate in the most recent sector,
+@@ -1500,8 +1650,8 @@ static int zms_init(struct zms_fs *fs)
+ 		/* ate on the last position within the sector is
+ 		 * reserved for deletion an entry
+ 		 */
+-		if ((fs->ate_wra == fs->data_wra) && last_ate.len) {
+-			/* not a delete ate */
++		if ((fs->ate_wra == fs->data_wra) && last_ate.len && zms_ate_valid(fs, &last_ate)) {
++			/* not a delete ate, an interrupted one is not valid */
+ 			rc = -ESPIPE;
+ 			goto end;
+ 		}
+@@ -1509,6 +1659,32 @@ static int zms_init(struct zms_fs *fs)
+ 		fs->ate_wra -= fs->ate_size;
+ 	}
+ 
++	/* A power loss while writing data leaves programmed bytes behind data_wra,
++	 * which the next data write would overwrite: skip them.
++	 */
++	if (ebw_required && flash_params_erase_value_readable(fs->flash_parameters)) {
++		uint8_t buf[ZMS_BLOCK_SIZE];
++		uint64_t dirty_end = fs->data_wra;
++
++		for (addr = fs->data_wra; addr < fs->ate_wra; addr += sizeof(buf)) {
++			size_t len = MIN(sizeof(buf), fs->ate_wra - addr);
++
++			rc = zms_flash_rd(fs, addr, buf, len);
++			if (rc) {
++				goto end;
++			}
++			for (size_t byte = 0; byte < len; byte++) {
++				if (buf[byte] != fs->flash_parameters->erase_value) {
++					dirty_end = addr + byte + 1;
++				}
++			}
++		}
++		if (dirty_end != fs->data_wra) {
++			fs->data_wra = (dirty_end & ADDR_SECT_MASK) +
++				       zms_al_size(fs, SECTOR_OFFSET(dirty_end));
++		}
++	}
++
+ 	/* The sector after the write sector is either empty with a valid empty ATE (regular case)
+ 	 * or it has never been used or it is a closed sector (GC didn't finish)
+ 	 * If it is a closed sector we must look for a valid GC done ATE in the current write
+@@ -1528,6 +1704,38 @@ static int zms_init(struct zms_fs *fs)
+ 		goto end;
+ 	}
+ 
++	/* An interrupted erase of the next sector can leave a valid looking empty
++	 * ATE behind in a sector that is not erased. Writing into it fails on flash
++	 * with ECC, so erase it again before it is used.
++	 */
++	if ((sec_closed == 0) && ebw_required &&
++	    flash_params_erase_value_readable(fs->flash_parameters) &&
++	    zms_empty_ate_valid(fs, &empty_ate)) {
++		uint32_t saved_full_cycle_cnt = 0;
++
++		rc = zms_flash_cmp_const(fs, addr & ADDR_SECT_MASK,
++					 fs->flash_parameters->erase_value,
++					 fs->sector_size - fs->ate_size);
++		if (rc < 0) {
++			goto end;
++		}
++		if (rc) {
++			LOG_INF("Next sector is not erased");
++			rc = zms_get_full_sector_cycle(fs, addr, &saved_full_cycle_cnt);
++			if (rc && rc != -ENOENT) {
++				goto end;
++			}
++			rc = zms_flash_erase_sector(fs, addr);
++			if (rc) {
++				goto end;
++			}
++			rc = zms_add_empty_ate(fs, addr, saved_full_cycle_cnt);
++			if (rc) {
++				goto end;
++			}
++		}
++	}
++
+ 	if (sec_closed == 1) {
+ 		/* The sector after fs->ate_wrt is closed.
+ 		 * Look for a marker (gc_done_ate) that indicates that gc was finished.
