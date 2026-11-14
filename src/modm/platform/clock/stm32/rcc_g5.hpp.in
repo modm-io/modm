@@ -606,10 +606,27 @@ public:
 		Pll2P = 0b110,
 		Iclk2 = 0b111,
 	};
-	static inline void
-	setAdcClockSource(AdcClockSource src)
+	enum class
+	AdcPrescaler : uint32_t
 	{
-		RCC->CCIPR5 = (RCC->CCIPR5 & ~RCC_CCIPR5_ADCSEL) | (uint32_t(src) << RCC_CCIPR5_ADCSEL_Pos);
+		Div1   = 0b0000,
+		Div2   = 0b0001,
+		Div4   = 0b0010,
+		Div6   = 0b0011,
+		Div8   = 0b0100,
+		Div10  = 0b0101,
+		Div12  = 0b0110,
+		Div16  = 0b0111,
+		Div32  = 0b1000,
+		Div64  = 0b1001,
+		Div128 = 0b1010,
+		Div256 = 0b1011,
+	};
+	static inline void
+	setAdcClockSource(AdcClockSource src, AdcPrescaler prescaler = AdcPrescaler::Div1)
+	{
+		RCC->CCIPR5 = (RCC->CCIPR5 & ~(RCC_CCIPR5_ADCSEL | RCC_CCIPR5_ADCDIV)) |
+					  (uint32_t(src) << RCC_CCIPR5_ADCSEL_Pos) | (uint32_t(prescaler) << RCC_CCIPR5_ADCDIV_Pos);
 	}
 
 	enum class

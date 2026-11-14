@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+class Instance(Module):
+    def __init__(self, instance):
+        self.instance = instance
+
+    def init(self, module):
+        module.name = str(self.instance)
+        module.description = "Instance {}".format(self.instance)
+
+    def prepare(self, module, options):
+        module.depends(":platform:adc")
+        return True
+
+    def build(self, env):
+        device = env[":target"]
+        target = device.identifier
+        instances = sorted(map(int, device.get_driver("adc")["instance"]))
+        # ADC1/2 share ADC12_COMMON, the H7P also pairs ADC3/4
+        common = "ADC12_COMMON" if self.instance in (1, 2) else \
+                 ("ADC34_COMMON" if 4 in instances else f"ADC{self.instance}_COMMON")
+        env.substitutions = {
+            "target": target,
+            "id": self.instance,
+            "common": common,
+            # PCSEL has 14 bits on the C5 and 20 bits on the G5 and H7P
+            "channels": 14 if target.family == "c5" else 20,
+            "adc_polarity": target.family != "c5",
+            # (VREFINT, VSENSE) channels, only on ADC1
+            "internal": {"c5": (13, 12), "g5": (18, 16), "h7": (17, 16)}[target.family] if self.instance == 1 else None,
+        }
+        env.outbasepath = "modm/src/modm/platform/adc"
+        env.template("adc.hpp.in", f"adc_{self.instance}.hpp")
+
+
+def init(module):
+    module.name = ":platform:adc"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    device = options[":target"]
+    if not device.has_driver("adc:stm32-c5"):
+        return False
+
+    module.depends(
+        ":architecture:adc",
+        ":architecture:delay",
+        ":cmsis:device",
+        ":platform:gpio",
+        ":platform:rcc")
+
+    for instance in device.get_driver("adc")["instance"]:
+        module.add_submodule(Instance(int(instance)))
+    return True
+
+def build(env):
+    pass

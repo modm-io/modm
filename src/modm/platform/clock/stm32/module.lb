@@ -148,6 +148,12 @@ def build(env):
         # The RTC domain reset also stops the LSE and clears the RTC clock source
         if "RST" in mode and not (per == "RTC" and nper == "RTC"):
             rcc_reset[per.capitalize()] = (nper, mode["RST"])
+    # ADC pairs share their bits, e.g. RCC_AHB2ENR_ADC12EN
+    for pair in ("ADC12", "ADC34"):
+        for adc in (f"Adc{pair[3]}", f"Adc{pair[4]}"):
+            if pair in rcc_map and adc in all_peripherals:
+                if "EN" in rcc_map[pair]: rcc_enable.setdefault(adc, (pair, rcc_map[pair]["EN"]))
+                if "RST" in rcc_map[pair]: rcc_reset.setdefault(adc, (pair, rcc_map[pair]["RST"]))
     # H7R/S: I2C1 shares its bits with I3C1 (RCC_APB1ENR1_I2C1_I3C1EN), which the rcc-map skips
     if t.family == "h7" and t.name[0] in ["r", "s"] and "I2c1" in all_peripherals:
         rcc_enable["I2c1"] = ("I2C1_I3C1", "APB1ENR1")

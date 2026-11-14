@@ -57,6 +57,13 @@ struct SystemClock
 	static constexpr uint32_t Apb2 = Hclk / 1;
 	static constexpr uint32_t Apb3 = Hclk / 1;
 
+	// ADC and DAC kernel clock
+	static constexpr uint32_t Adc = Hclk / 4;
+	static constexpr uint32_t Adc1 = Adc;
+	static constexpr uint32_t Adc2 = Adc;
+	static constexpr uint32_t Adc3 = Adc;
+	static constexpr uint32_t Dac1 = Adc;
+
 	// Peripherals on AHB1
 	static constexpr uint32_t Eth = Ahb1;
 
@@ -125,6 +132,7 @@ struct SystemClock
 
 		Rcc::enableSystemClock(Rcc::SystemClockSource::Psi);
 		Rcc::setClock48Source(Rcc::Clock48Source::PsiDiv3);
+		Rcc::setAdcDacClockSource(Rcc::AdcDacClockSource::Hclk, Rcc::AdcDacPrescaler::Div4);
 		Rcc::setRealTimeClockSource(Rcc::RealTimeClockSource::Lse);
 
 		return true;

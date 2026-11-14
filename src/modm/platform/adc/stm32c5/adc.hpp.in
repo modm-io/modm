@@ -1,0 +1,202 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <cstdint>
+#include "../device.hpp"
+#include <modm/architecture/interface/adc.hpp>
+#include <modm/architecture/interface/delay.hpp>
+#include <modm/platform/clock/rcc.hpp>
+#include <modm/platform/gpio/connector.hpp>
+
+namespace modm::platform
+{
+
+/**
+ * Analog-to-Digital Converter {{ id }} of the STM32C5/G5/H7P.
+ *
+ * Only single software-triggered regular conversions.
+ *
+ * @ingroup modm_platform_adc modm_platform_adc_{{id}}
+ */
+class Adc{{ id }} : public modm::Adc
+{
+public:
+	static constexpr uint8_t Resolution = 12;
+	static constexpr uint8_t Channels = {{ channels }};
+
+	enum class
+	Channel : uint8_t
+	{
+%% for ch in range(channels)
+		Channel{{ ch }} = {{ ch }},
+%% endfor
+%% if internal
+		InternalReference = {{ internal[0] }},
+		Temperature = {{ internal[1] }},
+%% endif
+	};
+
+	enum class
+	SampleTime : uint8_t
+	{
+		Cycles3   = 0b000, ///< 2.5 ADC clock cycles
+		Cycles5   = 0b001, ///< 4.5 ADC clock cycles
+		Cycles8   = 0b010, ///< 7.5 ADC clock cycles
+		Cycles13  = 0b011, ///< 12.5 ADC clock cycles
+		Cycles25  = 0b100, ///< 24.5 ADC clock cycles
+		Cycles48  = 0b101, ///< 47.5 ADC clock cycles
+		Cycles139 = 0b110, ///< 138.5 ADC clock cycles
+		Cycles289 = 0b111, ///< 288.5 ADC clock cycles
+	};
+
+	enum class
+	ResolutionBits : uint8_t
+	{
+		Bits12 = 0b00,
+		Bits10 = 0b01,
+		Bits8  = 0b10,
+		Bits6  = 0b11,
+	};
+
+public:
+	template< class... Signals >
+	static void
+	connect()
+	{
+		using Connector = GpioConnector<Peripheral::Adc{{ id }}, Signals...>;
+		Connector::connect();
+	}
+
+	/// Powers up, calibrates and enables the ADC.
+	/// The ADC kernel clock must be configured in the RCC beforehand.
+	static inline bool
+	initialize(uint32_t waitLoops = 0x100000)
+	{
+		Rcc::enable<Peripheral::Adc{{ id }}>();
+		if (ADC{{ id }}->CR & ADC_CR_ADEN) disable();
+
+		ADC{{ id }}->CR &= ~ADC_CR_DEEPPWD;
+		ADC{{ id }}->CR |= ADC_CR_ADVREGEN;
+		// Wait for the internal voltage regulator (tADCVREG_STUP)
+		uint32_t loops{waitLoops};
+		while (not (ADC{{ id }}->ISR & ADC_ISR_LDORDY) and --loops) ;
+		if (not loops) return false;
+
+		ADC{{ id }}->CR |= ADC_CR_ADCAL;
+		loops = waitLoops;
+		while ((ADC{{ id }}->CR & ADC_CR_ADCAL) and --loops) ;
+		if (not loops) return false;
+
+		ADC{{ id }}->ISR = ADC_ISR_ADRDY;
+		ADC{{ id }}->CR |= ADC_CR_ADEN;
+		loops = waitLoops;
+		while (not (ADC{{ id }}->ISR & ADC_ISR_ADRDY) and --loops) ;
+		ADC{{ id }}->ISR = ADC_ISR_ADRDY;
+		// Keep the newest conversion on overrun
+		ADC{{ id }}->CFGR1 |= ADC_CFGR1_OVRMOD;
+		return loops;
+	}
+
+	static inline void
+	disable()
+	{
+		if (ADC{{ id }}->CR & ADC_CR_ADSTART)
+		{
+			ADC{{ id }}->CR |= ADC_CR_ADSTP;
+			while (ADC{{ id }}->CR & ADC_CR_ADSTP) ;
+		}
+		ADC{{ id }}->CR |= ADC_CR_ADDIS;
+		while (ADC{{ id }}->CR & ADC_CR_ADEN) ;
+	}
+
+	/// Enables the internal voltage reference and the temperature sensor channels
+	static inline void
+	enableInternalChannels()
+	{
+		{{ common }}->CCR |= ADCC_CCR_VREFEN | ADCC_CCR_TSEN;
+	}
+
+	static inline void
+	setResolution(ResolutionBits resolution)
+	{
+		ADC{{ id }}->CFGR1 = (ADC{{ id }}->CFGR1 & ~ADC_CFGR1_RES) | (uint32_t(resolution) << ADC_CFGR1_RES_Pos);
+	}
+
+	static inline void
+	setSampleTime(Channel channel, SampleTime time)
+	{
+		const uint8_t ch = uint8_t(channel);
+		const uint32_t pos = (ch % 10) * 3;
+		volatile uint32_t& smpr = (ch < 10) ? ADC{{ id }}->SMPR1 : ADC{{ id }}->SMPR2;
+		smpr = (smpr & ~(0b111ul << pos)) | (uint32_t(time) << pos);
+	}
+
+	/// Selects the channel as the only one of the regular sequence
+	static inline void
+	setChannel(Channel channel, SampleTime time = SampleTime::Cycles48)
+	{
+		setSampleTime(channel, time);
+		ADC{{ id }}->PCSEL = 1ul << uint8_t(channel);
+		ADC{{ id }}->SQR1 = uint32_t(channel) << ADC_SQR1_SQ1_Pos;
+	}
+
+	static inline void
+	startConversion()
+	{
+		ADC{{ id }}->ISR = ADC_ISR_EOC | ADC_ISR_EOS | ADC_ISR_OVR;
+		ADC{{ id }}->CR |= ADC_CR_ADSTART;
+	}
+
+	static inline bool
+	isConversionFinished()
+	{
+		return ADC{{ id }}->ISR & ADC_ISR_EOC;
+	}
+
+	static inline uint16_t
+	getValue()
+	{
+		return ADC{{ id }}->DR;
+	}
+
+	static inline uint16_t
+	readChannel(Channel channel, SampleTime time = SampleTime::Cycles48)
+	{
+		setChannel(channel, time);
+		startConversion();
+		while (not isConversionFinished()) ;
+		return getValue();
+	}
+
+	template< class Gpio >
+	static inline constexpr Channel
+	getPinChannel()
+	{
+%% if adc_polarity
+		constexpr int8_t channel{detail::AdcChannel<typename Gpio::Data, Peripheral::Adc{{ id }}, detail::AdcPolarity::Positive>};
+%% else
+		constexpr int8_t channel{detail::AdcChannel<typename Gpio::Data, Peripheral::Adc{{ id }}>};
+%% endif
+		static_assert(channel >= 0, "Adc{{ id }} does not have a channel for this pin!");
+		return Channel(channel);
+	}
+
+	template< class Gpio >
+	static inline uint16_t
+	readPin(SampleTime time = SampleTime::Cycles48)
+	{
+		return readChannel(getPinChannel<Gpio>(), time);
+	}
+};
+
+}	// namespace modm::platform
