@@ -1,5 +1,7 @@
 <library>
   <extends>modm:nucleo-h563zi</extends>
+  <!-- <extends>modm:nucleo-c5a3zg</extends> -->
+  <!-- <extends>modm:nucleo-g564re</extends> -->
   <!-- <extends>modm:nucleo-h7s3l8</extends> -->
   <!-- <extends>modm:weact-h7r3z8</extends> -->
   <options>

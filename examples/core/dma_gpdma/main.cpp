@@ -15,6 +15,11 @@
 #include <numeric>
 
 using namespace modm::platform;
+#ifdef GPDMA1
+using Dma = Gpdma1;
+#else
+using Dma = Lpdma1; // STM32C5
+#endif
 
 // Copies memory once and then in circular mode, then transfers SPI data with
 // DMA. Without a wire from MOSI to MISO, MISO reads the internal pull-up.
@@ -27,7 +32,7 @@ volatile int32_t result{0};
 static bool
 copy(DmaBase::CircularMode circular)
 {
-	using Copy = Gpdma1::Channel0;
+	using Copy = Dma::Channel0;
 	std::ranges::fill(destination, 0);
 	completions = 0;
 	Copy::configure(DmaBase::DataTransferDirection::MemoryToMemory,
@@ -53,10 +58,16 @@ copy(DmaBase::CircularMode circular)
 static bool
 spi()
 {
-	using Spi = SpiMaster1_Dma<Gpdma1::Channel1, Gpdma1::Channel2>;
+	using Spi = SpiMaster1_Dma<Dma::Channel1, Dma::Channel2>;
+#ifdef STM32G5
+	using Sck = GpioG3;
+	using Miso = GpioC11;
+	using Mosi = GpioB2;
+#else
 	using Sck = GpioA5;
 	using Miso = GpioA6;
 	using Mosi = GpioA7;
+#endif
 	Spi::connect<Sck::Sck, Miso::Miso, Mosi::Mosi>();
 	Miso::configure(Gpio::InputType::PullUp);
 	Spi::initialize<Board::SystemClock, 1_MHz, modm::pct(50)>();
@@ -77,7 +88,7 @@ int
 main()
 {
 	Board::initialize();
-	Gpdma1::enable();
+	Dma::enable();
 	std::iota(source.begin(), source.end(), 0x1234'0000);
 
 	result = copy(DmaBase::CircularMode::Disabled) ? 1 : -1;
