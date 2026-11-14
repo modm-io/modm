@@ -25,6 +25,12 @@ namespace modm
  *
  * Access to storage devices like flash chips
  *
+ * Several fibers may use a device at the same time. `read()`, `program()` and
+ * `erase()` may yield to other fibers, e.g. while a flash chip is busy, but
+ * another operation on the same device, or on another device on the same
+ * hardware, only starts after the current one has returned. Devices that yield
+ * guard their operations with a fiber mutex.
+ *
  * @author	Raphael Lehmann
  * @ingroup	modm_architecture_block_device
  */

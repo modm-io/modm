@@ -70,6 +70,7 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > flashSize)) {
 		return false;
 	}
@@ -85,6 +86,7 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > flashSize)) {
 		return false;
 	}
@@ -108,6 +110,7 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::erase(bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > flashSize)) {
 		return false;
 	}

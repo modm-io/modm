@@ -15,6 +15,7 @@
 
 #include <modm/architecture/interface/block_device.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 #include <algorithm>
 
 namespace modm
@@ -114,6 +115,7 @@ public:
 	inline BlockDeviceB& getBlockDeviceB() {return blockDeviceB;};
 
 private:
+	modm::fiber::mutex mutex;
 	BlockDeviceA blockDeviceA;
 	BlockDeviceB blockDeviceB;
 };

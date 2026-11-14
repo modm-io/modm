@@ -37,6 +37,7 @@ template <typename BlockDeviceA, typename BlockDeviceB>
 bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	return blockDeviceA.read(buffer, address, size);
 }
 
@@ -45,6 +46,7 @@ template <typename BlockDeviceA, typename BlockDeviceB>
 bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeWrite != 0)) {
 		return false;
 	}
@@ -58,6 +60,7 @@ template <typename BlockDeviceA, typename BlockDeviceB>
 bool
 modm::BdMirror<BlockDeviceA, BlockDeviceB>::erase(bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeErase != 0)) {
 		return false;
 	}

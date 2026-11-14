@@ -19,6 +19,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 
 namespace modm
 {
@@ -233,6 +234,7 @@ public:
 	waitWhileBusy();
 
 private:
+	modm::fiber::mutex mutex;
 	/** Send a non-addressed operation instruction to the spi flash chip
 	 */
 	void
