@@ -28,6 +28,7 @@
   <!-- <extends>modm:nrf52840-dk</extends> -->
   <!-- <extends>modm:nrf5340-dk</extends> -->
   <!-- <extends>modm:nucleo-c031c6</extends> -->
+  <!-- <extends>modm:nucleo-c5a3zg</extends> -->
   <!-- <extends>modm:nucleo-f031k6</extends> -->
   <!-- <extends>modm:nucleo-f042k6</extends> -->
   <!-- <extends>modm:nucleo-f072rb</extends> -->
@@ -51,6 +52,7 @@
   <!-- <extends>modm:nucleo-g431kb</extends> -->
   <!-- <extends>modm:nucleo-g431rb</extends> -->
   <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-g564re</extends> -->
   <!-- <extends>modm:nucleo-h503rb</extends> -->
   <!-- <extends>modm:nucleo-h533re</extends> -->
   <!-- <extends>modm:nucleo-h563zi</extends> -->
