@@ -23,8 +23,8 @@ SUPPORTED_DMA_TYPES = [
     "stm32-gpdma",
 ]
 
-# Families whose GPDMA can read the GPIO input data registers.
-GPDMA_FAMILIES = ["h5", "u3", "u5"]
+# Families whose GPDMA (or LPDMA on the C5) can read the GPIO input data registers.
+GPDMA_FAMILIES = ["c5", "g5", "h5", "u3", "u5"]
 
 # Prefer uncomplicated general purpose timers over the advanced control timers,
 # since the latter are more likely to be used by the application.
@@ -75,8 +75,16 @@ def _buffer_memory(device):
     return name, end - start
 
 
+def _dma3(device):
+    """The DMA3 driver of the GPDMA, or of the LPDMA if there is no GPDMA (C5)."""
+    for kind in ("gpdma", "lpdma"):
+        if device.has_driver(f"{kind}:stm32"):
+            return kind, device.get_all_drivers(f"{kind}:stm32")[0]
+    return None, None
+
+
 def _dma_type(device):
-    if device.has_driver("gpdma:stm32"):
+    if _dma3(device)[0]:
         return "stm32-gpdma"
     if device.has_driver("dma:stm32*"):
         return device.get_driver("dma")["type"]
@@ -91,7 +99,7 @@ def _timer_dma_signals(device):
     """
     dma_type = _dma_type(device)
     if dma_type == "stm32-gpdma":
-        dma = device.get_all_drivers("gpdma:stm32")[0]
+        dma = _dma3(device)[1]
     else:
         dma = device.get_driver("dma")
     table = {}
@@ -104,6 +112,8 @@ def _timer_dma_signals(device):
                           signal.get("name", "")) for signal in node["signal"])
 
     def add(timer, signal, info):
+        # HAL2 device files call the compare requests ccN instead of chN
+        signal = re.sub(r"^cc(\d)$", r"ch\1", signal)
         table.setdefault(int(timer), {}).setdefault(signal, []).append(info)
 
     if dma_type == "stm32-stream-channel":
@@ -231,10 +241,16 @@ def _mux_dma_channels(dma, count):
 
 
 def _gpdma_channels(device, count):
-    """`count` high-numbered channels of GPDMA1."""
-    channels = sorted(int(m.group(1)) for v in device.get_driver("core")["vector"]
-                      if (m := re.fullmatch(r"GPDMA1_Channel(\d+)", v["name"])))
-    return ("DmaBase::Controller::Gpdma1", channels[-count:]) if len(channels) >= count else None
+    """`count` high-numbered channels of GPDMA1 (LPDMA1 on the C5) and the format of their CBR1 register."""
+    kind = _dma3(device)[0].upper()
+    matches = [m for v in device.get_driver("core")["vector"]
+               if (m := re.fullmatch(rf"{kind}1_(Channel|CH)(\d+)", v["name"]))]
+    channels = sorted(int(m.group(2)) for m in matches)
+    if len(channels) < count:
+        return None
+    # HAL2 headers call the channels CHx instead of Channelx
+    cbr1 = f"&{kind}1_{matches[0].group(1)}{{}}->CBR1"
+    return (f"DmaBase::Controller::{kind.capitalize()}1", channels[-count:], cbr1)
 
 
 def _request_expression(dma_type, info):
@@ -246,9 +262,6 @@ def _request_expression(dma_type, info):
 
 
 def _ndtr_expression(dma_type, dma, channel):
-    if dma_type == "stm32-gpdma":
-        # The remaining count of the GPDMA is in bytes, not in data items.
-        return "&GPDMA1_Channel{}->CBR1".format(channel)
     if dma_type in ["stm32-stream-channel", "stm32-mux-stream"]:
         return "&DMA{}_Stream{}->NDTR".format(dma, channel)
     return "&DMA{}_Channel{}->CNDTR".format(dma, channel)
@@ -304,7 +317,7 @@ def _wiring(device, channels=2, timer=None):
     if dma_type in ["stm32-mux", "stm32-mux-stream", "stm32-gpdma"]:
         if allocation is None:
             return None
-        dma, dma_channels = allocation
+        dma, dma_channels = allocation[:2]
         combo = tuple(dict(info, dma=dma, channel=dma_channels[index])
                       for index, info in enumerate(combo))
 
@@ -314,7 +327,9 @@ def _wiring(device, channels=2, timer=None):
             "dma": info["dma"],
             "channel": info["channel"],
             "request": _request_expression(dma_type, info),
-            "ndtr": _ndtr_expression(dma_type, info["dma"], info["channel"]),
+            # The remaining count of the GPDMA is in bytes, not in data items.
+            "ndtr": allocation[2].format(info["channel"]) if dma_type == "stm32-gpdma" else
+                    _ndtr_expression(dma_type, info["dma"], info["channel"]),
             "fcr": _fcr_expression(dma_type, info["dma"], info["channel"]),
         })
 
