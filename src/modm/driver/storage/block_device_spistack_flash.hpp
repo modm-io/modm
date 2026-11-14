@@ -18,6 +18,7 @@
 
 #include <modm/architecture/interface/block_device.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 
 namespace modm
 {
@@ -69,7 +70,7 @@ public:
 
 	/** Erase blocks
 	 *
-	 *  The state of an erased block is undefined until it has been programmed
+	 *  Every byte of an erased block reads as `ErasedValue`
 	 *
 	 *  @param address	Address of block to begin erasing
 	 *  @param size		Size to erase in bytes (multiple of read block size)
@@ -110,8 +111,12 @@ public:
 	static constexpr bd_size_t BlockSizeErase = SpiBlockDevice::BlockSizeErase;
 	static constexpr bd_size_t DieSize = SpiBlockDevice::DeviceSize;
 	static constexpr bd_size_t DeviceSize = DieCount * DieSize;
+	static constexpr uint8_t ErasedValue = SpiBlockDevice::ErasedValue;
+	static constexpr bool ProgramOnce = SpiBlockDevice::ProgramOnce;
 
 private:
+	/// Makes read(), program() and erase() atomic for fibers
+	modm::fiber::mutex mutex;
 	std::ldiv_t dv;
 	uint32_t index;
 	uint8_t currentDie;

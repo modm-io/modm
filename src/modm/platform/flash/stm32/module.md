@@ -97,3 +97,23 @@ Devices with a dual-bank option byte (F42x/F43x 1 MiB, F76x/F77x, G0B1, G4,
 L4, L4+, L5, U3, U5) select the geometry from the option byte at runtime.
 Bank swapping is not supported: the bank swap option must be cleared.
 On the STM32WB the second core must not access the flash during operations.
+
+## Block Device
+
+`modm::platform::BdFlash<Offset, Size>` makes a range of the flash a
+`modm::BlockDevice`, so that storage libraries and other block device code
+work on the internal flash the same way as on external flash. The range must
+start and end on a page or sector boundary:
+
+```cpp
+#include <modm/platform/flash/block_device.hpp>
+
+// The last 16 kB of the flash
+modm::platform::BdFlash<Flash::Size - 16*1024> storage;
+if (not storage.initialize()) { /* not aligned to the pages */ }
+```
+
+A write block is `Flash::WriteSize` bytes and can only be programmed once
+after an erase (`ProgramOnce`). `getEraseBlock(address)` returns the page or
+sector of an address, `BlockSizeErase` is the largest one. `read()` fails on
+words with a double ECC error, `readMarked()` reads them as `~ErasedValue`.

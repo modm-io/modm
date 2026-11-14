@@ -43,6 +43,7 @@ template <typename SpiBlockDevice, uint8_t DieCount>
 bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > DeviceSize)) {
 		return false;
 	}
@@ -69,6 +70,7 @@ template <typename SpiBlockDevice, uint8_t DieCount>
 bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > DeviceSize)) {
 		return false;
 	}
@@ -95,6 +97,7 @@ template <typename SpiBlockDevice, uint8_t DieCount>
 bool
 modm::BdSpiStackFlash<SpiBlockDevice, DieCount>::erase(bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > DeviceSize)) {
 		return false;
 	}

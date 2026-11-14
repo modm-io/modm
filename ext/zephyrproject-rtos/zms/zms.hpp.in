@@ -1,0 +1,113 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include <zephyr/kvss/zms.h>
+#include <zephyr/drivers/flash.h>
+#include <modm/architecture/interface/block_device.hpp>
+%% if flash
+#include <modm/platform/flash/block_device.hpp>
+%% endif
+#include <algorithm>
+#include <cerrno>
+#include <type_traits>
+
+namespace modm::zms
+{
+
+/// A `modm::BlockDevice` as Zephyr flash device: offsets are relative to the
+/// block device, the write block is `BlockSizeWrite` and the erase value
+/// `ErasedValue`. Write blocks that cannot be read, e.g. with an ECC error, read
+/// as `~ErasedValue`, so that ZMS finds them invalid.
+template< auto &bd >
+class Device : public ::device
+{
+	using Bd = std::remove_cvref_t<decltype(bd)>;
+
+	static int
+	read(const ::device *, off_t offset, void *data, size_t size)
+	{
+		if (size == 0) return 0;
+		return bd.readMarked(static_cast<uint8_t *>(data), offset, size) < 0 ? -EIO : 0;
+	}
+
+	static int
+	write(const ::device *, off_t offset, const void *data, size_t size)
+	{
+		if (size == 0) return 0;
+		return bd.program(static_cast<const uint8_t *>(data), offset, size) ? 0 : -EIO;
+	}
+
+	static int
+	erase(const ::device *, off_t offset, size_t size)
+	{ return bd.erase(offset, size) ? 0 : -EIO; }
+
+	static inline const flash_parameters parameters{Bd::BlockSizeWrite, {0}, Bd::ErasedValue};
+
+	static const flash_parameters *
+	get_parameters(const ::device *)
+	{ return &parameters; }
+
+	static int
+	get_page_info(const ::device *, off_t offset, flash_pages_info *info)
+	{
+		if (offset < 0 or uint32_t(offset) >= Bd::DeviceSize) return -EINVAL;
+		const auto block = bd.getEraseBlock(offset);
+		*info = {off_t(block.address), block.size, block.address / block.size};
+		return 0;
+	}
+
+	static inline const flash_driver_api driver{read, write, erase, get_parameters, get_page_info};
+
+public:
+	constexpr Device() : ::device{&driver, nullptr} {}
+};
+
+/// The Zephyr flash device of a block device
+template< auto &bd >
+inline constinit Device<bd> device{};
+
+/// Prepares fs for zms_mount() with sector_count sectors of the block device
+/// from offset on. Each sector is one erase block, or the smallest number of
+/// whole erase blocks of at least min_sector_size bytes.
+/// @return false if the erase blocks are not equally sized or not inside
+template< auto &bd >
+bool
+setup(zms_fs &fs, uint32_t offset, uint32_t sector_count, uint32_t min_sector_size = 0)
+{
+	using Bd = std::remove_cvref_t<decltype(bd)>;
+	if (offset >= Bd::DeviceSize or sector_count == 0) return false;
+	const auto first = bd.getEraseBlock(offset);
+	if (first.address != offset) return false;
+	const uint64_t sector_size = (std::max(min_sector_size, first.size) + first.size - 1) / first.size * first.size;
+	if (offset + sector_size * sector_count > Bd::DeviceSize) return false;
+	for (uint64_t addr = offset; addr < offset + sector_size * sector_count; addr += first.size)
+		if (bd.getEraseBlock(addr).size != first.size) return false;
+	fs = {};
+	fs.flash_device = &device<bd>;
+	fs.offset = offset;
+	fs.sector_size = sector_size;
+	fs.sector_count = sector_count;
+	return true;
+}
+%% if flash
+
+/// The whole internal flash, offsets are relative to `Flash::OriginAddr`
+inline constinit modm::platform::BdFlash<> flash{};
+
+/// Prepares fs for zms_mount() with sector_count sectors of the internal flash
+/// from offset on, see `setup<bd>()`.
+inline bool
+setup(zms_fs &fs, uint32_t offset, uint32_t sector_count, uint32_t min_sector_size = 0)
+{ return setup<flash>(fs, offset, sector_count, min_sector_size); }
+%% endif
+
+}	// namespace modm::zms

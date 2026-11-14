@@ -83,7 +83,7 @@ modm::BdHeap<DeviceSize, externalMemory>::erase(bd_address_t address, bd_size_t 
 		return false;
 	}
 
-	// erasing does nothing, memory is undefined after erase and has to be programed first
+	std::memset(&data[address], ErasedValue, size);
 	return true;
 }
 

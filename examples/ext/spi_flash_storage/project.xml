@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:black-pill-f411</extends>
+  <!-- <extends>modm:black-pill-f401</extends> -->
+  <options>
+    <option name="modm:tinyusb:config">device.cdc</option>
+  </options>
+  <modules>
+    <module>modm:driver:block.device:spi.flash</module>
+    <module>modm:platform:spi:1</module>
+    <module>modm:processing:fiber</module>
+    <module>modm:tinyusb</module>
+    <module>modm:debug</module>
+    <module>modm:zephyr-zms</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

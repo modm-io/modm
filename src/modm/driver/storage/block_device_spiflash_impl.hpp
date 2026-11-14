@@ -70,6 +70,7 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::read(uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeRead != 0) || (address + size > flashSize)) {
 		return false;
 	}
@@ -85,16 +86,19 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::program(const uint8_t* buffer, bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeWrite != 0) || (address + size > flashSize)) {
 		return false;
 	}
 
 	index = 0;
 	while(index < size) {
+		// A page program wraps around at the end of the page
+		const bd_size_t length = std::min<bd_size_t>(size - index, PageSize - (address + index) % PageSize);
 		waitWhileBusy();
 		spiOperation(Instruction::WE);
-		spiOperation(Instruction::PP, address + index, &buffer[index], nullptr, BlockSizeWrite);
-		index += BlockSizeWrite;
+		spiOperation(Instruction::PP, address + index, &buffer[index], nullptr, length);
+		index += length;
 	}
 
 	return true;
@@ -106,6 +110,7 @@ template <typename Spi, typename Cs, uint32_t flashSize>
 bool
 modm::BdSpiFlash<Spi, Cs, flashSize>::erase(bd_address_t address, bd_size_t size)
 {
+	std::lock_guard lock{mutex};
 	if((size == 0) || (size % BlockSizeErase != 0) || (address + size > flashSize)) {
 		return false;
 	}

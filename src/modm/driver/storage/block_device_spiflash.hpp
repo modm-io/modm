@@ -19,6 +19,7 @@
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 
 namespace modm
 {
@@ -74,7 +75,7 @@ public:
 
 	/** Erase blocks
 	 *
-	 *  The state of an erased block is undefined until it has been programmed
+	 *  Every byte of an erased block reads as `ErasedValue`
 	 *
 	 *  @param address	Address of block to begin erasing
 	 *  @param size		Size to erase in bytes (multiple of read block size)
@@ -156,7 +157,9 @@ public:
 
 public:
 	static constexpr bd_size_t BlockSizeRead = 1;
-	static constexpr bd_size_t BlockSizeWrite = 256;
+	static constexpr bd_size_t BlockSizeWrite = 1;
+	/// The largest program operation, programs are split at the page boundaries
+	static constexpr bd_size_t PageSize = 256;
 	static constexpr bd_size_t BlockSizeErase = 4 * 1'024;
 	static constexpr bd_size_t DeviceSize = flashSize;
 	static constexpr bd_size_t ExtendedAddressThreshold = 16 * 1'024 * 1'024;
@@ -231,6 +234,8 @@ public:
 	waitWhileBusy();
 
 private:
+	/// Makes read(), program() and erase() atomic for fibers
+	modm::fiber::mutex mutex;
 	/** Send a non-addressed operation instruction to the spi flash chip
 	 */
 	void

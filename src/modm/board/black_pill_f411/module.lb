@@ -32,6 +32,19 @@ A DFU command is integrated into the `modm:build:scons` tool and can be called a
 ```
 scons program-dfu
 ```
+
+## Logging
+
+To log via RTT attach a debugger to the SWD port and select the RTT option:
+
+```xml
+<option name="modm:board:black-pill-f411:with_rtt">yes</option>
+```
+
+## SPI Flash
+
+The footprint of a W25QxxJV SPI flash on the back is not populated. A soldered
+flash is connected to SPI1 with the pins in `Board::flash`.
 """
 
 def prepare(module, options):
@@ -44,18 +57,24 @@ def prepare(module, options):
         ":platform:core",
         ":platform:gpio",
         ":platform:usb:fs")
+
+    module.add_option(
+            BooleanOption(name="with_rtt", description="Log using RTT", default=False,
+                          dependencies=lambda v: [":platform:rtt", ":debug"] if v else None))
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/board"
     env.substitutions = {
-        "with_logger": False,
+        "with_logger": env["with_rtt"],
         "with_assert": env.has_module(":architecture:assert"),
         "target": env[":target"].identifier,
     }
     env.template("../board.cpp.in", "board.cpp")
     env.template("board.hpp.in")
 
+    # The board template uses "target" for the device identifier
+    env.substitutions = {}
     env.outbasepath = "modm/openocd/modm/board/"
     env.template(repopath("tools/openocd/modm/stm32_swd.cfg.in"), "board.cfg",
                  substitutions={"target": "stm32f4x"})

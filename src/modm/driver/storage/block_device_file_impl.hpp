@@ -88,7 +88,8 @@ modm::BdFile<Filename, DeviceSize>::erase(bd_address_t address, bd_size_t size)
 		return false;
 	}
 
-	// erasing does nothing, memory is undefined after erase and has to be programed first
+	file.seekp(address);
+	for (bd_size_t ii = 0; ii < size; ii++) file.put(char(ErasedValue));
 	return true;
 }
 

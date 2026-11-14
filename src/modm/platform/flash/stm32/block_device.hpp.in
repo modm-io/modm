@@ -1,0 +1,127 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+#include "flash.hpp"
+#include <modm/architecture/interface/block_device.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
+
+namespace modm::platform
+{
+
+namespace detail
+{
+/// All BdFlash share the flash controller
+inline constinit modm::fiber::mutex bd_flash_mutex;
+}
+
+/**
+ * The internal flash from `Offset` to `Offset + Size` as block device, the
+ * offset is relative to `Flash::OriginAddr`. Both ends must be aligned to the
+ * pages or sectors, which `initialize()` checks.
+ *
+ * A write block is `Flash::WriteSize` bytes and can only be programmed once
+ * after an erase. `read()` fails on words with a double ECC error, e.g. after a
+ * power loss during programming, `readMarked()` finds them. The erase blocks
+ * are the pages or sectors, on the F2/F4/F7 they have different sizes.
+ * `read()`, `program()` and `erase()` are atomic for fibers, also between
+ * instances with different ranges.
+ *
+ * @ingroup modm_platform_flash
+ */
+template< uint32_t Offset = 0, uint32_t Size = Flash::Size - Offset >
+class BdFlash : public modm::BlockDevice
+{
+	static_assert(Offset < Flash::Size and Size <= Flash::Size - Offset,
+				  "BdFlash is outside of the flash!");
+
+public:
+	static constexpr bd_size_t BlockSizeRead{1};
+	static constexpr bd_size_t BlockSizeWrite{Flash::WriteSize};
+	/// The largest page or sector of the device
+	static constexpr bd_size_t BlockSizeErase{Flash::MaxPageSize};
+	static constexpr bd_size_t DeviceSize{Size};
+	static constexpr uint8_t ErasedValue{Flash::ErasedValue};
+	static constexpr bool ProgramOnce{true};
+
+	/// @return false if the ends are not aligned to the pages or sectors
+	bool
+	initialize()
+	{ return isPageStart(0) and isPageStart(Size); }
+
+	bool
+	deinitialize()
+	{ return true; }
+
+	[[nodiscard]] bool
+	read(uint8_t *buffer, bd_address_t address, bd_size_t size)
+	{
+		if (not isInside(address, size)) return false;
+		std::lock_guard lock{detail::bd_flash_mutex};
+		return Flash::read(Origin + address, buffer, size) == 0;
+	}
+
+	[[nodiscard]] bool
+	program(const uint8_t *buffer, bd_address_t address, bd_size_t size)
+	{
+		if (not isInside(address, size) or (address | size) % BlockSizeWrite) return false;
+		std::lock_guard lock{detail::bd_flash_mutex};
+		if (not Flash::unlock()) return false;
+		// Refuses targets that are not erased and skips units of erased bytes
+		const uint32_t error = Flash::program(Origin + address, buffer, size);
+		Flash::lock();
+		return error == 0;
+	}
+
+	[[nodiscard]] bool
+	erase(bd_address_t address, bd_size_t size)
+	{
+		if (not isInside(address, size) or not isPageStart(address) or
+			not isPageStart(address + size)) return false;
+		std::lock_guard lock{detail::bd_flash_mutex};
+		if (not Flash::unlock()) return false;
+		uint32_t error{};
+		const uint16_t last = Flash::getPage(Origin + address + size - 1);
+		for (uint16_t page = Flash::getPage(Origin + address); page <= last and not error; page++)
+			error = Flash::erase(page);
+		Flash::lock();
+		return error == 0;
+	}
+
+	bool
+	write(const uint8_t *buffer, bd_address_t address, bd_size_t size)
+	{ return erase(address, size) and program(buffer, address, size); }
+
+	/// The page or sector that contains the address
+	EraseBlock
+	getEraseBlock(bd_address_t address) const
+	{
+		const uint16_t page = Flash::getPage(Origin + address);
+		return {bd_address_t(Flash::getOffset(page) - Offset), bd_size_t(Flash::getSize(page))};
+	}
+
+private:
+	/// Absolute address of the block device address 0
+	static constexpr uintptr_t Origin{Flash::OriginAddr + Offset};
+
+	static bool
+	isInside(bd_address_t address, bd_size_t size)
+	{ return size and address < Size and size <= Size - address; }
+
+	static bool
+	isPageStart(bd_address_t address)
+	{
+		if (Offset + address == Flash::Size) return true;
+		return Flash::getOffset(Flash::getPage(Origin + address)) == Offset + address;
+	}
+};
+
+}	// namespace modm::platform
