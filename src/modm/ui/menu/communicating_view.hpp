@@ -25,8 +25,10 @@
 namespace modm
 {
 	/// @ingroup modm_ui_menu
+	/// @deprecated XPCC is deprecated and will be removed in 2027q4.
+	// DEPRECATED: 2027q4
 	template<typename Allocator = std::allocator<IAbstractView> >
-	class CommunicatingView : public xpcc::Communicatable
+	class [[deprecated("XPCC is deprecated and will be removed in 2027q4, please migrate to DroneCAN or a similar protocol.")]] CommunicatingView : public xpcc::Communicatable
 	{
 	public:
 		constexpr CommunicatingView(modm::CommunicatingViewStack<Allocator>* /*stack*/)

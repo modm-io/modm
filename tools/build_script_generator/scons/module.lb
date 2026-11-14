@@ -92,7 +92,7 @@ def build(env):
         "utils",
         "utils_buildpath",
     }
-    if env.has_module(":communication:xpcc:generator"):
+    if env.has_module(":communication:xpcc:generator"): # DEPRECATED: 2027q4
         tools.add("xpcc_generator")
     if len(env["::image.source"]):
         tools.add("bitmap")
@@ -148,7 +148,7 @@ def build(env):
 
 def post_build(env):
     is_unittest = len(env["::unittest.source"])
-    has_xpcc_generator = env.has_module(":communication:xpcc:generator")
+    has_xpcc_generator = env.has_module(":communication:xpcc:generator") # DEPRECATED: 2027q4
     has_image_source = len(env["::image.source"])
     has_nanopb = env.has_module(":nanopb")
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]

@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":communication:xpcc"
-    module.description = "Cross Platform Component Communication (XPCC)"
+    module.description = FileReader("module.md")
 
 def prepare(module, options):
     module.depends(
@@ -41,6 +41,9 @@ def prepare(module, options):
     return True
 
 def build(env):
+    # DEPRECATED: 2027q4
+    env.log.warning("The 'modm:communication:xpcc' module is deprecated and will be removed in 2027q4! "
+                    "Please migrate to a modern CAN protocol like DroneCAN.")
     env.outbasepath = "modm/src/modm/communication/xpcc"
 
     ignore = ["*.in", "*backend/tipc*"]

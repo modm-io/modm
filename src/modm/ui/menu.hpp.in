@@ -17,8 +17,11 @@
 #include "menu/view_stack.hpp"
 #include "menu/abstract_view.hpp"
 #include "menu/abstract_menu.hpp"
+%% if with_xpcc
+// DEPRECATED: 2027q4
 #include "menu/communicating_view.hpp"
 #include "menu/communicating_view_stack.hpp"
+%% endif
 #include "menu/menu_buttons.hpp"
 #include "menu/standard_menu.hpp"
 #include "menu/menu_entry_callback.hpp"

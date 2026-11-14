@@ -45,7 +45,7 @@ class Sab(Module):
         env.copy("sab")
 
 
-class Xpcc(Module):
+class Xpcc(Module): # DEPRECATED: 2027q4
     def init(self, module):
         module.name = "xpcc"
         module.description = "Tests for XPCC"
