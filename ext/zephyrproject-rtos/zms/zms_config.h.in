@@ -1,0 +1,20 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+// The Kconfig options of ZMS, 32-bit IDs (CONFIG_ZMS_ID_64BIT must stay undefined)
+#pragma once
+%% if lookup_cache
+#define CONFIG_ZMS_LOOKUP_CACHE 1
+#define CONFIG_ZMS_LOOKUP_CACHE_SIZE {{ lookup_cache }}
+%% endif
+#define CONFIG_ZMS_LOOKUP_CACHE_MANUAL 0
+#define CONFIG_ZMS_DATA_CRC 1
+#define CONFIG_ZMS_NO_DOUBLE_WRITE 1
