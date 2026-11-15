@@ -713,8 +713,11 @@ public:
 		SmpsDirect = PWR_CSR2_SDEN,
 		External = PWR_CSR2_BYPASS,
 	};
-	/// Configure the power supply, can be written only once after power-on!
-	static inline bool
+	/// Must be called exactly once early on start-up
+	/// @return whether the supply configuration is active and reads back
+	/// @note This is always inlined, so that a caller which must not access
+	/// the stack, like modm_initialize_platform(), stays a leaf function.
+	static modm_always_inline bool
 	configurePowerSource(PowerSource source, uint32_t waitLoops = 0x10000)
 	{
 		constexpr uint32_t mask = PWR_CSR2_SDHILEVEL | PWR_CSR2_SMPSEXTHP |
