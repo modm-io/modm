@@ -129,7 +129,7 @@ main()
 	}
 	// Sweep the reset over the program time
 	modm::delay(5ms);
-#if __DCACHE_PRESENT
+#if defined(__DCACHE_PRESENT) && __DCACHE_PRESENT
 	SCB_CleanDCache();
 #endif
 	programWithReset(state.index, 1 + (state.ticks * (state.step % 100)) / 90);

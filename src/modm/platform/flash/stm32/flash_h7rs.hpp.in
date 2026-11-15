@@ -13,11 +13,16 @@
 #include "../device.hpp"
 #include <cstddef>
 #include <cstdint>
+%% set a = "A" if bank2 else ""
 
 namespace modm::platform
 {
 
-/// Flash controller of the STM32H7R and STM32H7S.
+/// Flash controller of the STM32H7R, STM32H7S and STM32H7P.
+%% if bank2
+///
+/// The sectors are numbered continuously over both banks.
+%% endif
 /// @ingroup modm_platform_flash
 class Flash
 {
@@ -32,6 +37,9 @@ public:
 	/// Value of every byte after erasing
 	static constexpr uint8_t ErasedValue{ 0xff };
 	static constexpr size_t SectorSize{ 1ul << {{ shift }} };
+	static constexpr uint16_t SectorsPerBank{ {{ sectors_per_bank }} };
+	/// Start of the second bank, OriginAddr without a second bank
+	static constexpr uintptr_t Bank2Addr{ 0x{{ "%0x" | format(bank2_start) }} };
 	struct alignas(4) MaxWordType { uint32_t data[4]; };
 	/// Smallest unit that can be programmed in bytes
 	static constexpr size_t WriteSize{ sizeof(MaxWordType) };
@@ -43,6 +51,15 @@ public:
 	static void
 	disable() {}
 
+%% if bank2
+	static bool
+	isLocked()
+	{ return (FLASH->ACR | FLASH->BCR) & FLASH_ACR_LOCK; }
+
+	static bool
+	isBusy()
+	{ return (FLASH->ASR | FLASH->BSR) & (FLASH_ASR_BUSY | FLASH_ASR_QW | FLASH_ASR_WBNE); }
+%% else
 	static bool
 	isLocked()
 	{ return FLASH->CR & FLASH_CR_LOCK; }
@@ -50,13 +67,18 @@ public:
 	static bool
 	isBusy()
 	{ return FLASH->SR & (FLASH_SR_BUSY | FLASH_SR_QW | FLASH_SR_WBNE); }
+%% endif
 
 	static bool
 	unlock();
 
 	static void
 	lock()
+%% if bank2
+	{ FLASH->ACR |= FLASH_ACR_LOCK; FLASH->BCR |= FLASH_BCR_LOCK; }
+%% else
 	{ FLASH->CR |= FLASH_CR_LOCK; }
+%% endif
 
 	static uint16_t
 	getSector(uint8_t *ptr)

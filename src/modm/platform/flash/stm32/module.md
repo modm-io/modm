@@ -10,9 +10,9 @@ different flash controllers, each with its own implementation:
 | L0         | L0, L1         | 128 or 256 byte pages          | 32-bit            |
 | L4         | C0, G0, G4, L4, U0, WB, WL | 2, 4 or 8 KiB pages | 64-bit          |
 | U5         | L5, U3, U5     | 2, 4 or 8 KiB pages            | 64 or 128-bit     |
-| H5         | H5             | 8 KiB sectors                  | 128-bit           |
+| H5         | C5, G5, H5     | 8 KiB sectors or pages         | 128-bit           |
 | H7         | H7             | 8 or 128 KiB sectors           | 128 or 256-bit    |
-| H7RS       | H7R, H7S       | 8 KiB sectors                  | 128-bit           |
+| H7RS       | H7P, H7R, H7S  | 8 KiB sectors                  | 128-bit           |
 | WB0        | WB0, WL3       | 2 KiB pages                    | 32-bit            |
 
 All controllers share the same interface: `Flash::unlock()` before any
@@ -96,4 +96,6 @@ Erased flash reads as `0xff`, except on the L0 and L1, where it reads as `0x00`.
 Devices with a dual-bank option byte (F42x/F43x 1 MiB, F76x/F77x, G0B1, G4,
 L4, L4+, L5, U3, U5) select the geometry from the option byte at runtime.
 Bank swapping is not supported: the bank swap option must be cleared.
+The single-bank mode of the STM32C5 with half of the largest flash size
+(SINGLE_BANK option bit) is not supported: `Flash::erase()` returns an error.
 On the STM32WB the second core must not access the flash during operations.

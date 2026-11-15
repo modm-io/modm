@@ -13,11 +13,12 @@
 #include "../device.hpp"
 #include <cstddef>
 #include <cstdint>
+%% set ns = "NS" if family == "h5" else ""
 
 namespace modm::platform
 {
 
-/// Flash controller of the STM32H5.
+/// Flash controller of the STM32C5, STM32G5 and STM32H5.
 ///
 /// The sectors are numbered continuously over both banks.
 /// @ingroup modm_platform_flash
@@ -49,18 +50,18 @@ public:
 
 	static bool
 	isLocked()
-	{ return FLASH->NSCR & FLASH_CR_LOCK; }
+	{ return FLASH->{{ns}}CR & FLASH_CR_LOCK; }
 
 	static bool
 	isBusy()
-	{ return FLASH->NSSR & (FLASH_SR_BSY | FLASH_SR_WBNE | FLASH_SR_DBNE); }
+	{ return FLASH->{{ns}}SR & (FLASH_SR_BSY | FLASH_SR_WBNE | FLASH_SR_DBNE); }
 
 	static bool
 	unlock();
 
 	static void
 	lock()
-	{ FLASH->NSCR |= FLASH_CR_LOCK; }
+	{ FLASH->{{ns}}CR |= FLASH_CR_LOCK; }
 
 	static uint16_t
 	getSector(uint8_t *ptr)

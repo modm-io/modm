@@ -19,17 +19,15 @@ _CLUSTERS = {
     "l0": ["l0", "l1"],
     "l4": ["c0", "g0", "g4", "l4", "u0", "wb", "wl"],
     "u5": ["l5", "u3", "u5"],
-    "h5": ["h5"],
+    "h5": ["c5", "g5", "h5"],
     "h7": ["h7"],
 }
-_H7RS = ["r3", "r7", "s3", "s7"]
+# The H7P has two banks of the H7R/S controller
+_H7RS = ["p4", "p5", "r3", "r7", "s3", "s7"]
 
 def cluster(target):
     if target.family == "h7" and target.name in _H7RS:
         return "h7rs"
-    # The H7P has a new flash controller, C5 and G5 are not supported either
-    if target.family == "h7" and target.name.startswith("p"):
-        return None
     # WB0x and WL3x use the command based controller of the BlueNRG
     if target.family == "wb" and target.name.startswith("0"):
         return "wb0"
@@ -163,7 +161,13 @@ def build(env):
         times = {"u5": (118, 8 * 48, 1_500), "u3": (73, 16 * 42, 11_800), "l5": (82, 0, 22_000)}[family]
         subs.update(zip(("t_prog", "t_burst", "t_erase"), times))
     elif name == "h5":
-        subs.update({"t_prog": 31, "t_erase": 2_000})
+        # DS15137 Table 41, DS14920 Table 47
+        subs.update({"t_prog": 20 if family == "c5" else 31, "t_erase": 2_000})
+    elif name == "h7rs":
+        # DS15208 Table 44, the H7R/S datasheets do not list them
+        subs.update({"t_prog": 20, "t_erase": 2_000})
+        # The sectors are numbered continuously over both banks
+        assert banks[-1][0] == start + (len(banks) - 1) * (len(banks[0][1]) << subs["shift"]), "Banks not continuous"
     elif name == "h7":
         # The H7A3/H7B0/H7B3 datasheet only lists the maximum times
         subs.update({"t_prog": 20, "t_erase": 2_200} if subs["ab"] else {"t_prog": 100, "t_erase": 1_000_000})

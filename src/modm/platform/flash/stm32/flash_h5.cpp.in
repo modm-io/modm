@@ -17,6 +17,12 @@
 #include <modm/architecture/interface/fiber.hpp>
 
 extern "C" const uint8_t __rom_start[], __rom_end[];
+%% set ns = "NS" if family == "h5" else ""
+%% if family == "h5"
+%% set ser, snb, start, eccr, eccc = "SER", "SNB", "START", "ECCR", "ECCR"
+%% else
+%% set ser, snb, start, eccr, eccc = "PER", "PNB", "STRT", "ECCDETR", "ECCCORR"
+%% endif
 
 
 %% if tick
@@ -41,7 +47,7 @@ outsideImage(uintptr_t start, uintptr_t end)
 constexpr uint32_t Errors = FLASH_SR_WRPERR | FLASH_SR_PGSERR | FLASH_SR_STRBERR | FLASH_SR_INCERR;
 constexpr uint32_t Busy = FLASH_SR_BSY | FLASH_SR_WBNE | FLASH_SR_DBNE;
 
-constexpr uint32_t Operation = FLASH_CR_PG | FLASH_CR_SER | FLASH_CR_SNB_Msk | FLASH_CR_BKSEL;
+constexpr uint32_t Operation = FLASH_CR_PG | FLASH_CR_{{ser}} | FLASH_CR_{{snb}}_Msk | FLASH_CR_BKSEL;
 /// Not a CR bit: the operation is on the bank the program does not run from, so
 /// interrupts are not masked and other fibers run during an erase
 constexpr uint32_t Other = 1ul << 30;
@@ -82,16 +88,16 @@ template< bool other >
 modm_always_inline uint32_t
 operate(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr, [[maybe_unused]] uint32_t typical)
 {
-	while (FLASH->NSSR & Busy) ;
-	FLASH->NSCCR = Errors | FLASH_SR_EOP;
-	FLASH->NSCR = (FLASH->NSCR & ~Operation) | (cr & Operation);
+	while (FLASH->{{ns}}SR & Busy) ;
+	FLASH->{{ns}}CCR = Errors | FLASH_SR_EOP;
+	FLASH->{{ns}}CR = (FLASH->{{ns}}CR & ~Operation) | (cr & Operation);
 	if (words != end)
 	{
 		modm::atomic::Lock lock;
 		do *dst++ = *words++;
 		while (words != end);
 	}
-	else FLASH->NSCR |= FLASH_CR_START;
+	else FLASH->{{ns}}CR |= FLASH_CR_{{start}};
 	__DSB();
 	// Other fibers run from flash meanwhile, while the operation takes the
 	// typical time, and until it finished
@@ -100,12 +106,12 @@ operate(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint
 %% if clock
 		modm::this_fiber::sleep_for(std::chrono::microseconds(typical));
 %% endif
-		modm::this_fiber::poll([&] { return not (FLASH->NSSR & Busy); });
+		modm::this_fiber::poll([&] { return not (FLASH->{{ns}}SR & Busy); });
 	}
-	else while (FLASH->NSSR & Busy) {{ "tick();" if tick else ";" }}
-	const uint32_t err = FLASH->NSSR & Errors;
-	FLASH->NSCCR = Errors | FLASH_SR_EOP;
-	FLASH->NSCR &= ~Operation;
+	else while (FLASH->{{ns}}SR & Busy) {{ "tick();" if tick else ";" }}
+	const uint32_t err = FLASH->{{ns}}SR & Errors;
+	FLASH->{{ns}}CCR = Errors | FLASH_SR_EOP;
+	FLASH->{{ns}}CR &= ~Operation;
 	return err;
 }
 
@@ -157,8 +163,8 @@ eccInRange(uint32_t eccr)
 {
 	using Flash = modm::platform::Flash;
 	// Offset of the flash word in its bank in flash words
-	const uintptr_t word = ((eccr & FLASH_ECCR_BK_ECC_Msk) ? Flash::Bank2Addr : Flash::OriginAddr) +
-			((eccr & FLASH_ECCR_ADDR_ECC_Msk) << 4);
+	const uintptr_t word = ((eccr & FLASH_{{eccr}}_BK_ECC_Msk) ? Flash::Bank2Addr : Flash::OriginAddr) +
+			((eccr & 0xffff) << 4);
 	return word < ecc_end and ecc_begin < word + Flash::WriteSize;
 }
 
@@ -170,7 +176,7 @@ eccNmiHandler()
 	// Writing the register back clears the ECC flags
 	bool ecc{false};
 	uint32_t error{0};
-	if (const uint32_t eccr = FLASH->ECCDETR; eccr & FLASH_ECCR_ECCD)
+	if (const uint32_t eccr = FLASH->ECCDETR; eccr & FLASH_{{eccr}}_ECCD)
 	{
 		FLASH->ECCDETR = eccr;
 		ecc = true;
@@ -193,7 +199,7 @@ targetErased(uintptr_t addr, size_t size)
 		const size_t length = std::min(sizeof(chunk), size - offset);
 		if (Flash::read(addr + offset, chunk, length)) return false;
 		// A partially programmed word may be "corrected" to erased
-		if (const uint32_t eccr = FLASH->ECCCORR; (eccr & FLASH_ECCR_ECCC) and eccInRange(eccr)) return false;
+		if (const uint32_t eccr = FLASH->ECCCORR; (eccr & FLASH_{{eccc}}_ECCC) and eccInRange(eccr)) return false;
 		for (size_t ii{0}; ii < length; ii++)
 			if (chunk[ii] != Flash::ErasedValue) return false;
 	}
@@ -234,8 +240,8 @@ Flash::unlock()
 {
 	if (isLocked())
 	{
-		FLASH->NSKEYR = 0x45670123;
-		FLASH->NSKEYR = 0xCDEF89AB;
+		FLASH->{{ns}}KEYR = 0x45670123;
+		FLASH->{{ns}}KEYR = 0xCDEF89AB;
 	}
 	return not isLocked();
 }
@@ -243,7 +249,11 @@ Flash::unlock()
 uint32_t
 Flash::erase(uint16_t sector)
 {
-	uint32_t cr = FLASH_CR_SER;
+%% if dual_option and dual_option != "true"
+	// The pages of the single-bank mode (SINGLE_BANK option bit) are not supported
+	if (not ({{ dual_option }})) return uint32_t(-1);
+%% endif
+	uint32_t cr = FLASH_CR_{{ser}};
 	const uintptr_t bank = sector >= SectorsPerBank ? Bank2Addr : OriginAddr;
 	if (outsideImage(bank, bank + SectorsPerBank * SectorSize)) cr |= Other;
 	if (sector >= SectorsPerBank)
@@ -252,7 +262,7 @@ Flash::erase(uint16_t sector)
 		sector -= SectorsPerBank;
 		cr |= FLASH_CR_BKSEL;
 	}
-	cr |= (uint32_t(sector) << FLASH_CR_SNB_Pos) & FLASH_CR_SNB_Msk;
+	cr |= (uint32_t(sector) << FLASH_CR_{{snb}}_Pos) & FLASH_CR_{{snb}}_Msk;
 	const uint32_t err = run(nullptr, nullptr, nullptr, cr, {{ t_erase }});
 	flushCaches();
 	return err;

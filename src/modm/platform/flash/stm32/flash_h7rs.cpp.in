@@ -16,18 +16,65 @@
 #include <modm/architecture/utils.hpp>
 #include <modm/architecture/interface/fiber.hpp>
 
+extern "C" const uint8_t __rom_start[], __rom_end[];
 
 %% if tick
 extern "C" void SysTick_Handler();
 %% endif
 
+%% set a = "A" if bank2 else ""
 namespace
 {
 
-constexpr uint32_t Errors = FLASH_ISR_WRPERRF | FLASH_ISR_PGSERRF | FLASH_ISR_STRBERRF | FLASH_ISR_INCERRF;
-constexpr uint32_t Busy = FLASH_SR_BUSY | FLASH_SR_QW | FLASH_SR_WBNE;
+using Flash = modm::platform::Flash;
 
-constexpr uint32_t Operation = FLASH_CR_PG | FLASH_CR_SER | FLASH_CR_SSN_Msk;
+/// @return true if the program image is outside of [start, end), so that other
+///         fibers can run from flash during an operation in this range
+bool
+outsideImage(uintptr_t start, uintptr_t end)
+{
+	return uintptr_t(__rom_end) <= start or end <= uintptr_t(__rom_start);
+}
+
+constexpr uint32_t Errors = FLASH_{{a}}ISR_WRPERRF | FLASH_{{a}}ISR_PGSERRF | FLASH_{{a}}ISR_STRBERRF | FLASH_{{a}}ISR_INCERRF;
+constexpr uint32_t Busy = FLASH_{{a}}SR_BUSY | FLASH_{{a}}SR_QW | FLASH_{{a}}SR_WBNE;
+
+constexpr uint32_t Operation = FLASH_{{a}}CR_PG | FLASH_{{a}}CR_SER | FLASH_{{a}}CR_SSN_Msk;
+/// Not a CR bit: the operation is on a bank the program does not run from, so
+/// interrupts are not masked and other fibers run meanwhile
+constexpr uint32_t Other = 1ul << 31;
+static_assert(not (Operation & Other));
+
+/// The registers of a bank, those of the H7P bank B are 0x100 behind bank A
+struct Bank
+{
+	volatile uint32_t *const regs;
+	modm_always_inline explicit Bank(bool b) : regs(reinterpret_cast<volatile uint32_t *>(FLASH) + (b ? 0x40 : 0)) {}
+	modm_always_inline volatile uint32_t &KEYR() const { return regs[1]; }
+	modm_always_inline volatile uint32_t &CR() const { return regs[4]; }
+	modm_always_inline volatile uint32_t &SR() const { return regs[5]; }
+	modm_always_inline volatile uint32_t &ISR() const { return regs[9]; }
+	modm_always_inline volatile uint32_t &ICR() const { return regs[10]; }
+};
+static_assert(offsetof(FLASH_TypeDef, {{a}}KEYR) == 0x04 and offsetof(FLASH_TypeDef, {{a}}ICR) == 0x28);
+%% if bank2
+static_assert(offsetof(FLASH_TypeDef, BKEYR) == 0x104 and offsetof(FLASH_TypeDef, BICR) == 0x128);
+%% endif
+
+/// @return the bank of the absolute address addr
+Bank
+bankOf(uintptr_t addr)
+{
+	return Bank(Flash::Bank2Addr != Flash::OriginAddr and addr >= Flash::Bank2Addr);
+}
+
+/// @return Other if the program image is outside of the bank of addr
+uint32_t
+otherOf(uintptr_t addr)
+{
+	const uintptr_t start = (addr >= Flash::Bank2Addr) ? Flash::Bank2Addr : Flash::OriginAddr;
+	return outsideImage(start, start + Flash::SectorsPerBank * Flash::SectorSize) ? Other : 0;
+}
 
 %% if basepri
 /// Interrupts with handlers in flash stall during an operation on the bank of
@@ -57,30 +104,60 @@ tick()
 %% endif
 
 
-/// The only code that runs while the flash is busy, therefore in RAM: sets the
-/// operation in CR, writes [words, end) back-to-back to dst or starts an erase
-/// without words, and waits until the operation finished.
+/// Sets the operation in CR, writes [words, end) back-to-back to dst or starts
+/// an erase without words, and waits until the operation finished.
 /// @return error flags, zero on success
-modm_ramcode uint32_t
-run(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t cr)
+template< bool other >
+modm_always_inline uint32_t
+operate(const Bank bank, volatile uint32_t *dst, const uint32_t *words, const uint32_t *end,
+		uint32_t cr, [[maybe_unused]] uint32_t typical)
 {
-	const Mask mask;
-	while (FLASH->SR & Busy) ;
-	FLASH->ICR = Errors | FLASH_ICR_EOPF;
-	FLASH->CR = (FLASH->CR & ~Operation) | cr;
+	while (bank.SR() & Busy) ;
+	bank.ICR() = Errors | FLASH_{{a}}ICR_EOPF;
+	bank.CR() = (bank.CR() & ~Operation) | (cr & Operation);
 	if (words != end)
 	{
 		modm::atomic::Lock lock;
 		do *dst++ = *words++;
 		while (words != end);
 	}
-	else FLASH->CR |= FLASH_CR_START;
+	else bank.CR() |= FLASH_{{a}}CR_START;
 	__DSB();
-	while (FLASH->SR & Busy) {{ "tick();" if tick else ";" }}
-	const uint32_t err = FLASH->ISR & Errors;
-	FLASH->ICR = Errors | FLASH_ICR_EOPF;
-	FLASH->CR &= ~Operation;
+	// Other fibers run from flash meanwhile, while the operation takes the
+	// typical time, and until it finished
+	if constexpr (other)
+	{
+%% if clock
+		modm::this_fiber::sleep_for(std::chrono::microseconds(typical));
+%% endif
+		modm::this_fiber::poll([&] { return not (bank.SR() & Busy); });
+	}
+	else while (bank.SR() & Busy) {{ "tick();" if tick else ";" }}
+	const uint32_t err = bank.ISR() & Errors;
+	bank.ICR() = Errors | FLASH_{{a}}ICR_EOPF;
+	bank.CR() &= ~Operation;
 	return err;
+}
+
+/// The only code that runs while the bank of the program is busy, therefore in
+/// RAM with interrupts masked
+modm_ramcode uint32_t
+runMasked(const Bank bank, volatile uint32_t *dst, const uint32_t *words, const uint32_t *end,
+		  uint32_t cr, uint32_t typical)
+{
+	const Mask mask;
+	return operate<false>(bank, dst, words, end, cr, typical);
+}
+
+uint32_t
+run(uintptr_t addr, volatile uint32_t *dst, const uint32_t *words, const uint32_t *end,
+	uint32_t cr, uint32_t typical)
+{
+	const Bank bank = bankOf(addr);
+	// The other bank does not stall the program, so the operation runs from flash
+	// without masking interrupts
+	if (otherOf(addr)) return operate<true>(bank, dst, words, end, cr, typical);
+	return runMasked(bank, dst, words, end, cr, typical);
 }
 
 
@@ -88,15 +165,15 @@ run(volatile uint32_t *dst, const uint32_t *words, const uint32_t *end, uint32_t
 bool
 targetErased(uintptr_t addr, size_t size)
 {
-	using Flash = modm::platform::Flash;
-	FLASH->ICR = FLASH_ICR_SNECCERRF;
 	uint8_t chunk[64];
 	for (size_t offset{0}; offset < size; offset += sizeof(chunk))
 	{
 		const size_t length = std::min(sizeof(chunk), size - offset);
+		const Bank bank = bankOf(addr + offset);
+		bank.ICR() = FLASH_{{a}}ICR_SNECCERRF;
 		if (Flash::read(addr + offset, chunk, length)) return false;
 		// A partially programmed word may be "corrected" to erased
-		if (FLASH->ISR & FLASH_ISR_SNECCERRF) return false;
+		if (bank.ISR() & FLASH_{{a}}ISR_SNECCERRF) return false;
 		for (size_t ii{0}; ii < length; ii++)
 			if (chunk[ii] != Flash::ErasedValue) return false;
 	}
@@ -122,27 +199,33 @@ namespace modm::platform
 bool
 Flash::unlock()
 {
-	if (isLocked())
+%% for b in ([False, True] if bank2 else [False])
+	if (const Bank bank({{ "true" if b else "false" }}); bank.CR() & FLASH_{{a}}CR_LOCK)
 	{
-		FLASH->KEYR = 0x45670123;
-		FLASH->KEYR = 0xCDEF89AB;
+		bank.KEYR() = 0x45670123;
+		bank.KEYR() = 0xCDEF89AB;
 	}
+%% endfor
 	return not isLocked();
 }
 
 uint32_t
 Flash::erase(uint16_t sector)
 {
-	const uint32_t err = run(nullptr, nullptr, nullptr, FLASH_CR_SER |
-			((uint32_t(sector) << FLASH_CR_SSN_Pos) & FLASH_CR_SSN_Msk));
-	SCB_InvalidateDCache_by_Addr(getAddr(sector), SectorSize);
+	uint8_t *const addr = getAddr(sector);
+	// The sectors of the second bank are numbered from zero again
+	if (sector >= SectorsPerBank) sector -= SectorsPerBank;
+	const uint32_t err = run(uintptr_t(addr), nullptr, nullptr, nullptr, FLASH_{{a}}CR_SER |
+			((uint32_t(sector) << FLASH_{{a}}CR_SSN_Pos) & FLASH_{{a}}CR_SSN_Msk), {{ t_erase }});
+	SCB_InvalidateDCache_by_Addr(addr, SectorSize);
 	return err;
 }
 
 uint32_t
 Flash::program(uintptr_t addr, MaxWordType data)
 {
-	const uint32_t err = run(reinterpret_cast<volatile uint32_t *>(addr), data.data, data.data + 4, FLASH_CR_PG);
+	const uint32_t err = run(addr, reinterpret_cast<volatile uint32_t *>(addr), data.data, data.data + 4,
+							 FLASH_{{a}}CR_PG, {{ t_prog }});
 	SCB_InvalidateDCache_by_Addr(reinterpret_cast<void *>(addr), sizeof(MaxWordType));
 	return err;
 }
@@ -177,7 +260,9 @@ uint32_t
 Flash::read(uintptr_t addr, void *buffer, size_t size)
 {
 	// A double ECC error raises a bus error, which is ignored at the priority of FAULTMASK
-	FLASH->ICR = FLASH_ICR_DBECCERRF;
+%% for b in ([False, True] if bank2 else [False])
+	Bank({{ "true" if b else "false" }}).ICR() = FLASH_{{a}}ICR_DBECCERRF;
+%% endfor
 	const uint32_t faultmask = __get_FAULTMASK();
 	const uint32_t ccr = SCB->CCR;
 	__set_FAULTMASK(1);
@@ -190,11 +275,13 @@ Flash::read(uintptr_t addr, void *buffer, size_t size)
 	__ISB();
 	__set_FAULTMASK(faultmask);
 	uint32_t error{0};
-	if (FLASH->ISR & FLASH_ISR_DBECCERRF)
+%% for b in ([False, True] if bank2 else [False])
+	if (const Bank bank({{ "true" if b else "false" }}); bank.ISR() & FLASH_{{a}}ISR_DBECCERRF)
 	{
-		error |= FLASH_ISR_DBECCERRF;
-		FLASH->ICR = FLASH_ICR_DBECCERRF;
+		error |= FLASH_{{a}}ISR_DBECCERRF;
+		bank.ICR() = FLASH_{{a}}ICR_DBECCERRF;
 	}
+%% endfor
 	return error;
 }
 
