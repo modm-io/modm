@@ -73,7 +73,6 @@ template<uint8_t id, fdcan::MessageRamConfig mrc>
 void
 McanDriver<id, mrc>::readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint16_t *timestamp)
 {
-	using CommonHeader = MessageRam::CommonFifoHeader;
 	using RxFifoAddress = MessageRam::RxFifoAddress;
 
 	// retrieve index of next frame in RX fifo
@@ -82,14 +81,7 @@ McanDriver<id, mrc>::readMsg(modm::can::Message& message, uint8_t fifoIndex, uin
 
 	const auto [commonHeader, rxHeader] = MessageRam::readRxHeaders(address);
 
-	message.setExtended(bool(commonHeader & CommonHeader::ExtendedId));
-	message.setRemoteTransmitRequest(bool(commonHeader & CommonHeader::RemoteFrame));
-	const auto canid = MessageRam::CanId_t::get(commonHeader);
-	if(message.isExtended()) {
-		message.setIdentifier(canid);
-	} else {
-		message.setIdentifier(canid >> 18);
-	}
+	MessageRam::messageFromRxHeaders(message, commonHeader, rxHeader);
 
 	if (filter_id != nullptr) {
 		*filter_id = MessageRam::FilterIndex_t::get(rxHeader);
@@ -98,9 +90,6 @@ McanDriver<id, mrc>::readMsg(modm::can::Message& message, uint8_t fifoIndex, uin
 	if (timestamp != nullptr) {
 		*timestamp = MessageRam::Timestamp_t::get(rxHeader);
 	}
-
-	const uint8_t dlcValue = MessageRam::RxDlc_t::get(rxHeader);
-	message.setDataLengthCode(dlcValue);
 
 	// required for optimization in MessageRam::readData()
 	static_assert((std::size(decltype(message.data){}) % 4) == 0);

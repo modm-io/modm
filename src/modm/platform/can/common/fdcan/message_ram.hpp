@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <concepts>
 #include <span>
@@ -297,6 +298,29 @@ public:
 		const auto commonHeader = CommonFifoHeader{*messageRam++};
 		const auto rxHeader = RxFifoHeader{*messageRam};
 		return {commonHeader, rxHeader};
+	}
+
+	/// Set identifier, flags and length of a message from RX element headers
+	static void
+	messageFromRxHeaders(modm::can::Message& message, CommonFifoHeader common, RxFifoHeader rx)
+	{
+		message.setExtended(bool(common & CommonFifoHeader::ExtendedId));
+		message.setRemoteTransmitRequest(bool(common & CommonFifoHeader::RemoteFrame));
+		const uint32_t id = CanId_t::get(common);
+		message.setIdentifier(message.isExtended() ? id : (id >> 18));
+		const bool fd = bool(rx & RxFifoHeader::FdFrame);
+		// Classic CAN frames with a DLC above 8 carry 8 data bytes
+		const uint8_t dlc = RxDlc_t::get(rx);
+		message.setDataLengthCode(fd ? dlc : std::min<uint8_t>(dlc, 8));
+		message.setFlexibleData(fd);
+		message.setBitRateSwitching(bool(rx & RxFifoHeader::BitRateSwitching));
+	}
+
+	/// Read the common header of a TX element
+	static CommonFifoHeader_t
+	readTxCommonHeader(uint8_t index)
+	{
+		return CommonFifoHeader_t(*txFifoElement(index));
 	}
 
 	/// Read message data from RX fifo
