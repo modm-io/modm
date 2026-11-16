@@ -83,6 +83,12 @@ struct Message
 		return (flags.fd != 0);
 	}
 
+	constexpr void
+	setBitRateSwitching(bool brs = true)
+	{
+		flags.brs = brs;
+	}
+
 	constexpr bool
 	isBitRateSwitching() const
 	{

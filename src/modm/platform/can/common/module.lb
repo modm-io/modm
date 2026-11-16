@@ -16,9 +16,10 @@ def init(module):
     module.description = "CAN Common"
 
 def prepare(module, options):
-    module.depends(":architecture:clock")
+    module.depends(":architecture:can", ":architecture:clock")
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/can"
     env.copy("can_bit_timings.hpp")
+    env.copy("can_tx_queue.hpp")

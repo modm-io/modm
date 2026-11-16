@@ -28,3 +28,5 @@ def build(env):
     env.outbasepath = "modm-test/src/modm-test/platform"
     env.copy("can_bit_timings_test.hpp")
     env.copy("can_bit_timings_test.cpp")
+    env.copy("can_tx_queue_test.hpp")
+    env.copy("can_tx_queue_test.cpp")
