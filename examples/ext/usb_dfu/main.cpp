@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Niklas Hauser
+ * Copyright (c) 2020, 2026, Niklas Hauser
  *
  * This file is part of the modm project.
  *
@@ -15,6 +15,7 @@
 #include <modm/processing.hpp>
 
 using namespace Board;
+using namespace modm::platform;
 
 modm::PeriodicTimer tmr{1s};
 
@@ -29,17 +30,7 @@ void tud_suspend_cb(bool) { tmr.restart(2.5s); }
 // Invoked when usb bus is resumed
 void tud_resume_cb() { tmr.restart(1s); }
 
-modm_section(".noinit") uint64_t dfu_mode;
-constexpr uint64_t DFU_MAGIC{0xf318ea89313f2be8};
-
-// The address of the bootloader in SystemFlash differs between devices, see AN2606!
-#if defined STM32F3
-constexpr uintptr_t SystemFlash{0x1FFFD800};
-#elif defined STM32U5
-constexpr uintptr_t SystemFlash{0x0BF90000};
-#else
-#error "Please add the SystemFlash address of your device!"
-#endif
+modm::Timeout dfu_timeout;
 
 /* 1. Do scons program once
  * 2. Power-cycle by disconnecting USB cable from ST-Link
@@ -52,18 +43,6 @@ constexpr uintptr_t SystemFlash{0x0BF90000};
 
 int main()
 {
-	if (dfu_mode == DFU_MAGIC)
-	{
-		dfu_mode = 0; __DSB();
-		// Jump to SystemFlash *before* initializing any peripherals!
-		const uint32_t *const vectors = reinterpret_cast<const uint32_t*>(SystemFlash);
-		asm volatile
-		(
-			"msr msp, %0"	"\n\t"
-			"bx  %1"
-			: : "r" (vectors[0]), "r" (vectors[1])
-		);
-	}
 	Board::initialize();
 	Board::initializeUsb();
 	tusb_init();
@@ -72,11 +51,8 @@ int main()
 	{
 		tud_task();
 
-		if (tmr.execute())
-		{
-			if (dfu_mode == DFU_MAGIC) NVIC_SystemReset();
-			Leds::toggle();
-		}
+		if (tmr.execute()) Leds::toggle();
+		if (dfu_timeout.execute()) SystemBootloader::reboot();
 	}
 
 	return 0;
@@ -85,7 +61,6 @@ int main()
 // Invoked on DFU_DETACH request to reboot to the bootloader
 void tud_dfu_runtime_reboot_to_dfu_cb(void)
 {
-	dfu_mode = DFU_MAGIC;
-	// You must delay SystemReset so that TinyUSB can finish!!!
-	tmr.restart(100ms);
+	// You must delay the reset so that TinyUSB can finish!!!
+	dfu_timeout.restart(100ms);
 }
