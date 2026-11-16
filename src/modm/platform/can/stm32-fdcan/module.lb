@@ -19,11 +19,18 @@ global_properties = {}
 
 tx_hw_queue_mode_description = """
 Controls the order in which frames are popped from the hardware TX queue (see
-message_ram.tx_fifo_elements). Does not affect the optional software buffer
-(buffer.tx), which is always popped in FIFO order.
+message_ram.tx_fifo_elements). The optional software buffer (buffer.tx) is
+always popped in priority order, and frames with the same identifier keep their
+order.
 
-FIFO: transmit frames in the order they were enqueued.
-Priority: transmit the frame with the lowest arbitration ID first.
+FIFO: transmit frames in the order they were enqueued. A high priority frame
+waits for the frames already in the hardware queue.
+
+Priority: transmit the frame with the lowest arbitration ID first. Since the
+hardware sends frames with the same identifier in the order of their buffer
+index, `sendMessage()` refuses a frame while another frame with the same
+identifier is pending in the hardware queue. Without software buffer this means
+that `sendMessage()` can fail even though `isReadyToSend()` returned true.
 """
 
 message_ram_option_legacy_values = {

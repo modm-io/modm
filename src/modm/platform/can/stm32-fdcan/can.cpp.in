@@ -17,6 +17,8 @@
 #include <optional>
 
 #include <modm/architecture/interface/atomic_queue.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/platform/can/can_tx_queue.hpp>
 #include <modm/platform/clock/rcc.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/assert.hpp>
@@ -31,7 +33,7 @@ using MessageRam = modm::platform::fdcan::MessageRam<
 	modm::platform::fdcan::Fdcan{{id}}MessageRamConfig>;
 
 %% if options["buffer.tx"] > 0
-modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
+modm::platform::CanTxQueue<{{ options["buffer.tx"] }}> txQueue;
 %% endif
 
 struct RxMessage {
@@ -94,7 +96,6 @@ void
 readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint16_t *timestamp)
 {
 	using namespace modm::platform;
-	using CommonHeader = MessageRam::CommonFifoHeader;
 	using RxFifoAddress = MessageRam::RxFifoAddress;
 
 	// retrieve index of next frame in RX fifo
@@ -102,15 +103,7 @@ readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint
 	const RxFifoAddress address = {fifoIndex, getIndex};
 
 	const auto [commonHeader, rxHeader] = MessageRam::readRxHeaders(address);
-
-	message.setExtended(bool(commonHeader & CommonHeader::ExtendedId));
-	message.setRemoteTransmitRequest(bool(commonHeader & CommonHeader::RemoteFrame));
-	const auto id = MessageRam::CanId_t::get(commonHeader);
-	if(message.isExtended()) {
-		message.setIdentifier(id);
-	} else {
-		message.setIdentifier(id >> 18);
-	}
+	MessageRam::messageFromRxHeaders(message, commonHeader, rxHeader);
 
 	if (filter_id != nullptr) {
 		*filter_id = MessageRam::FilterIndex_t::get(rxHeader);
@@ -119,9 +112,6 @@ readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint
 	if (timestamp != nullptr) {
 		*timestamp = MessageRam::Timestamp_t::get(rxHeader);
 	}
-
-	const uint8_t dlcValue = MessageRam::RxDlc_t::get(rxHeader);
-	message.setDataLengthCode(dlcValue);
 
 	// required for optimization in MessageRam::readData()
 	static_assert((std::size(decltype(message.data){}) % 4) == 0);
@@ -141,8 +131,22 @@ sendMsg(const modm::can::Message& message)
 		return false;
 	}
 
-	const uint8_t putIndex = retrieveTxFifoPutIndex();
 	const auto commonHeader = MessageRam::headerFromMessage(message);
+%% if options["tx_hw_queue_mode"] == "Priority"
+	// The Tx queue sends pending buffers with the same identifier in the order
+	// of their buffer index, not in the order they were added. Wait until the
+	// pending frame with this identifier is sent, so that frames stay in order.
+	using CommonHeader = MessageRam::CommonFifoHeader;
+	constexpr uint32_t idMask = MessageRam::CanId_t::mask().value | uint32_t(CommonHeader::ExtendedId);
+	for (uint32_t pending = {{ reg }}->TXBRP; pending; pending &= pending - 1)
+	{
+		const uint8_t index = __builtin_ctz(pending);
+		if (((MessageRam::readTxCommonHeader(index).value ^ commonHeader.value) & idMask) == 0)
+			return false;
+	}
+%% endif
+
+	const uint8_t putIndex = retrieveTxFifoPutIndex();
 	const auto txHeader = MessageRam::txHeaderFromMessage(message);
 	MessageRam::writeTxHeaders(putIndex, commonHeader, txHeader);
 
@@ -156,6 +160,18 @@ sendMsg(const modm::can::Message& message)
 
 	return true;
 }
+
+%% if options["buffer.tx"] > 0
+// Moves frames from the software queue into the hardware queue.
+// Must be called with interrupts disabled.
+void
+sendQueuedMessages()
+{
+	while (txQueue.isNotEmpty() and sendMsg(txQueue.get())) {
+		txQueue.pop();
+	}
+}
+%% endif
 
 }
 
@@ -286,14 +302,13 @@ MODM_ISR({{ reg }}_IT0)
 %% endif
 {
 %% if options["buffer.tx"] > 0
-	if ({{ reg }}->IR & FDCAN_IR_TC) {
-		{{ reg }}->IR = FDCAN_IR_TC;
-		if (txQueue.isNotEmpty()) {
-			const bool success = sendMsg(txQueue.get());
-			if (success) {
-				txQueue.pop();
-			}
-		}
+	// A transmission completed, or failed without automatic retransmission
+	if ({{ reg }}->IR & (FDCAN_IR_TC | FDCAN_IR_TCF)) {
+		{{ reg }}->IR = FDCAN_IR_TC | FDCAN_IR_TCF;
+		// several transmissions may have completed since the last interrupt,
+		// and sendMessage() may be called from a higher priority interrupt
+		modm::atomic::Lock lock;
+		sendQueuedMessages();
 	}
 %% endif
 
@@ -318,6 +333,9 @@ MODM_ISR({{ reg }}_IT1)
 %% endif
 {
 %% if options["buffer.rx"] > 0
+	// Acknowledge first, so that a frame received while the FIFOs are read
+	// triggers the interrupt again instead of waiting for the next frame.
+	{{ reg }}->IR = FDCAN_IR_RF0N | FDCAN_IR_RF1N;
 	int_fast16_t msgRetrieveLimit = rxQueue.getMaxSize() - rxQueue.getSize();
 
 	RxMessage rxMessage;
@@ -334,14 +352,12 @@ MODM_ISR({{ reg }}_IT1)
 		msgRetrieveLimit--;
 	}
 
-	if (rxQueue.isFull()){
+	if (rxFifo0HasMessage() or rxFifo1HasMessage()) {
 		modm_assert_continue_ignore(false, "fdcan.rx.buffer",
 			"CAN receive software buffer full, not reading new message(s)!");
-		// disable rx ISR until we read data from the rxQueue (IST for tx remains active)
-		// The interrupt remains unacknowledged, so it fires again after the read.
+		// Disable the RX interrupt until getMessage() makes room in the rxQueue,
+		// which then triggers this interrupt again.
 		{{ reg }}->ILE &= ~FDCAN_ILE_EINT1;
-	} else {
-		{{ reg }}->IR = FDCAN_IR_RF0N | FDCAN_IR_RF1N;  // acknowledge interrupt flags
 	}
 %% endif
 }
@@ -417,12 +433,16 @@ modm::platform::Fdcan{{ id }}::configureInterrupts(uint32_t interruptPriority)
 	{{ reg }}->ILS = (FDCAN_ILS_RXFIFO0 | FDCAN_ILS_RXFIFO1);
 %% endif
 
-	{{ reg }}->IE = 0;
+	// keep the error interrupts of an error callback set before initialization
+	{{ reg }}->IE = errorCallback_ ? (FDCAN_IE_BOE | FDCAN_IE_EPE | FDCAN_IE_EWE) : 0;
 %% if options["buffer.tx"] > 0
 	// enable transmission complete and fifo empty interrupt
 	{{ reg }}->IE |= FDCAN_IE_TCE;
 	// enable TX interrupts for all 3 buffers
 	{{ reg }}->TXBTIE |= FDCAN_TXBTIE_TIE;
+	// without automatic retransmission a failed frame only ends as cancelled
+	{{ reg }}->IE |= FDCAN_IE_TCFE;
+	{{ reg }}->TXBCIE |= FDCAN_TXBCIE_CFIE;
 %% endif
 %% if options["buffer.rx"] > 0
 	// enable message receive interrupts for both RX FIFOs
@@ -434,6 +454,8 @@ modm::platform::Fdcan{{ id }}::configureInterrupts(uint32_t interruptPriority)
 void
 modm::platform::Fdcan{{ id }}::setAutomaticRetransmission(bool retransmission)
 {
+	// DAR is write-protected outside of the initialization mode
+	EnterInitMode init;
 	if (retransmission) {
 		// Enable retransmission
 		{{ reg }}->CCCR = ({{ reg }}->CCCR & ~FDCAN_CCCR_DAR);
@@ -471,7 +493,17 @@ modm::platform::Fdcan{{ id }}::getMessage(can::Message& message, uint8_t *filter
 			(*timestamp) = rxMessage.timestamp;
 		}
 		rxQueue.pop();
-		{{ reg }}->ILE = FDCAN_ILE_EINT1 | FDCAN_ILE_EINT0; // reenable ISR, in case it was disabled due to rxQueue full
+		if (not ({{ reg }}->ILE & FDCAN_ILE_EINT1)) {
+			// The RX interrupt was disabled because the rxQueue was full. Frames
+			// left in the hardware FIFOs may already be acknowledged, so trigger
+			// the interrupt to read them.
+			{{ reg }}->ILE |= FDCAN_ILE_EINT1;
+%% if shared_irq_it1
+			NVIC_SetPendingIRQ({{ shared_irq_it1 }}_IRQn);
+%% else
+			NVIC_SetPendingIRQ({{ reg }}_IT1_IRQn);
+%% endif
+		}
 		return true;
 	}
 %% else
@@ -490,6 +522,11 @@ bool
 modm::platform::Fdcan{{ id }}::isReadyToSend()
 {
 %% if options["buffer.tx"] > 0
+	if (txQueue.isFull()) {
+		// The hardware queue is emptied by setMode() without TX interrupt
+		modm::atomic::Lock lock;
+		sendQueuedMessages();
+	}
 	return txQueue.isNotFull();
 %% else
 	return not isHardwareTxQueueFull();
@@ -500,36 +537,24 @@ bool
 modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 {
 %% if options["buffer.tx"] > 0
-	/* Disable CAN interrupts to prevent race condition:
-	 * sendMsg() could be called concurrently from the TX interrupt and
-	 * simultaneously access the same TX buffer.
-	 * isHardwareTxQueueFull() must be checked while interrupts are off to
-	 * prevent a "time-of-check to time-of-use" bug. */
-	struct Lock
-	{
-		const uint32_t flags;
-		/* An edge case could occur where the RX interrupt gets disabled
-		 * in the RX handler when the queue is full between reading ILE and
-		 * writing ILE = 0. This will invoke the RX handler once
-		 * after sendMessage() but not cause any further issues. */
-		Lock() : flags({{ reg }}->ILE) { {{ reg }}->ILE = 0; }
-		~Lock() { {{ reg }}->ILE = flags; }
-	} lock;
+	// Keep the TX interrupt from changing the hardware and software queues.
+	// Disabling the interrupt in the peripheral is not enough, since the NVIC
+	// may already have latched it as pending.
+	modm::atomic::Lock lock;
 %% endif
 
-	if (isHardwareTxQueueFull()) {
 %% if options["buffer.tx"] > 0
-		if (txQueue.isFull()) {
-			return false;
-		}
-		txQueue.push(message);
+	// The hardware queue may have room if the TX interrupt is still pending,
+	// or after setMode() emptied it without TX interrupt
+	sendQueuedMessages();
+	// Only bypass the software queue when it is empty, so that frames stay in order
+	if (txQueue.isEmpty() and sendMsg(message)) {
 		return true;
-%% else
-		return false;
-%% endif
-	} else {
-		return sendMsg(message);
 	}
+	return txQueue.push(message);
+%% else
+	return sendMsg(message);
+%% endif
 }
 
 modm::platform::Fdcan{{ id }}::BusState

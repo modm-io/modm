@@ -104,6 +104,10 @@ public:
 	// Expose jinja template parameters to be checked by e.g. drivers or application
 	static constexpr size_t RxBufferSize = {{ options["buffer.rx"] }};
 	static constexpr size_t TxBufferSize = {{ options["buffer.tx"] }};
+	/// In priority mode sendMessage() refuses a frame while a frame with the
+	/// same identifier is pending in the hardware queue, even if isReadyToSend().
+	static constexpr size_t TxHwQueueSize = fdcan::Fdcan{{id}}MessageRamConfig.txFifoElements;
+	static constexpr bool TxHwQueuePriority = {{ "true" if options["tx_hw_queue_mode"] == "Priority" else "false" }};
 
 	using ErrorCallback = void (*)();
 
