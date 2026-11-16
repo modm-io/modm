@@ -17,6 +17,7 @@
 #define MODM_STM32_CAN{{ id }}_HPP
 
 #include <modm/architecture/interface/can.hpp>
+#include <modm/architecture/interface/can_filter.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include "../device.hpp"
 
@@ -141,6 +142,9 @@ public:
 	static bool
 	isMessageAvailable();
 
+	/// \param filter_id the filter match index of the hardware, which counts the
+	///		filters of each FIFO separately by bank scale and mode, so it is not
+	///		the index of setStandardFilter() and setExtendedFilter().
 	static bool
 	getMessage(can::Message& message, uint8_t *filter_id=nullptr);
 
@@ -149,6 +153,45 @@ public:
 
 	static bool
 	sendMessage(const can::Message& message);
+
+public:
+	// Filter interface of the FDCAN drivers, used by e.g. libcanard
+	enum class
+	FilterConfig : uint8_t
+	{
+		Fifo0 = CanFilter::FIFO0,	///< store in RX FIFO 0 if filter matches
+		Fifo1 = CanFilter::FIFO1,	///< store in RX FIFO 1 if filter matches
+	};
+
+	/// Maximum number of standard and extended filters. Unlike on the FDCAN,
+	/// standard and extended filters share the filter banks of this instance:
+	/// the filter index is the bank number{% if type != "Single" %} from the start bank of this instance.
+	/// Can{{ other_instance }} shares the filter banks, which are split by
+	/// CanFilter::setStartFilterBankForCan2(), at 14 by default{% endif %}.
+	/// A filter overwrites the filter set with CanFilter in the same bank.
+	static constexpr uint8_t StandardFilterCount = 14;
+	static constexpr uint8_t ExtendedFilterCount = 14;
+
+	/// Sets the filter bank at standardIndex to a standard identifier and mask.
+	/// \returns true if the filter index is valid
+	static bool
+	setStandardFilter(uint8_t standardIndex, FilterConfig config,
+			modm::can::StandardIdentifier id, modm::can::StandardMask mask);
+
+	/// Sets the filter bank at extendedIndex to an extended identifier and mask.
+	/// \returns true if the filter index is valid
+	static bool
+	setExtendedFilter(uint8_t extendedIndex, FilterConfig config,
+			modm::can::ExtendedIdentifier id, modm::can::ExtendedMask mask);
+
+	/// Disables all filter banks of this instance, both standard and extended
+	/// filters, so no frames are received until a filter is set again.
+	static void
+	clearStandardFilters();
+
+	/// Same as clearStandardFilters(), since the filters share the banks.
+	static void
+	clearExtendedFilters();
 
 public:
 	// Extended Functionality

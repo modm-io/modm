@@ -546,3 +546,84 @@ modm::platform::Can{{ id }}::enableStatusChangeInterrupt(
 
 	{{ reg }}->IER = interruptEnable | ({{ reg }}->IER & 0x000000ff);
 }
+
+// ----------------------------------------------------------------------------
+%% set filter_reg = "CAN1" if type == "Slave" else reg
+%% if type == "Single"
+static constexpr uint8_t firstFilterBank() { return 0; }
+static constexpr uint8_t endFilterBank() { return 14; }
+%% else
+static uint8_t
+startFilterBankCan2()
+{
+	return (CAN1->FMR & CAN_FMR_CAN2SB_Msk) >> CAN_FMR_CAN2SB_Pos;
+}
+	%% if type == "Master"
+static uint8_t firstFilterBank() { return 0; }
+static uint8_t endFilterBank() { return startFilterBankCan2(); }
+	%% else
+static uint8_t firstFilterBank() { return startFilterBankCan2(); }
+static uint8_t endFilterBank() { return 28; }
+	%% endif
+%% endif
+
+// The filter registers of CAN2 are the ones of CAN1, CAN3 has its own.
+// Changing a filter stops the reception of all instances sharing the filter
+// registers for a moment.
+static bool
+setFilterBank(uint8_t index, uint8_t fifo, uint32_t fr1, uint32_t fr2)
+{
+	const uint8_t bank = firstFilterBank() + index;
+	if (index >= 14 or bank >= endFilterBank()) return false;
+	const uint32_t bit = 1ul << bank;
+
+	modm::atomic::Lock lock;
+	{{ filter_reg }}->FMR |= CAN_FMR_FINIT;
+	{{ filter_reg }}->FA1R &= ~bit;
+	{{ filter_reg }}->FM1R &= ~bit;	// mask mode
+	{{ filter_reg }}->FS1R |= bit;	// single 32-bit scale
+	if (fifo) {{ filter_reg }}->FFA1R |= bit;
+	else {{ filter_reg }}->FFA1R &= ~bit;
+	{{ filter_reg }}->sFilterRegister[bank].FR1 = fr1;
+	{{ filter_reg }}->sFilterRegister[bank].FR2 = fr2;
+	{{ filter_reg }}->FA1R |= bit;
+	{{ filter_reg }}->FMR &= ~CAN_FMR_FINIT;
+	return true;
+}
+
+bool
+modm::platform::Can{{ id }}::setStandardFilter(uint8_t standardIndex, FilterConfig config,
+		modm::can::StandardIdentifier id, modm::can::StandardMask mask)
+{
+	// standard data and remote frames, like the FDCAN filters
+	return setFilterBank(standardIndex, uint8_t(config),
+			uint32_t(uint16_t(id) & 0x7ff) << 21,
+			(uint32_t(uint16_t(mask) & 0x7ff) << 21) | CAN_TI0R_IDE);
+}
+
+bool
+modm::platform::Can{{ id }}::setExtendedFilter(uint8_t extendedIndex, FilterConfig config,
+		modm::can::ExtendedIdentifier id, modm::can::ExtendedMask mask)
+{
+	// extended data and remote frames, like the FDCAN filters
+	return setFilterBank(extendedIndex, uint8_t(config),
+			((uint32_t(id) & 0x1fff'ffff) << 3) | CAN_TI0R_IDE,
+			((uint32_t(mask) & 0x1fff'ffff) << 3) | CAN_TI0R_IDE);
+}
+
+void
+modm::platform::Can{{ id }}::clearStandardFilters()
+{
+	uint32_t bits{};
+	for (uint8_t bank = firstFilterBank(); bank < endFilterBank(); bank++) bits |= 1ul << bank;
+	modm::atomic::Lock lock;
+	{{ filter_reg }}->FMR |= CAN_FMR_FINIT;
+	{{ filter_reg }}->FA1R &= ~bits;
+	{{ filter_reg }}->FMR &= ~CAN_FMR_FINIT;
+}
+
+void
+modm::platform::Can{{ id }}::clearExtendedFilters()
+{
+	clearStandardFilters();
+}
