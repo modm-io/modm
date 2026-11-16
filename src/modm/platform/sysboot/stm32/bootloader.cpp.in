@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2020, 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "bootloader.hpp"
+#include "../device.hpp"
+#include <modm/platform/core/hardware_init.hpp>
+
+/// Vector table of the bootloader in system memory (AN2606 Table 226)
+static constexpr uintptr_t BootloaderAddress{ {{ "0x%08X" | format(address) }} };
+static constexpr uint32_t BootloaderMagic{0xb007'10ad};
+modm_section(".noinit") static volatile uint32_t bootloader_magic;
+
+void
+modm::platform::SystemBootloader::reboot()
+{
+	bootloader_magic = BootloaderMagic;
+%% if enable_dcache
+	// The reset discards the write-back cache
+	SCB_CleanDCache();
+%% endif
+	NVIC_SystemReset();
+}
+
+uint16_t
+modm::platform::SystemBootloader::id()
+{
+%% if id_address
+	return *reinterpret_cast<const volatile uint16_t*>({{ "0x%08X" | format(id_address) }});
+%% else
+	return 0;
+%% endif
+}
+
+/// Runs first after the reset, before the clock tree, GPIOs or any interrupt
+/// is configured, as AN2606 §4.1 requires for jumping to the bootloader.
+static void
+modm_system_bootloader_enter()
+{
+	if (bootloader_magic != BootloaderMagic) return;
+	bootloader_magic = 0;
+
+	// Undo what the modm startup configured before the hardware init hooks
+%% if enable_icache
+	SCB_DisableICache();
+%% endif
+%% if enable_stm32_icache
+	ICACHE->CR &= ~ICACHE_CR_EN;
+	%% if target.family != "h7"
+	MPU->CTRL = 0;
+	%% endif
+%% endif
+%% if with_msplim
+	// The bootloader stack may be below the application stack limit
+	__set_MSPLIM(0);
+%% endif
+
+%% if remap
+	// Map the system memory to 0x0, which dual bank boot and Cortex-M0 need
+	SYSCFG->{{remap}} = (SYSCFG->{{remap}} & ~SYSCFG_{{remap}}_MEM_MODE) | SYSCFG_{{remap}}_MEM_MODE_0;
+%% endif
+%% if core != "cortex-m0"
+	SCB->VTOR = BootloaderAddress;
+%% endif
+	__DSB(); __ISB();
+
+	const uint32_t *const vectors = reinterpret_cast<const uint32_t*>(BootloaderAddress);
+	asm volatile
+	(
+		"msr msp, %0"	"\n\t"
+		"bx  %1"
+		: : "r" (vectors[0]), "r" (vectors[1])
+	);
+	__builtin_unreachable();
+}
+
+MODM_HARDWARE_INIT_ORDER(modm_system_bootloader_enter, 0);

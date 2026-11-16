@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:sysboot"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    # Only devices that can jump into their bootloader have an entry address
+    if "entry" not in (options[":target"].get_driver("sysboot:stm32") or {}):
+        return False
+    module.depends(":cmsis:device", ":platform:core")
+    return True
+
+def build(env):
+    env.outbasepath = "modm/src/modm/platform/sysboot"
+    target = env[":target"].identifier
+    core = env[":target"].get_driver("core")["type"]
+    sysboot = env[":target"].get_driver("sysboot:stm32")
+    remap = None
+    if target.family in ["c0", "f0", "f3", "g0", "l0", "u0"]: remap = "CFGR1"
+    if target.family in ["f2", "f4", "g4", "l1", "l4", "wb", "wl"]: remap = "MEMRMP"
+    env.substitutions = {
+        "target": target,
+        "core": core,
+        "address": int(sysboot["entry"], 16),
+        "id_address": int(sysboot["id-address"], 16) if "id-address" in sysboot else None,
+        "remap": remap,
+        "with_msplim": sum(c.isnumeric() for c in core) == 2,
+        "enable_icache": env.get(":platform:cortex-m:enable_icache", False),
+        "enable_dcache": env.get(":platform:cortex-m:enable_dcache", False),
+        "enable_stm32_icache": env.get(":platform:core:enable_icache", False),
+    }
+    env.copy("bootloader.hpp")
+    env.template("bootloader.cpp.in")
