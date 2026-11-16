@@ -67,7 +67,7 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::connect(PullUps pullups, ResetDevice
 	SCL::setOutput(SCL::OutputType::OpenDrain);
 	SDA::setOutput(SDA::OutputType::OpenDrain);
 	busReset = reset;
-	clearBus();
+	clearBus(Cut::Nothing);
 	Connector::connect();
 }
 
@@ -181,6 +181,8 @@ template <class Scl, class Sda>
 void
 modm::platform::BitBangI2cMaster<Scl, Sda>::reset()
 {
+	// also after an error that left the bus without its STOP (a device held SCL too long)
+	const Cut cut = (state == State::Read) ? Cut::Read : Cut::Write;
 	// the fiber that runs the transaction stops at its next step and leaves the bus alone
 	if (running) aborted = true;
 	errorState = Error::SoftwareReset;
@@ -194,14 +196,18 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::reset()
 	SDA::set();
 	// a device may still stretch the clock, the bus clear needs SCL high
 	sclSetAndWait();
-	clearBus();
+	clearBus(cut);
 }
 
 template <class Scl, class Sda>
 bool
-modm::platform::BitBangI2cMaster<Scl, Sda>::clearBus()
+modm::platform::BitBangI2cMaster<Scl, Sda>::clearBus(Cut cut)
 {
-	if (busReset != ResetDevices::NoReset) resetDevices<SCL, SDA>(uint32_t(busReset));
+	if (busReset != ResetDevices::NoReset)
+	{
+		const std::chrono::microseconds delay{500'000ul / uint32_t(busReset)};
+		modm::I2c::clearBus<SCL, SDA>([&] { modm::this_fiber::sleep_for(delay); }, cut);
+	}
 	return SCL::read() and SDA::read();
 }
 

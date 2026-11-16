@@ -154,10 +154,11 @@ private:
 		state = after;
 	}
 
-	/// Clears the bus with resetDevices() if enabled in connect()
+	/// Clears the bus with I2c::clearBus() if enabled in connect(), by default even while
+	/// both lines are high: it ends a transfer that was cut off
 	/// @return	`true` if both lines are high afterwards
 	static inline bool
-	clearBus();
+	clearBus(Cut cut = Cut::Write);
 
 	/// runs the attached transaction until its STOP or an error
 	static inline void

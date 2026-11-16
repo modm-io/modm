@@ -166,7 +166,7 @@ private:
 		Scl::setOutput(Gpio::OutputType::OpenDrain);
 		Sda::setOutput(Gpio::OutputType::OpenDrain);
 		const uint32_t us = 500'000ul / uint32_t(busReset);
-		I2c::clearBus<Scl, Sda>([us] { modm::delay_us(us); }, afterRead);
+		I2c::clearBus<Scl, Sda>([us] { modm::delay_us(us); }, afterRead ? I2c::Cut::Read : I2c::Cut::Nothing);
 		Connector::connect();
 	}
 
