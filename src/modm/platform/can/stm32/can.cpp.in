@@ -15,12 +15,15 @@
 // ----------------------------------------------------------------------------
 
 #include <modm/architecture/interface/atomic_queue.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
+#include <modm/platform/can/can_tx_queue.hpp>
 #include <modm/utils.hpp>
 #include <modm/architecture/interface/assert.hpp>
 #include <modm/architecture/interface/interrupt.hpp>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/platform/clock/rcc.hpp>
 #include <cstring>
+#include <algorithm>
 
 %% if id == ""
 #include "can.hpp"
@@ -36,7 +39,7 @@
 
 // ----------------------------------------------------------------------------
 %% if options["buffer.tx"] > 0
-static modm::atomic::Queue<modm::can::Message, {{ options["buffer.tx"] }}> txQueue;
+static modm::platform::CanTxQueue<{{ options["buffer.tx"] }}> txQueue;
 %% endif
 
 struct RxMessage {
@@ -82,8 +85,10 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	{{ reg }}->MCR &= (~(uint32_t)CAN_MCR_SLEEP);
 
 	// Bus off is left automatically by the hardware after 128 occurrences
-	// of 11 recessive bits, TX Order depends on the order of request and
-	// not on the CAN priority.
+	// of 11 recessive bits. The mailboxes are sent in the order of request
+	// (TXFP), since in priority mode the mailboxes of frames with the same
+	// identifier are sent in the order of their number, which could reorder
+	// them. The software queue is sorted by priority instead.
 	if (overwriteOnOverrun) {
 		{{ reg }}->MCR |= CAN_MCR_ABOM | CAN_MCR_TXFP;
 	}
@@ -102,7 +107,7 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.
 	}
-	if (deadlockPreventer == 0)
+	if (deadlockPreventer < 0)
 		return false;
 
 	// Enable Interrupts:
@@ -151,9 +156,10 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	{{ reg }}->MCR &= ~(uint32_t)CAN_MCR_INRQ;
 	deadlockPreventer = 10'000; // max ~10ms
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
-		// wait for the normal mode
+		// wait for the normal mode, which needs 11 recessive bits on the bus
+		modm::delay_us(1);
 	}
-	return deadlockPreventer > 0;
+	return deadlockPreventer >= 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -205,7 +211,10 @@ readMailbox(modm::can::Message& message, uint32_t mailboxId, uint8_t* filter_id)
 		message.setExtended(false);
 	}
 	message.setRemoteTransmitRequest(rir & CAN_RI0R_RTR);
-	message.setDataLengthCode(mailbox->RDTR & CAN_TDT1R_DLC);
+	// Classic CAN frames with a DLC above 8 carry 8 data bytes
+	message.setDataLengthCode(std::min<uint32_t>(mailbox->RDTR & CAN_TDT1R_DLC, 8));
+	message.setFlexibleData(false);
+	message.setBitRateSwitching(false);
 	if(filter_id != nullptr)
         (*filter_id) = (mailbox->RDTR & CAN_RDT1R_FMI) >> CAN_RDT1R_FMI_Pos;
 
@@ -213,6 +222,26 @@ readMailbox(modm::can::Message& message, uint32_t mailboxId, uint8_t* filter_id)
 	reinterpret_cast<uint32_t *>(data)[0] = mailbox->RDLR;
 	reinterpret_cast<uint32_t *>(data)[1] = mailbox->RDHR;
 }
+
+// ----------------------------------------------------------------------------
+static bool
+hasEmptyMailbox()
+{
+	return {{ reg }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2);
+}
+
+%% if options["buffer.tx"] > 0
+// Moves frames from the software queue into the empty mailboxes.
+// Must be called with interrupts disabled.
+static void
+sendQueuedMessages()
+{
+	while (txQueue.isNotEmpty() and hasEmptyMailbox()) {
+		sendMailbox(txQueue.get(), ({{ reg }}->TSR & CAN_TSR_CODE) >> CAN_TSR_CODE_Pos);
+		txQueue.pop();
+	}
+}
+%% endif
 
 // ----------------------------------------------------------------------------
 /* Transmit Interrupt
@@ -226,27 +255,11 @@ MODM_ISR({{ irqs.tx }})
 %% endif
 {
 %% if options["buffer.tx"] > 0
-	uint32_t mailbox;
-	uint32_t tsr = {{ reg }}->TSR;
-
-	if (tsr & CAN_TSR_RQCP2) {
-		mailbox = 2;
-		{{ reg }}->TSR = CAN_TSR_RQCP2;
-	}
-	else if (tsr & CAN_TSR_RQCP1) {
-		mailbox = 1;
-		{{ reg }}->TSR = CAN_TSR_RQCP1;
-	}
-	else {
-		mailbox = 0;
-		{{ reg }}->TSR = CAN_TSR_RQCP0;
-	}
-
-	if (txQueue.isNotEmpty())
-	{
-		sendMailbox(txQueue.get(), mailbox);
-		txQueue.pop();
-	}
+	// acknowledge all completed requests, then fill all empty mailboxes
+	{{ reg }}->TSR = CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2;
+	// sendMessage() may be called from a higher priority interrupt
+	modm::atomic::Lock lock;
+	sendQueuedMessages();
 %% endif
 }
 
@@ -265,19 +278,32 @@ MODM_ISR({{ irqs.rx0 }})
 	if (not modm_assert_continue_ignore(not ({{ reg }}->RF0R & CAN_RF0R_FOVR0),
 			"can.rx.hw0", "CAN receive hardware buffer overflowed!", {{ 0 if id == '' else id }}))
 	{
-		// release overrun flag & access the next message
-		{{ reg }}->RF0R = CAN_RF0R_FOVR0 | CAN_RF0R_RFOM0;
+		// only clear the overrun flag, the FIFO still holds three frames
+		{{ reg }}->RF0R = CAN_RF0R_FOVR0;
 	}
 
 %% if options["buffer.rx"] > 0
-	RxMessage rxMessage;
-	readMailbox(rxMessage.message, 0, &(rxMessage.filter_id));
+	// the overrun interrupt may run without a frame
+	if ({{ reg }}->RF0R & CAN_RF0R_FMP0)
+	{
+		if (rxQueue.isFull())
+		{
+			// Leave the frames in the hardware FIFO until getMessage() makes room
+			// in the rxQueue and enables this interrupt again.
+			{{ reg }}->IER &= ~CAN_IER_FMPIE0;
+			// unless getMessage() made room meanwhile in a higher priority interrupt
+			if (rxQueue.isNotFull()) {{ reg }}->IER |= CAN_IER_FMPIE0;
+		}
+		else
+		{
+			RxMessage rxMessage;
+			readMailbox(rxMessage.message, 0, &(rxMessage.filter_id));
 
-	// Release FIFO (access the next message)
-	{{ reg }}->RF0R = CAN_RF0R_RFOM0;
-
-	modm_assert_continue_ignore(rxQueue.push(rxMessage), "can.rx.sw0",
-		"CAN receive software buffer overflowed!", {{ 0 if id == '' else id }});
+			// Release FIFO (access the next message)
+			{{ reg }}->RF0R = CAN_RF0R_RFOM0;
+			rxQueue.push(rxMessage);
+		}
+	}
 %% endif
 }
 
@@ -295,19 +321,32 @@ MODM_ISR({{ irqs.rx1 }})
 	if (not modm_assert_continue_ignore(not ({{ reg }}->RF1R & CAN_RF1R_FOVR1),
 			"can.rx.hw1", "CAN receive hardware buffer overflowed!", {{ 0 if id == '' else id }}))
 	{
-		// release overrun flag & access the next message
-		{{ reg }}->RF1R = CAN_RF1R_FOVR1 | CAN_RF1R_RFOM1;
+		// only clear the overrun flag, the FIFO still holds three frames
+		{{ reg }}->RF1R = CAN_RF1R_FOVR1;
 	}
 
 %% if options["buffer.rx"] > 0
-	RxMessage rxMessage;
-	readMailbox(rxMessage.message, 1, &(rxMessage.filter_id));
+	// the overrun interrupt may run without a frame
+	if ({{ reg }}->RF1R & CAN_RF1R_FMP1)
+	{
+		if (rxQueue.isFull())
+		{
+			// Leave the frames in the hardware FIFO until getMessage() makes room
+			// in the rxQueue and enables this interrupt again.
+			{{ reg }}->IER &= ~CAN_IER_FMPIE1;
+			// unless getMessage() made room meanwhile in a higher priority interrupt
+			if (rxQueue.isNotFull()) {{ reg }}->IER |= CAN_IER_FMPIE1;
+		}
+		else
+		{
+			RxMessage rxMessage;
+			readMailbox(rxMessage.message, 1, &(rxMessage.filter_id));
 
-	// Release FIFO (access the next message)
-	{{ reg }}->RF1R = CAN_RF1R_RFOM1;
-
-	modm_assert_continue_ignore(rxQueue.push(rxMessage), "can.rx.sw1",
-		"CAN receive software buffer overflowed!", {{ 0 if id == '' else id }});
+			// Release FIFO (access the next message)
+			{{ reg }}->RF1R = CAN_RF1R_RFOM1;
+			rxQueue.push(rxMessage);
+		}
+	}
 %% endif
 }
 
@@ -395,6 +434,13 @@ modm::platform::Can{{ id }}::getMessage(can::Message& message, uint8_t *filter_i
 
         if(filter_id != nullptr) (*filter_id) = rxMessage.filter_id;
 		rxQueue.pop();
+		// The RX interrupts are disabled while the rxQueue is full. They are
+		// level-triggered, so enabling them reads the waiting frames.
+		constexpr uint32_t fmpie = CAN_IER_FMPIE0 | CAN_IER_FMPIE1;
+		if (({{ reg }}->IER & fmpie) != fmpie) {
+			modm::atomic::Lock lock;
+			{{ reg }}->IER |= fmpie;
+		}
 		return true;
 	}
 %% else
@@ -423,9 +469,14 @@ bool
 modm::platform::Can{{ id }}::isReadyToSend()
 {
 %% if options["buffer.tx"] > 0
+	if (txQueue.isFull()) {
+		// A reinitialization empties the mailboxes without TX interrupt
+		modm::atomic::Lock lock;
+		sendQueuedMessages();
+	}
 	return txQueue.isNotFull();
 %% else
-	return (({{ reg }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) != 0);
+	return hasEmptyMailbox();
 %% endif
 }
 
@@ -433,29 +484,30 @@ modm::platform::Can{{ id }}::isReadyToSend()
 bool
 modm::platform::Can{{ id }}::sendMessage(const can::Message& message)
 {
-	// This function is not reentrant. If one of the mailboxes is empty it
-	// means that the software buffer is empty too. Therefore the mailbox
-	// will stay empty and won't be taken by an interrupt.
-	if (({{ reg }}->TSR & (CAN_TSR_TME0 | CAN_TSR_TME1 | CAN_TSR_TME2)) == 0)
-	{
-		// All mailboxes used at the moment
+	// bxCAN only supports Classic CAN with up to 8 data bytes
+	if (message.getDataLengthCode() > 8) return false;
 %% if options["buffer.tx"] > 0
-		if (not modm_assert_continue_ignore(txQueue.push(message), "can.tx",
-				"CAN transmit software buffer overflowed!", {{ 0 if id == '' else id }})) {
-			return false;
+	bool success{true};
+	{
+		// Keep the TX interrupt from changing the mailboxes and the queue.
+		// Disabling the interrupt in the peripheral is not enough, since the
+		// NVIC may already have latched it as pending.
+		modm::atomic::Lock lock;
+		// A mailbox may be empty if the TX interrupt is still pending, or
+		// after a reinitialization emptied them without TX interrupt
+		sendQueuedMessages();
+		// Only bypass the software queue when it is empty, so that frames stay in order
+		if (txQueue.isEmpty() and hasEmptyMailbox()) {
+			sendMailbox(message, ({{ reg }}->TSR & CAN_TSR_CODE) >> CAN_TSR_CODE_Pos);
 		}
-		return true;
+		else success = txQueue.push(message);
+	}
+	return success;
 %% else
-		return false;
+	if (not hasEmptyMailbox()) return false;
+	sendMailbox(message, ({{ reg }}->TSR & CAN_TSR_CODE) >> CAN_TSR_CODE_Pos);
+	return true;
 %% endif
-	}
-	else {
-		// Get number of the first free mailbox
-		uint32_t mailbox = ({{ reg }}->TSR & CAN_TSR_CODE) >> 24;
-
-		sendMailbox(message, mailbox);
-		return true;
-	}
 }
 
 // ----------------------------------------------------------------------------
