@@ -785,6 +785,26 @@ cpp_sources += env.NanopbProtofile(
 The generated files are available as a top-level `#include <protofile.pb.hpp>`.
 
 
+## Cyphal DSDL Generator Tool
+
+The `modm:ext:nunavut` module translates the Cyphal DSDL namespaces of the
+public regulated data types and of the `modm:ext:nunavut:sources` option into C
+headers with the `nnvg` tool of [Nunavut](https://github.com/OpenCyphal/nunavut),
+which must be installed with `pip install nunavut`.
+This module contains a SCons wrapper tool that asks `nnvg` for the files it
+generates, so that they are updated when the DSDL files change:
+
+```py
+env.NunavutDsdl(
+    namespaces=["modm/ext/dsdl/uavcan", "modm/ext/dsdl/reg", "dsdl/mycompany"],
+    path=options[":ext:nunavut:path"],
+)
+```
+
+The generated headers are available as `#include <uavcan/node/Heartbeat_1_0.h>`.
+The `NNVG` environment variable selects another `nnvg` executable.
+
+
 ## XPCC Generator Tool
 
 !!! warning "Deprecated"

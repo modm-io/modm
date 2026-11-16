@@ -74,6 +74,14 @@ sources += env.NanopbProtofile(
     sources={{ nanopb_source }},
     path=abspath("{{ nanopb_path }}"))
 %% endif
+%% if has_nunavut
+# Generating Cyphal DSDL serialization headers
+env.Append(CPPPATH=abspath("{{ nunavut_path }}"))
+ignored.append("{{ nunavut_path }}")
+env.NunavutDsdl(
+    namespaces={{ nunavut_source }},
+    path=abspath("{{ nunavut_path }}"))
+%% endif
 
 %% if options["::info.git"] != "Disabled"
 sources.append(env.InfoGit(with_status={{ "True" if "Status" in options["::info.git"] else "False" }}))
