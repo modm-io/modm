@@ -150,9 +150,9 @@ jobs:
       - name: Update lbuild
         run: |
           pip3 install --upgrade --upgrade-strategy=eager --break-system-packages modm
-      - name: Install protobuf==3.20.1 grpcio-tools (pip)
+      - name: Install protobuf==3.20.1 grpcio-tools nunavut (pip)
         run: |
-          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages protobuf grpcio-tools
+          pip3 install --upgrade --upgrade-strategy=eager --break-system-packages protobuf grpcio-tools nunavut
       - name: Examples Cortex-M Part ${{ matrix.part }}
         run: |
           (cd examples && ../tools/scripts/examples_compile.py . ../test/integration --target '^(stm32|sam|rp|nrf)' --split 7 --part ${{ matrix.part }})

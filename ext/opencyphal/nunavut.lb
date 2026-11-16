@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":nunavut"
+    module.description = FileReader("nunavut.md")
+
+def prepare(module, options):
+    module.add_set_option(
+        PathOption(name="sources", absolute=True, empty_ok=True,
+                   description="Root namespace folders of your own DSDL types."),
+        default="")
+    module.add_option(
+        PathOption(name="path", default="generated/nunavut", absolute=True,
+                   description="Path to the generated headers"))
+    return True
+
+def build(env):
+    env.outbasepath = "modm/ext/dsdl"
+    env.copy("cyphal/public_regulated_data_types/uavcan", "uavcan")
+    env.copy("cyphal/public_regulated_data_types/reg", "reg")
+    env.copy("cyphal/public_regulated_data_types/LICENSE", "LICENSE")

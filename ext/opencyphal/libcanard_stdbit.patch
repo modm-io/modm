@@ -1,0 +1,14 @@
+diff --git a/canard.c.inc b/canard.c.inc
+--- a/canard.c.inc
++++ b/canard.c.inc
+@@ -9,8 +9,10 @@
+ #include <stddef.h>
+ #include <string.h>
+ #if __STDC_VERSION__ >= 202311L
++#if __has_include(<stdbit.h>)
+ #include <stdbit.h>
+ #endif
++#endif
+ 
+ // Define this macro to include build configuration header.
+ // Usage example with CMake: "-DCANARD_CONFIG_HEADER=\"${CMAKE_CURRENT_SOURCE_DIR}/my_canard_config.h\""

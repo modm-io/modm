@@ -75,8 +75,10 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [ETL][]: Embedded Template Library.
 	- [FatFS][]: FAT/exFAT filesystem.
 	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
+	- [libcanard][]: Cyphal/CAN and DroneCAN protocol stack.
 	- [LVGL][]: Embedded Graphics Library.
 	- [Nanopb][]: Embedded Protocol Buffers.
+	- [Nunavut][]: Cyphal DSDL code generator for the [Cyphal public regulated data types][].
 	- [o1heap][]: Constant-time memory allocator.
 	- [printf][]: Small printf implementation.
 	- [ROSserial][]: Embedded ROS client.
@@ -1229,6 +1231,9 @@ and [many more contributors][contributors].
 [CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
 [printf]:          https://github.com/eyalroz/printf
 [Nanopb]:          https://github.com/nanopb/nanopb
+[Nunavut]:         https://github.com/OpenCyphal/nunavut
+[Cyphal public regulated data types]: https://github.com/OpenCyphal/public_regulated_data_types
+[libcanard]:       https://github.com/OpenCyphal/libcanard
 [LVGL]:            https://lvgl.io
 [RTT]:             https://kb.segger.com/RTT
 [Eigen]:           https://libeigen.gitlab.io

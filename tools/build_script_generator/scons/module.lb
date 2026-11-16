@@ -112,6 +112,8 @@ def build(env):
 
     if env.has_module(":nanopb"):
         tools.add("nanopb")
+    if env.has_module(":nunavut"):
+        tools.add("nunavut")
 
     env.collect("path.tools", *toolpaths)
     env.collect("tools", *tools)
@@ -151,6 +153,7 @@ def post_build(env):
     has_xpcc_generator = env.has_module(":communication:xpcc:generator") # DEPRECATED: 2027q4
     has_image_source = len(env["::image.source"])
     has_nanopb = env.has_module(":nanopb")
+    has_nunavut = env.has_module(":nunavut")
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
     generated_paths = [env.relcwdoutpath("") + "/" + r for r in repositories]
@@ -178,6 +181,7 @@ def post_build(env):
         "has_image_source": has_image_source,
         "has_xpcc_generator": has_xpcc_generator,
         "has_nanopb": has_nanopb,
+        "has_nunavut": has_nunavut,
     })
     if has_image_source:
         subs["image_source"] = env.relcwdoutpath(env["::image.source"])
@@ -193,6 +197,10 @@ def post_build(env):
     if has_nanopb:
         subs["nanopb_source"] = [env.relcwdoutpath(p) for p in env.get(":nanopb:sources", [])]
         subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", "."))
+    if has_nunavut:
+        subs["nunavut_source"] = [env.relcwdoutpath("modm/ext/dsdl/" + ns) for ns in ("uavcan", "reg")] + \
+                                 [env.relcwdoutpath(p) for p in env.get(":nunavut:sources", []) if p]
+        subs["nunavut_path"] = env.relcwdoutpath(env.get(":nunavut:path", "."))
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":
