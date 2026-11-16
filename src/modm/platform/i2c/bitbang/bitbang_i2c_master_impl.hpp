@@ -267,6 +267,10 @@ modm::platform::BitBangI2cMaster<Scl, Sda>::stopCondition()
 	// pull down both lines
 	SCL::reset();
 	SDA::reset();
+	// SCL stays low for a while: released right away it rose together with SDA falling,
+	// a device saw a START and then a STOP (a void message) and NACKed its next address
+	// (measured with a CS43L22 on DISCO-F407VG)
+	delay2();
 
 	// first release clock line
 	if (not sclSetAndWait()) return false;
