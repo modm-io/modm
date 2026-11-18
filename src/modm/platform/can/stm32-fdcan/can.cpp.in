@@ -98,6 +98,22 @@ readMsg(modm::can::Message& message, uint8_t fifoIndex, uint8_t* filter_id, uint
 	using namespace modm::platform;
 	using RxFifoAddress = MessageRam::RxFifoAddress;
 
+	// In overwrite mode a full FIFO overwrites the oldest frame, which may be
+	// the one that is read. Drop it and read from the get index + 1 instead.
+%% if target["family"] == "h7"
+	const bool overwrite = (fifoIndex ? {{ reg }}->RXF1C & FDCAN_RXF1C_F1OM : {{ reg }}->RXF0C & FDCAN_RXF0C_F0OM);
+%% else
+	const bool overwrite = {{ reg }}->RXGFC & (fifoIndex ? FDCAN_RXGFC_F1OM : FDCAN_RXGFC_F0OM);
+%% endif
+	const uint32_t status = fifoIndex ? {{ reg }}->RXF1S : {{ reg }}->RXF0S;
+	const bool full = status & (fifoIndex ? FDCAN_RXF1S_F1F : FDCAN_RXF0S_F0F);
+	// a FIFO with one element has no next frame to read instead
+	const uint32_t fill = fifoIndex ? (status & FDCAN_RXF1S_F1FL_Msk) >> FDCAN_RXF1S_F1FL_Pos
+									: (status & FDCAN_RXF0S_F0FL_Msk) >> FDCAN_RXF0S_F0FL_Pos;
+	if (overwrite and full and fill > 1) {
+		acknowledgeRxFifoRead(fifoIndex, retrieveRxFifoGetIndex(fifoIndex));
+	}
+
 	// retrieve index of next frame in RX fifo
 	const uint8_t getIndex = retrieveRxFifoGetIndex(fifoIndex);
 	const RxFifoAddress address = {fifoIndex, getIndex};
@@ -127,7 +143,13 @@ sendMsg(const modm::can::Message& message)
 {
 	using namespace modm::platform;
 
-	if (isHardwareTxQueueFull()) {
+	// TXBAR is ignored while the configuration can be changed, which also
+	// empties the hardware queue. setMode() refills it from the software queue.
+	if (isHardwareTxQueueFull() or ({{ reg }}->CCCR & FDCAN_CCCR_CCE)) {
+		return false;
+	}
+	// The bus monitoring mode keeps TXBRP in reset, so the frame would vanish
+	if (({{ reg }}->CCCR & (FDCAN_CCCR_MON | FDCAN_CCCR_TEST)) == FDCAN_CCCR_MON) {
 		return false;
 	}
 
@@ -183,7 +205,8 @@ modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
 {
 	Rcc::enable<Peripheral::Fdcan1>();
 
-	EnterInitMode init;
+	std::optional<EnterInitMode> init;
+	init.emplace();
 
 	// Configure nominal bitrate
 	{{ reg }}->NBTP =
@@ -290,6 +313,13 @@ modm::platform::Fdcan{{ id }}::initializeWithPrescaler(
 	}
 
 	configureMode(startupMode);
+
+	init.reset();
+%% if options["buffer.tx"] > 0
+	// The initialization mode emptied the hardware queue
+	modm::atomic::Lock lock;
+	sendQueuedMessages();
+%% endif
 }
 
 // line 0 used as TX and error interrupt
@@ -312,13 +342,22 @@ MODM_ISR({{ reg }}_IT0)
 	}
 %% endif
 
-	const bool hasErrorInterrupt = ({{ reg }}->IR & (FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP));
-	if (hasErrorInterrupt) {
+	// Clear the flags first, so that the callback does not miss a new event
+	const uint32_t errors = {{ reg }}->IR & (FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP);
+	if (errors) {
+		{{ reg }}->IR = errors;
+		// The FDCAN enters the initialization mode on bus-off, leave it to start
+		// the recovery after 129 occurrences of 11 recessive bits, like the
+		// automatic bus-off management of the bxCAN. Not while the configuration
+		// is changed, which leaves the initialization mode at its end.
+		if ((errors & FDCAN_IR_BO) and ({{ reg }}->PSR & FDCAN_PSR_BO) and
+			not ({{ reg }}->CCCR & FDCAN_CCCR_CCE)) {
+			{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
+		}
 		const auto callback = modm::platform::Fdcan{{ id }}::getErrorInterruptCallback();
 		if (callback) {
 			callback();
 		}
-		{{ reg }}->IR = FDCAN_IR_BO | FDCAN_IR_EW | FDCAN_IR_EP;
 	}
 }
 
@@ -336,6 +375,14 @@ MODM_ISR({{ reg }}_IT1)
 	// Acknowledge first, so that a frame received while the FIFOs are read
 	// triggers the interrupt again instead of waiting for the next frame.
 	{{ reg }}->IR = FDCAN_IR_RF0N | FDCAN_IR_RF1N;
+	// A full hardware FIFO lost a frame, for example while the rxQueue was full
+	if (const uint32_t lost = {{ reg }}->IR & (FDCAN_IR_RF0L | FDCAN_IR_RF1L); lost) {
+		{{ reg }}->IR = lost;
+		modm_assert_continue_ignore(not (lost & FDCAN_IR_RF0L), "can.rx.hw0",
+			"CAN receive hardware buffer overflowed!", {{ id }});
+		modm_assert_continue_ignore(not (lost & FDCAN_IR_RF1L), "can.rx.hw1",
+			"CAN receive hardware buffer overflowed!", {{ id }});
+	}
 	int_fast16_t msgRetrieveLimit = rxQueue.getMaxSize() - rxQueue.getSize();
 
 	RxMessage rxMessage;
@@ -353,11 +400,18 @@ MODM_ISR({{ reg }}_IT1)
 	}
 
 	if (rxFifo0HasMessage() or rxFifo1HasMessage()) {
-		modm_assert_continue_ignore(false, "fdcan.rx.buffer",
-			"CAN receive software buffer full, not reading new message(s)!");
 		// Disable the RX interrupt until getMessage() makes room in the rxQueue,
 		// which then triggers this interrupt again.
 		{{ reg }}->ILE &= ~FDCAN_ILE_EINT1;
+		// unless getMessage() made room meanwhile in a higher priority interrupt
+		if (rxQueue.isNotFull()) {
+			{{ reg }}->ILE |= FDCAN_ILE_EINT1;
+%% if shared_irq_it1
+			NVIC_SetPendingIRQ({{ shared_irq_it1 }}_IRQn);
+%% else
+			NVIC_SetPendingIRQ({{ reg }}_IT1_IRQn);
+%% endif
+		}
 	}
 %% endif
 }
@@ -366,9 +420,15 @@ MODM_ISR({{ reg }}_IT1)
 void
 modm::platform::Fdcan{{ id }}::setMode(Mode mode)
 {
-	EnterInitMode init;
-	{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
-	configureMode(mode);
+	{
+		EnterInitMode init;
+		configureMode(mode);
+	}
+%% if options["buffer.tx"] > 0
+	// The initialization mode emptied the hardware queue
+	modm::atomic::Lock lock;
+	sendQueuedMessages();
+%% endif
 }
 
 
@@ -433,8 +493,9 @@ modm::platform::Fdcan{{ id }}::configureInterrupts(uint32_t interruptPriority)
 	{{ reg }}->ILS = (FDCAN_ILS_RXFIFO0 | FDCAN_ILS_RXFIFO1);
 %% endif
 
-	// keep the error interrupts of an error callback set before initialization
-	{{ reg }}->IE = errorCallback_ ? (FDCAN_IE_BOE | FDCAN_IE_EPE | FDCAN_IE_EWE) : 0;
+	// bus-off for the recovery, and the error interrupts of an error callback
+	// set before initialization
+	{{ reg }}->IE = FDCAN_IE_BOE | (errorCallback_ ? (FDCAN_IE_EPE | FDCAN_IE_EWE) : 0);
 %% if options["buffer.tx"] > 0
 	// enable transmission complete and fifo empty interrupt
 	{{ reg }}->IE |= FDCAN_IE_TCE;
@@ -454,15 +515,22 @@ modm::platform::Fdcan{{ id }}::configureInterrupts(uint32_t interruptPriority)
 void
 modm::platform::Fdcan{{ id }}::setAutomaticRetransmission(bool retransmission)
 {
-	// DAR is write-protected outside of the initialization mode
-	EnterInitMode init;
-	if (retransmission) {
-		// Enable retransmission
-		{{ reg }}->CCCR = ({{ reg }}->CCCR & ~FDCAN_CCCR_DAR);
-	} else {
-		// Disable retransmission
-		{{ reg }}->CCCR = ({{ reg }}->CCCR | FDCAN_CCCR_DAR);
+	{
+		// DAR is write-protected outside of the initialization mode
+		EnterInitMode init;
+		if (retransmission) {
+			// Enable retransmission
+			{{ reg }}->CCCR = ({{ reg }}->CCCR & ~FDCAN_CCCR_DAR);
+		} else {
+			// Disable retransmission
+			{{ reg }}->CCCR = ({{ reg }}->CCCR | FDCAN_CCCR_DAR);
+		}
 	}
+%% if options["buffer.tx"] > 0
+	// The initialization mode emptied the hardware queue
+	modm::atomic::Lock lock;
+	sendQueuedMessages();
+%% endif
 }
 
 
@@ -536,6 +604,10 @@ modm::platform::Fdcan{{ id }}::isReadyToSend()
 bool
 modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 {
+	// without CAN FD mode, FD frames would be sent truncated as Classic CAN
+	if (message.isFlexibleData() and not ({{ reg }}->CCCR & FDCAN_CCCR_FDOE)) {
+		return false;
+	}
 %% if options["buffer.tx"] > 0
 	// Keep the TX interrupt from changing the hardware and software queues.
 	// Disabling the interrupt in the peripheral is not enough, since the NVIC
@@ -560,13 +632,15 @@ modm::platform::Fdcan{{ id }}::sendMessage(const can::Message& message)
 modm::platform::Fdcan{{ id }}::BusState
 modm::platform::Fdcan{{ id }}::getBusState()
 {
-	if ({{ reg }}->PSR & FDCAN_PSR_BO) {
+	// reading PSR resets some of its fields, so read it once
+	const uint32_t psr = {{ reg }}->PSR;
+	if (psr & FDCAN_PSR_BO) {
 		return BusState::Off;
 	}
-	else if ({{ reg }}->PSR & FDCAN_PSR_EP) {
+	else if (psr & FDCAN_PSR_EP) {
 		return BusState::ErrorPassive;
 	}
-	else if ({{ reg }}->PSR & FDCAN_PSR_EW) {
+	else if (psr & FDCAN_PSR_EW) {
 		return BusState::ErrorWarning;
 	}
 	else {
@@ -584,8 +658,6 @@ modm::platform::Fdcan{{ id }}::setStandardFilter(
 	if (standardIndex >= MessageRam::Config.filterCountStandard) {
 		return false;
 	}
-
-	EnterInitMode init;
 
 	MessageRam::setStandardFilter(standardIndex,
 		MessageRam::FilterType::Classic,
@@ -605,8 +677,6 @@ modm::platform::Fdcan{{ id }}::setStandardFilter(
 		return false;
 	}
 
-	EnterInitMode init;
-
 	MessageRam::setStandardFilter(standardIndex,
 		MessageRam::FilterType::Dual,
 		config, uint16_t(id0), uint16_t(id1));
@@ -624,8 +694,6 @@ modm::platform::Fdcan{{ id }}::setStandardRangeFilter(
 	if (standardIndex >= MessageRam::Config.filterCountStandard) {
 		return false;
 	}
-
-	EnterInitMode init;
 
 	MessageRam::setStandardFilter(standardIndex,
 		MessageRam::FilterType::Range,
@@ -645,12 +713,12 @@ modm::platform::Fdcan{{ id }}::setExtendedFilter(
 		return false;
 	}
 
-	EnterInitMode init;
-
-	MessageRam::setExtendedFilter0(extendedIndex,
-		config, uint32_t(id));
+	// disable the filter while its two words are written
+	MessageRam::setExtendedFilterDisabled(extendedIndex);
 	MessageRam::setExtendedFilter1(extendedIndex,
 		MessageRam::FilterType::Classic, uint32_t(mask));
+	MessageRam::setExtendedFilter0(extendedIndex,
+		config, uint32_t(id));
 
 	return true;
 }
@@ -666,12 +734,12 @@ modm::platform::Fdcan{{ id }}::setExtendedFilter(
 		return false;
 	}
 
-	EnterInitMode init;
-
-	MessageRam::setExtendedFilter0(extendedIndex,
-		config, uint32_t(id0));
+	// disable the filter while its two words are written
+	MessageRam::setExtendedFilterDisabled(extendedIndex);
 	MessageRam::setExtendedFilter1(extendedIndex,
 		MessageRam::FilterType::Dual, uint32_t(id1));
+	MessageRam::setExtendedFilter0(extendedIndex,
+		config, uint32_t(id0));
 
 	return true;
 }
@@ -687,21 +755,22 @@ modm::platform::Fdcan{{ id }}::setExtendedRangeFilter(
 		return false;
 	}
 
-	EnterInitMode init;
-
-	MessageRam::setExtendedFilter0(extendedIndex,
-		config, uint32_t(first));
+	// disable the filter while its two words are written
+	MessageRam::setExtendedFilterDisabled(extendedIndex);
 	MessageRam::setExtendedFilter1(extendedIndex,
 		MessageRam::FilterType::Range, uint32_t(last));
+	MessageRam::setExtendedFilter0(extendedIndex,
+		config, uint32_t(first));
 
 	return true;
 }
 
 
+// The filter elements are in the message RAM, which may be written while the
+// FDCAN is running. The initialization mode would empty the hardware queues.
 void
 modm::platform::Fdcan{{ id }}::clearStandardFilters()
 {
-	EnterInitMode init;
 	for (unsigned i = 0; i < MessageRam::Config.filterCountStandard; ++i) {
 		MessageRam::setStandardFilterDisabled(i);
 	}
@@ -711,7 +780,6 @@ modm::platform::Fdcan{{ id }}::clearStandardFilters()
 void
 modm::platform::Fdcan{{ id }}::clearExtendedFilters()
 {
-	EnterInitMode init;
 	for (unsigned i = 0; i < MessageRam::Config.filterCountExtended; ++i) {
 		MessageRam::setExtendedFilterDisabled(i);
 	}

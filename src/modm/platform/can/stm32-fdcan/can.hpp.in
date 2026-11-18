@@ -18,6 +18,7 @@
 
 #include <modm/architecture/interface/can.hpp>
 #include <modm/architecture/interface/can_filter.hpp>
+#include <modm/architecture/interface/atomic_lock.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include "../device.hpp"
 
@@ -166,8 +167,10 @@ public:
 	 * 			\see Fdcan{{ id }}::Mode
 	 * \param overwriteOnOverrun
 	 * 			Once a receive FIFO is full the next incoming message
-	 * 			will overwrite the previous one if \c true otherwise
-	 * 			the incoming message will be discarded
+	 * 			will overwrite the oldest one if \c true otherwise
+	 * 			the incoming message will be discarded. In overwrite
+	 * 			mode the oldest frame of a full FIFO is dropped when
+	 * 			reading, since it may be overwritten while it is read.
 	 *
 	 * \warning	Has to called after connect(), but before any
 	 * 			other function from this class!
@@ -180,7 +183,7 @@ public:
 	>
 	static inline void
 	initialize(	uint32_t interruptPriority, Mode startupMode = Mode::Normal,
-				bool overwriteOnOverrun = true)
+				bool overwriteOnOverrun = false)
 	{
 		using Timings = CanBitTiming<
 			SystemClock::Fdcan{{ id }},
@@ -214,10 +217,17 @@ public:
 	 * Set the operating mode.
 	 *
 	 * Default after initialization is the normal mode.
+	 *
+	 * \warning Changing the mode needs the initialization mode, which
+	 * 			discards the frames in the hardware transmit queue and
+	 * 			the receive FIFOs. Frames in the software queues are kept.
 	 */
 	static void
 	setMode(Mode mode);
 
+	/// Enables or disables the automatic retransmission of frames that lost
+	/// the arbitration or had an error.
+	/// \warning Discards the frames in the hardware queues like setMode().
 	static void
 	setAutomaticRetransmission(bool retransmission);
 
@@ -319,7 +329,8 @@ public:
 	static inline uint8_t
 	getReceiveErrorCounter()
 	{
-		return (({{ reg }}->ECR >> 8) & 0xFF);
+		// without the receive error passive bit
+		return (({{ reg }}->ECR & FDCAN_ECR_REC_Msk) >> FDCAN_ECR_REC_Pos);
 	}
 
 	/**
@@ -342,6 +353,10 @@ public:
 	 * - The FDCAN peripheral enters ERROR_PASSIVE or BUS_OFF state
 	 * - The error counter exceeds the warning limit
 	 *
+	 * The driver leaves the bus-off state automatically after 129 occurrences
+	 * of 11 recessive bits, also without callback. Pending frames are kept
+	 * and sent after the recovery.
+	 *
 	 * To disable the interrupt set the callback to nullptr.
 	 */
 	static void
@@ -349,9 +364,9 @@ public:
 	{
 		errorCallback_ = callback;
 		if(callback) {
-			FDCAN{{ id }}->IE |=  (FDCAN_IE_BOE | FDCAN_IE_EPE | FDCAN_IE_EWE);
+			{{ reg }}->IE |=  (FDCAN_IE_EPE | FDCAN_IE_EWE);
 		} else {
-			FDCAN{{ id }}->IE &= ~(FDCAN_IE_BOE | FDCAN_IE_EPE | FDCAN_IE_EWE);
+			{{ reg }}->IE &= ~(FDCAN_IE_EPE | FDCAN_IE_EWE);
 		}
 	}
 
@@ -378,21 +393,39 @@ private:
 	{
 		EnterInitMode()
 		{
-			{{ reg }}->CCCR |= FDCAN_CCCR_INIT;
+			bool entered{false};
 			int deadlockPreventer = 10'000; // max ~10ms
-			while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
-				using namespace std::literals;
-				modm::delay(1us);
-				// Wait until the initialization mode is entered.
+			while (not entered and deadlockPreventer-- > 0)
+			{
+				{{ reg }}->CCCR |= FDCAN_CCCR_INIT;
+				while ((({{ reg }}->CCCR & FDCAN_CCCR_INIT) == 0) and (deadlockPreventer-- > 0)) {
+					using namespace std::literals;
+					modm::delay(1us);
+					// Wait until the initialization mode is entered.
+				}
+				// The bus-off interrupt leaves the initialization mode unless
+				// CCE is set, in which case INIT is set again.
+				modm::atomic::Lock lock;
+				if ({{ reg }}->CCCR & FDCAN_CCCR_INIT) {
+					{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
+					entered = true;
+				}
 			}
-			modm_assert(deadlockPreventer > 0, "can.{{ id }}.init", "timeout expired");
-			{{ reg }}->CCCR |= FDCAN_CCCR_CCE;
+			modm_assert(entered, "can.{{ id }}.init", "timeout expired");
 		}
 
 		~EnterInitMode()
 		{
 			// Switch to normal operation, automatically clears CCE flag
 			{{ reg }}->CCCR &= ~FDCAN_CCCR_INIT;
+			// INIT must be accepted before it is set again. The hardware keeps
+			// INIT set in the sleep mode.
+			if ({{ reg }}->CCCR & FDCAN_CCCR_CSR) return;
+			int deadlockPreventer = 10'000; // max ~10ms
+			while (({{ reg }}->CCCR & FDCAN_CCCR_INIT) and (deadlockPreventer-- > 0)) {
+				using namespace std::literals;
+				modm::delay(1us);
+			}
 		}
 
 		EnterInitMode(const EnterInitMode&) = delete;
@@ -406,7 +439,7 @@ private:
 	irqIT0();
 %% endif
 
-%% if shared_irq_it0
+%% if shared_irq_it1
 	friend void ::{{ shared_irq_it1 }}_IRQHandler();
 
 	static void
