@@ -23,6 +23,7 @@
 void
 modm::platform::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t fr1, uint32_t fr2)
 {
+	if (bank >= FilterBanks) return;
 	uint32_t mask = (1UL << bank);
 	// the filter registers are shared with the filter functions of the instances
 	modm::atomic::Lock lock;
@@ -67,6 +68,7 @@ modm::platform::CanFilter::setFilterBase(uint8_t bank, uint32_t flags, uint32_t 
 void
 modm::platform::CanFilter::disableFilter(uint8_t id)
 {
+	if (id >= FilterBanks) return;
 	uint32_t mask = (1UL << id);
 	modm::atomic::Lock lock;
 

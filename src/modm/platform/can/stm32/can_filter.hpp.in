@@ -25,11 +25,19 @@ namespace platform
 /**
  * @brief		Filters for the Basic Extended CAN Module
  *
+ * Configures the filter banks of {% if target_has_can2 %}CAN1 and CAN2{% else %}the CAN{% endif %}.
+ * CAN3 has its own filter banks, use the filter functions of Can3 instead.
+ *
  * @author		Fabian Greif <fabian.greif@rwth-aachen.de>
  * @ingroup		modm_platform_can
  */
 class CanFilter
 {
+public:
+	/// Number of filter banks{% if target_has_can2 %}, shared by CAN1 and CAN2{% endif %}
+	static constexpr uint8_t FilterBanks = {{ 28 if target_has_can2 else 14 }};
+
+private:
 	// internal constants
 	static const uint32_t MASK_MODE	= 0x00;
 	static constexpr uint32_t LIST_MODE = 0x02;
@@ -131,7 +139,7 @@ public:
 	{
 		inline
 		constexpr StandardFilterMask(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
-			value((identifier << 21) | ((rtr) ? 0x2 : 0))
+			value((identifier << 21) | 0x4 | ((rtr) ? 0x2 : 0))	// standard frames only
 		{
 		}
 
@@ -179,7 +187,7 @@ public:
 		inline
 		constexpr ExtendedIdentifierShort(uint32_t identifier, RemoteRequestStatus rtr = NO_RTR) :
 			IdentifierShort(((identifier >> 13) & 0xffe0) |
-					((identifier >> 15) & 0x007f) |
+					((identifier >> 15) & 0x0007) |
 					0x08 |
 					((rtr) ? 0x10 : 0))
 		{
@@ -197,7 +205,7 @@ public:
 		inline
 		constexpr ExtendedFilterMaskShort(uint32_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
 			value(((identifier >> 13) & 0xffe0) |
-					((identifier >> 15) & 0x007f) |
+					((identifier >> 15) & 0x0007) |
 					0x08 |
 					((rtr) ? 0x10 : 0))
 		{
@@ -230,7 +238,7 @@ public:
 	{
 		inline
 		constexpr StandardFilterMaskShort(uint16_t identifier, RemoteRequestFilter rtr = RTR_MATCH) :
-			value(((identifier << 5) & 0xffe0) | ((rtr) ? 0x10 : 0))
+			value(((identifier << 5) & 0xffe0) | 0x08 | ((rtr) ? 0x10 : 0))	// standard frames only
 		{
 		}
 
