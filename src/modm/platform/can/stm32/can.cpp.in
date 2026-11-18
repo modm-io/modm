@@ -40,6 +40,7 @@
 // ----------------------------------------------------------------------------
 %% if options["buffer.tx"] > 0
 static modm::platform::CanTxQueue<{{ options["buffer.tx"] }}> txQueue;
+static void sendQueuedMessages();
 %% endif
 
 struct RxMessage {
@@ -81,27 +82,19 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	while ({{ reg }}->MCR & CAN_MCR_RESET)
 		;
 
-	// Exit from sleep mode
-	{{ reg }}->MCR &= (~(uint32_t)CAN_MCR_SLEEP);
-
 	// Bus off is left automatically by the hardware after 128 occurrences
 	// of 11 recessive bits. The mailboxes are sent in the order of request
 	// (TXFP), since in priority mode the mailboxes of frames with the same
 	// identifier are sent in the order of their number, which could reorder
 	// them. The software queue is sorted by priority instead.
-	if (overwriteOnOverrun) {
-		{{ reg }}->MCR |= CAN_MCR_ABOM | CAN_MCR_TXFP;
-	}
-	else {
-		// No overwrite at RX FIFO: Once a receive FIFO is full the next
-		// incoming message will be discarded
-		{{ reg }}->MCR |= CAN_MCR_ABOM | CAN_MCR_RFLM | CAN_MCR_TXFP;
-	}
-
-	// Request initialization
-	{{ reg }}->MCR |= CAN_MCR_INRQ;
-	int deadlockPreventer = 10'000; // max ~10ms
-	while ((({{ reg }}->MSR & CAN_MSR_INAK) == 0) and (deadlockPreventer-- > 0)) {
+	// Without overwrite (RFLM) a full receive FIFO discards the next frame.
+	// Request the initialization mode in the same write that leaves the sleep
+	// mode, since leaving it alone would start the normal mode with the reset
+	// bit timing after 11 recessive bits.
+	{{ reg }}->MCR = ({{ reg }}->MCR & ~CAN_MCR_SLEEP) | CAN_MCR_INRQ | CAN_MCR_ABOM | CAN_MCR_TXFP |
+			(overwriteOnOverrun ? 0 : CAN_MCR_RFLM);
+	int deadlockPreventer = 50'000; // max ~50ms, two frames at 10 kbit/s
+	while ((({{ reg }}->MSR & (CAN_MSR_INAK | CAN_MSR_SLAK)) != CAN_MSR_INAK) and (deadlockPreventer-- > 0)) {
 		modm::delay_us(1);
 		// Wait until the initialization mode is entered.
 		// The CAN hardware waits until the current CAN activity (transmission
@@ -134,8 +127,8 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 	NVIC_EnableIRQ({{ irqs.rx1 }}_IRQn);
 
 	%% if options["buffer.tx"] > 0
-	NVIC_EnableIRQ({{ irqs.tx }}_IRQn);
 	NVIC_SetPriority({{ irqs.tx }}_IRQn, interruptPriority);
+	NVIC_EnableIRQ({{ irqs.tx }}_IRQn);
 	%% endif
 %% endif
 
@@ -154,11 +147,18 @@ modm::platform::Can{{ id }}::initializeWithPrescaler(
 
 	// Request leave initialization
 	{{ reg }}->MCR &= ~(uint32_t)CAN_MCR_INRQ;
-	deadlockPreventer = 10'000; // max ~10ms
+	deadlockPreventer = 50'000; // max ~50ms, two frames at 10 kbit/s
 	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0))  {
 		// wait for the normal mode, which needs 11 recessive bits on the bus
 		modm::delay_us(1);
 	}
+%% if options["buffer.tx"] > 0
+	{
+		// The master reset emptied the mailboxes
+		modm::atomic::Lock lock;
+		sendQueuedMessages();
+	}
+%% endif
 	return deadlockPreventer >= 0;
 }
 
@@ -356,6 +356,17 @@ MODM_ISR({{ irqs.rx1 }})
 // the interrupt source and call the correct interrupts function defined above.
 // Sources for the different interrupts are specified in the Reference Manual
 // in the "bxCAN interrupts" section.
+// The status change interrupt shares the vector with the other interrupts,
+// so this handler is called instead. It must clear the flags of the enabled
+// status change interrupts, which this default handler does. Not MODM_ISR(),
+// since CAN_SCE is not in the vector table.
+MODM_ISR_DECL(CAN_SCE) modm_weak;
+void
+MODM_ISR_NAME(CAN_SCE)()
+{
+	{{ reg }}->MSR = CAN_MSR_ERRI | CAN_MSR_WKUI | CAN_MSR_SLAKI;
+}
+
 MODM_ISR(CEC_CAN)
 {
 	if({{ reg }}->TSR & (CAN_TSR_RQCP0 | CAN_TSR_RQCP1 | CAN_TSR_RQCP2)) {
@@ -370,7 +381,9 @@ MODM_ISR(CEC_CAN)
 		MODM_ISR_NAME({{ irqs.rx1 }})();
 	}
 
-	// TODO: we do not handle status changes at the moment.
+	if({{ reg }}->MSR & (CAN_MSR_ERRI | CAN_MSR_WKUI | CAN_MSR_SLAKI)) {
+		MODM_ISR_NAME(CAN_SCE)();
+	}
 }
 %% endif
 
@@ -380,17 +393,26 @@ modm::platform::Can{{ id }}::setMode(Mode mode)
 {
 	// Request initialization
 	{{ reg }}->MCR |= CAN_MCR_INRQ;
-	while (({{ reg }}->MSR & CAN_MSR_INAK) == 0) {
+	int deadlockPreventer = 50'000; // max ~50ms, two frames at 10 kbit/s
+	while ((({{ reg }}->MSR & CAN_MSR_INAK) == 0) and (deadlockPreventer-- > 0)) {
+		modm::delay_us(1);
 		// Wait until the initialization mode is entered.
 		// The CAN hardware waits until the current CAN activity (transmission
 		// or reception) is completed before entering the initialization mode.
 	}
 
-	{{ reg }}->BTR = ({{ reg }}->BTR & ~(CAN_BTR_SILM | CAN_BTR_LBKM))
-						| static_cast<uint32_t>(mode);
+	// BTR is write-protected outside of the initialization mode
+	if (deadlockPreventer >= 0) {
+		{{ reg }}->BTR = ({{ reg }}->BTR & ~(CAN_BTR_SILM | CAN_BTR_LBKM))
+							| static_cast<uint32_t>(mode);
+	}
 
-	// Leave initialization mode
+	// Leave initialization mode, which needs 11 recessive bits on the bus
 	{{ reg }}->MCR &= ~CAN_MCR_INRQ;
+	deadlockPreventer = 50'000; // max ~50ms, two frames at 10 kbit/s
+	while ((({{ reg }}->MSR & CAN_MSR_INAK) == CAN_MSR_INAK) and (deadlockPreventer-- > 0)) {
+		modm::delay_us(1);
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -485,7 +507,7 @@ bool
 modm::platform::Can{{ id }}::sendMessage(const can::Message& message)
 {
 	// bxCAN only supports Classic CAN with up to 8 data bytes
-	if (message.getDataLengthCode() > 8) return false;
+	if (message.isFlexibleData() or message.getDataLengthCode() > 8) return false;
 %% if options["buffer.tx"] > 0
 	bool success{true};
 	{

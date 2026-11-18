@@ -233,6 +233,21 @@ public:
 	 * - Wakeup condition, SOF monitored on the CAN Rx signal.
 	 * - Entry into Sleep mode
 	 *
+%% if combined_isr
+	 * The status change interrupt shares one interrupt vector with the
+	 * other CAN interrupts, which calls this handler. Its default only
+	 * acknowledges the interrupt, override it with your own. Since CAN_SCE
+	 * is not in the vector table, use MODM_ISR_DECL() instead of MODM_ISR():
+	 * \code
+	 * MODM_ISR_DECL(CAN_SCE)
+	 * {
+	 *     ...
+	 *
+	 *     // Acknowledge the interrupt
+	 *     CAN->MSR = CAN_MSR_ERRI | CAN_MSR_WKUI | CAN_MSR_SLAKI;
+	 * }
+	 * \endcode
+%% else
 	 * You need to create you own interrupt handler for this interrupt.
 	 * The interrupt handler has a fixed name:
 	 * \code
@@ -244,6 +259,7 @@ public:
 	 *     CAN{{ id }}->MSR = CAN_MSR_ERRI;
 	 * }
 	 * \endcode
+%% endif
 	 *
 	 * \param interruptEnable
 	 * 			Upper 24-bit of the CAN_IER register. E.g.:
