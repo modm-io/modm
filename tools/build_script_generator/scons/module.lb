@@ -114,6 +114,8 @@ def build(env):
         tools.add("nanopb")
     if env.has_module(":nunavut"):
         tools.add("nunavut")
+    if env.has_module(":dronecan"):
+        tools.add("dronecan_dsdl")
 
     env.collect("path.tools", *toolpaths)
     env.collect("tools", *tools)
@@ -154,6 +156,7 @@ def post_build(env):
     has_image_source = len(env["::image.source"])
     has_nanopb = env.has_module(":nanopb")
     has_nunavut = env.has_module(":nunavut")
+    has_dronecan = env.has_module(":dronecan")
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
     generated_paths = [env.relcwdoutpath("") + "/" + r for r in repositories]
@@ -182,6 +185,7 @@ def post_build(env):
         "has_xpcc_generator": has_xpcc_generator,
         "has_nanopb": has_nanopb,
         "has_nunavut": has_nunavut,
+        "has_dronecan": has_dronecan,
     })
     if has_image_source:
         subs["image_source"] = env.relcwdoutpath(env["::image.source"])
@@ -201,6 +205,11 @@ def post_build(env):
         subs["nunavut_source"] = [env.relcwdoutpath("modm/ext/dsdl/" + ns) for ns in ("uavcan", "reg")] + \
                                  [env.relcwdoutpath(p) for p in env.get(":nunavut:sources", []) if p]
         subs["nunavut_path"] = env.relcwdoutpath(env.get(":nunavut:path", "."))
+    if has_dronecan:
+        subs["dronecan_source"] = [env.relcwdoutpath("modm/ext/dronecan/dsdl/" + ns) for ns in env.get(":dronecan:namespaces", [])] + \
+                                  [env.relcwdoutpath(p) for p in env.get(":dronecan:sources", []) if p]
+        subs["dronecan_types"] = [t.strip() for t in env.get(":dronecan:types", "").split(",") if t.strip()]
+        subs["dronecan_path"] = env.relcwdoutpath(env.get(":dronecan:path", "."))
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":

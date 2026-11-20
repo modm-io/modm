@@ -25,7 +25,7 @@ class BuildModuleDocs:
         if self._content is None:
             self._content = Path(localpath("module.md")).read_text(encoding="utf-8").strip()
             tools = ["avrdude", "openocd", "bmp", "gdb", "size", "info", "jlink",
-                     "unit_test", "itm", "rtt", "build_id", "bitmap", "elf2uf2"]
+                     "unit_test", "itm", "rtt", "build_id", "bitmap", "elf2uf2", "dronecan_dsdl"]
 
             for tool in tools:
                 tpath = Path(repopath("tools/modm_tools/{}.py".format(tool)))
@@ -225,6 +225,8 @@ def build(env):
         tools.update({"avrdude"})
     if env.has_module(":driver:logic_analyzer"):
         tools.add("logic_analyzer")
+    if env.has_module(":dronecan"):
+        tools.add("dronecan_dsdl")
 
     env.outbasepath = "modm/"
     env.substitutions = {"tools": tools}
@@ -235,6 +237,8 @@ def build(env):
             env.copy(localpath("../modm_tools/info.c.in"), "modm_tools/info.c.in")
         if "jlink" in tool:
             env.copy(localpath("../modm_tools/jlink.JLinkScript"), "modm_tools/jlink.JLinkScript")
+        if "dronecan_dsdl" in tool:
+            env.copy(localpath("../modm_tools/dronecan_dsdl.h.in"), "modm_tools/dronecan_dsdl.h.in")
 
     env.outbasepath = "modm/"
     env.template("probe_gdbinit.in", "gdbinit_openocd", substitutions={"probe": "openocd"})

@@ -18,6 +18,7 @@
 #include <modm/architecture/interface/clock.hpp>
 #include <cstdlib>
 #include <cstring>
+#include <span>
 
 namespace modm::canard
 {
@@ -156,6 +157,35 @@ public:
 	poll()
 	{
 		canard_poll(&canard, Can::isReadyToSend() ? 1 : 0);
+	}
+
+	/// Sends an anonymous DroneCAN message of up to 7 bytes as a single frame,
+	/// e.g. the uavcan.protocol.dynamic_node_id.Allocation request of a node
+	/// without node-ID. libcanard can't send anonymous frames, so the frame
+	/// bypasses its TX queue. Only the 2 low bits of the data type ID are sent.
+	/// @return false if the payload is too long or the driver is busy.
+	bool
+	publishAnonymous(uint16_t data_type_id, uint8_t transfer_id, std::span<const uint8_t> payload,
+					 canard_prio_t priority = canard_prio_nominal)
+	{
+		if (payload.size() > 7) return false;
+		// CRC-16-CCITT of the payload as discriminator, so that anonymous nodes
+		// sending different payloads at the same time don't collide
+		uint16_t crc = 0xffff;
+		for (const uint8_t byte : payload)
+		{
+			crc ^= uint16_t(byte) << 8;
+			for (int bit = 0; bit < 8; bit++)
+				crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : (crc << 1);
+		}
+		const uint32_t id = (uint32_t(priority) << 26) | (uint32_t(crc & 0x7ffe) << 9) |
+							(uint32_t(data_type_id & 0b11) << 8);
+		modm::can::Message message(id, payload.size() + 1);
+		message.setExtended(true);
+		std::memcpy(message.data, payload.data(), payload.size());
+		// single frame: start and end of transfer, toggle 0
+		message.data[payload.size()] = 0xC0 | (transfer_id & CANARD_TRANSFER_ID_MAX);
+		return send(message);
 	}
 
 	/// Received frames of other nodes with the node-ID of this node, with `keep_node_id`

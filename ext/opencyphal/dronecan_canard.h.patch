@@ -1,0 +1,14 @@
+diff --git a/canard.h b/canard.h
+--- a/canard.h
++++ b/canard.h
+@@ -42,8 +42,8 @@
+ #endif
+ 
+ /// Libcanard version. API will be backwards compatible within the same major version.
+-#define CANARD_VERSION_MAJOR                        0
+-#define CANARD_VERSION_MINOR                        2
++#define DRONECAN_CANARD_VERSION_MAJOR                        0
++#define DRONECAN_CANARD_VERSION_MINOR                        2
+ 
+ 
+ #ifndef CANARD_ENABLE_CANFD
