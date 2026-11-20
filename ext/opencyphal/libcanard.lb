@@ -15,8 +15,13 @@ def init(module):
     module.description = FileReader("libcanard.md")
 
 def prepare(module, options):
-    module.depends(":architecture:assert")
-    return True
+    module.depends(
+        ":architecture:assert",
+        ":architecture:can",
+        ":architecture:clock",
+        ":o1heap")
+    # o1heap is only available on Cortex-M
+    return options[":target"].has_driver("core:cortex-m*")
 
 def build(env):
     env.collect(":build:path.include", "modm/ext/canard")
@@ -28,3 +33,5 @@ def build(env):
     # newlib has no <stdbit.h> yet, which libcanard only needs for an optimization
     env.copy("cyphal/libcanard/libcanard/canard.c", "canard.c.inc", patch="libcanard_stdbit.patch")
     env.copy("canard.c")
+    # modm::canard::Node connects libcanard to the modm CAN drivers
+    env.copy("canard.hpp")
