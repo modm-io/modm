@@ -15,7 +15,11 @@ def init(module):
     module.description = FileReader("libcanard.md")
 
 def prepare(module, options):
-    module.depends(":architecture:assert")
+    module.depends(
+        ":architecture:assert",
+        ":architecture:can",
+        ":architecture:clock",
+        ":ext:o1heap")
     # too large for AVR
     return not options[":target"].has_driver("core:avr*")
 
@@ -29,3 +33,5 @@ def build(env):
     # newlib has no <stdbit.h> yet, which libcanard only needs for an optimization
     env.copy("cyphal/libcanard/libcanard/canard.c", "canard.c.inc", patch="libcanard_stdbit.patch")
     env.copy("canard.c")
+    # modm::canard::Node connects libcanard to the modm CAN drivers
+    env.copy("canard.hpp")
