@@ -117,3 +117,45 @@ libcanard treats a received frame with its own node-ID as a node-ID collision,
 so a node with a CAN controller in loopback mode must drop the echoes of its
 own frames with `{.loopback = true}`. Several nodes on one controller read
 the driver once and pass each frame to all nodes with `ingest()`.
+
+
+## Parameters
+
+`modm::canard::Parameter` in `<modm/ext/canard/parameter.hpp>` holds an
+integer, real or boolean value with a default, and a range for integers and
+reals, for the configuration services of the DroneCAN and Cyphal nodes. The
+application reads it with `integer()`, `real()` or `boolean()` and may change
+it with `set()`, which refuses values out of range.
+
+```cpp
+modm::canard::Parameter node_id{"uavcan.node.id", 0, 0, 127}; // integer with range
+modm::canard::Parameter gain{"example.gain", 0.5f, 0.f, 10.f}; // real with range
+modm::canard::Parameter enable{"example.enable", true};        // boolean
+modm::canard::Parameter* const parameters[]{&node_id, &gain, &enable};
+```
+
+`canard::loadParameters()`, `saveParameters()` and `eraseParameters()` read
+and write them in a `canard::ParameterStorage`. Each parameter is stored under
+a 32-bit hash of its name and type, so the order may change between firmware
+versions, and parameters with the default value are removed from the storage,
+so that a new default takes effect. Load them before the node is initialized,
+so that e.g. its node-ID can be a parameter.
+
+With the `modm:ext:zms` module, `modm::canard::ZmsStorage` stores the
+parameters in a ZMS file system on the internal or an external flash:
+
+```cpp
+#include <modm/ext/canard/parameter_zms.hpp>
+
+zms_fs fs;
+modm::zms::setup(fs, Flash::Size - 4 * Flash::MaxPageSize, 4, Flash::MaxPageSize);
+zms_mount(&fs);
+modm::canard::ZmsStorage storage{fs};
+modm::canard::loadParameters(parameters, storage);
+```
+
+Saving blocks the node while the flash is programmed or erased. On devices
+with a single flash bank, all interrupts are masked during these operations,
+and the CAN receive FIFO overflows if frames arrive meanwhile. Put the storage
+into the second bank of dual-bank devices instead, where the CPU keeps running
+and the CAN driver keeps receiving into its software queue.

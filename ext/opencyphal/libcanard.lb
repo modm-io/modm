@@ -35,3 +35,7 @@ def build(env):
     env.copy("canard.c")
     # modm::canard::Node connects libcanard to the modm CAN drivers
     env.copy("canard.hpp")
+    # parameters of the DroneCAN and Cyphal nodes, with an optional ZMS storage
+    env.copy("parameter.hpp")
+    if env.has_module(":ext:zms"):
+        env.copy("parameter_zms.hpp")
