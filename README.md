@@ -71,6 +71,7 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [CMSIS-DAP][]: USB to SWD/JTAG bridge.
 	- [CMSIS-DSP][]: Embedded compute library.
 	- [CrashCatcher][]: Crash reports for HardFaults.
+	- [DroneCAN][] data types and serialization functions.
 	- [Eigen][]: Linear Algebra Library.
 	- [ETL][]: Embedded Template Library.
 	- [FatFS][] and [Petit FatFS][]: FAT/exFAT filesystems.
@@ -1233,6 +1234,7 @@ and [many more contributors][contributors].
 [FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
 [ROSserial]:       https://wiki.ros.org/rosserial
 [CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
+[DroneCAN]:        https://dronecan.github.io
 [printf]:          https://github.com/eyalroz/printf
 [Nanopb]:          https://github.com/nanopb/nanopb
 [Nunavut]:         https://github.com/OpenCyphal/nunavut

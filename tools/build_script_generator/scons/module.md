@@ -805,6 +805,27 @@ The generated headers are available as `#include <uavcan/node/Heartbeat_1_0.h>`.
 The `NNVG` environment variable selects another `nnvg` executable.
 
 
+## DroneCAN DSDL Generator Tool
+
+The `modm:ext:dronecan` module translates the DroneCAN DSDL namespaces of the
+`modm:ext:dronecan:namespaces` and `modm:ext:dronecan:sources` options into C headers
+with the `modm_tools.dronecan_dsdl` generator, which parses the DSDL with
+pydronecan and renders the code with jinja2 (`pip install dronecan jinja2`).
+The SCons wrapper tool asks the generator for the files it writes, so that they
+are updated when the DSDL files change:
+
+```py
+env.DronecanDsdl(
+    namespaces=["modm/ext/dronecan/dsdl/uavcan"],
+    types=["uavcan.protocol.NodeStatus"],
+    path=options[":ext:dronecan:path"],
+)
+```
+
+The generated headers are available as `#include <uavcan.protocol.NodeStatus.h>`.
+pydronecan and jinja2 must be installed in the Python interpreter of SCons.
+
+
 ## XPCC Generator Tool
 
 !!! warning "Deprecated"

@@ -82,6 +82,15 @@ env.NunavutDsdl(
     namespaces={{ nunavut_source }},
     path=abspath("{{ nunavut_path }}"))
 %% endif
+%% if has_dronecan
+# Generating DroneCAN DSDL serialization headers
+env.Append(CPPPATH=abspath("{{ dronecan_path }}"))
+ignored.append("{{ dronecan_path }}")
+env.DronecanDsdl(
+    namespaces={{ dronecan_source }},
+    types={{ dronecan_types }},
+    path=abspath("{{ dronecan_path }}"))
+%% endif
 
 %% if options["::info.git"] != "Disabled"
 sources.append(env.InfoGit(with_status={{ "True" if "Status" in options["::info.git"] else "False" }}))
