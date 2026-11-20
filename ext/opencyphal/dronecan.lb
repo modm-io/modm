@@ -33,6 +33,10 @@ def prepare(module, options):
     module.add_option(
         PathOption(name="path", default="generated/dronecan", absolute=True,
                    description="Path to the generated code"))
+    module.add_collector(
+        StringCollector(name="type",
+                        description="Full names of types that other modules need, which are "
+                                    "added to the `types` option if it is not empty."))
     module.depends(":ext:libcanard")
     # too large for AVR
     return not options[":target"].has_driver("core:avr*")

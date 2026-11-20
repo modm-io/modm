@@ -210,7 +210,10 @@ def post_build(env):
     if has_dronecan:
         subs["dronecan_source"] = [env.relcwdoutpath("modm/ext/dronecan/dsdl/" + ns) for ns in env.get(":ext:dronecan:namespaces", [])] + \
                                   [env.relcwdoutpath(p) for p in env.get(":ext:dronecan:sources", []) if p]
-        subs["dronecan_types"] = [t.strip() for t in env.get(":ext:dronecan:types", "").split(",") if t.strip()]
+        types = [t.strip() for t in env.get(":ext:dronecan:types", "").split(",") if t.strip()]
+        # an empty option generates all types, so the collected ones only add to a selection
+        if types: types = sorted(set(types + env.collector_values(":ext:dronecan:type")))
+        subs["dronecan_types"] = types
         subs["dronecan_path"] = env.relcwdoutpath(env.get(":ext:dronecan:path", "."))
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
