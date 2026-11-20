@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- CI: limit 30 -->
+  <modules>
+    <module>modm:platform:can</module>
+    <module>modm:platform:can:*</module>
+    <module>modm:platform:flash</module>
+    <module>modm:communication:cyphal</module>
+    <module>modm:ext:zms</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
