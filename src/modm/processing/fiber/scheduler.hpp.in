@@ -13,7 +13,10 @@
 
 #ifndef MODM_FIBER_SCHEDULER_HPP
 #define MODM_FIBER_SCHEDULER_HPP
-%% if with_tls
+%% if with_emutls
+%#
+extern "C" void* __emutls_get_address(void*);
+%% elif with_tls
 %#
 extern "C" void __aeabi_read_tp();
 %% endif
@@ -53,7 +56,9 @@ protected:
 	friend class Task;
 	friend void modm::this_fiber::yield();
 	friend modm::fiber::id modm::this_fiber::get_id();
-%% if with_tls
+%% if with_emutls
+	friend void* ::__emutls_get_address(void*);
+%% elif with_tls
 	friend void ::__aeabi_read_tp();
 %% endif
 	Scheduler(const Scheduler&) = delete;

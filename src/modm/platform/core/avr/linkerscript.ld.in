@@ -21,5 +21,11 @@ SECTIONS
 
 		__assertion_table_end = .;
 	}
+
+	/DISCARD/ :
+	{
+		/* Catch use of thread_local without a TLS implementation. */
+		*({{ no_thread_local_section }})
+	}
 }
 INSERT AFTER .data

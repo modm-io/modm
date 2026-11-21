@@ -29,12 +29,18 @@ def prepare(module, options):
     module.depends(":architecture:interrupt", ":stdc++")
     return True
 
+# A weak __emutls_get_address() in this discarded section turns the use of
+# thread_local without a TLS implementation into a readable linker error.
+no_thread_local_section = (".thread_local_is_not_enabled!__"
+        "Please_enable_the__modm:processing:fiber:thread_local__option!")
+
 def build(env):
     target = env[":target"]
     is_xmega = "xmega" in target.get_driver("core")["type"]
 
+    env.substitutions = {"no_thread_local_section": no_thread_local_section}
     env.outbasepath = "modm/link"
-    env.copy("linkerscript.ld")
+    env.template("linkerscript.ld.in", "linkerscript.ld")
     env.collect(":build:linkflags", "-L{project_source_dir}",
                 "-T{}".format(env.relcwdoutpath("modm/link/linkerscript.ld")))
 
@@ -43,8 +49,11 @@ def build(env):
         "core": target.get_driver("core")["type"],
         "f_cpu": env["f_cpu"],
         "shift": int(4e9/env["f_cpu"]).bit_length(),
+        "no_thread_local_section": no_thread_local_section,
     }
     env.outbasepath = "modm/src/modm/platform/core"
+    # The fiber TLS implementation overrides this weak function
+    env.template("no_thread_local.c.in", "no_thread_local.c")
 
     env.copy("main.hpp")
 

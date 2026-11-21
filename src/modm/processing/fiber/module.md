@@ -349,9 +349,9 @@ register, therefore the context switch is a little faster.
 
 ## Thread-Local Storage
 
-With the `modm:processing:fiber:thread_local` option on Cortex-M, each fiber
-has its own copy of all `thread_local` variables, while code outside of fibers
-uses its own copy:
+With the `modm:processing:fiber:thread_local` option on Cortex-M and AVR, each
+fiber has its own copy of all `thread_local` variables, while code outside of
+fibers uses its own copy:
 
 ```cpp
 thread_local uint32_t counter;	// one per fiber
@@ -365,8 +365,8 @@ initialization are constructed on first use in each fiber, together with all
 other such objects of the same translation unit. Declare plain data `constinit`
 to avoid the initialization check on every access.
 
-The option is disabled by default. Without it, using `thread_local` fails to
-link with an error that names the option.
+The option is disabled by default. Without it, using `thread_local` on Cortex-M
+and AVR fails to link with an error that names the option.
 
 !!! warning "Destructors of `thread_local` objects are never called"
     Neither when a fiber returns or is restarted, nor for the main context.
@@ -407,6 +407,28 @@ derives the thread pointer from the top of the stack of the current fiber, so
 the scheduler does not need to switch anything. Code outside of fibers uses the
 copy in the `.tdata` and `.tbss` sections. Each access costs a function call of
 ~15-25 cycles and each fiber start copies the storage with ~1.1 cycles per byte.
+
+### AVR
+
+AVR has no native thread-local storage, so GCC emulates it by calling
+`__emutls_get_address()` with a control object per variable. The linker sorts
+input sections by name (`--sort-section=name`) to collect these objects into a
+table, which assigns each variable an offset at startup. Code outside of fibers
+uses a copy at the top of the main stack. Each access costs a function call of
+~35 cycles and each fiber start ~120 cycles per variable.
+
+!!! warning "Variables are limited to 255 bytes on AVR"
+    GCC stores the size of each variable in the 8-bit word mode of AVR, so
+    larger `thread_local` variables are silently truncated by the compiler.
+
+### Hosted
+
+The option is not available on hosted targets, since their compilers access
+`thread_local` variables through the thread pointer of the operating system.
+
+!!! warning "Fibers share `thread_local` variables on hosted targets"
+    `thread_local` variables still compile, but all fibers of a thread share the
+    same copy without any error, so code relying on a copy per fiber misbehaves.
 
 
 ## Scheduling
