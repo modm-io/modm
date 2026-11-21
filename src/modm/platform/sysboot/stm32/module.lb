@@ -35,6 +35,8 @@ def build(env):
         "address": int(sysboot["entry"], 16),
         "id_address": int(sysboot["id-address"], 16) if "id-address" in sysboot else None,
         "remap": remap,
+        # Boot_V3_2 cannot start every application with Go (AN2606 §4.10)
+        "reset_on_exit": target.family == "h5",
         "with_msplim": sum(c.isnumeric() for c in core) == 2,
         "enable_icache": env.get(":platform:cortex-m:enable_icache", False),
         "enable_dcache": env.get(":platform:cortex-m:enable_dcache", False),

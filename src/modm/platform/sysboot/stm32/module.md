@@ -50,4 +50,25 @@ if (dfu_timeout.execute()) SystemBootloader::reboot();
   bank 2 instead. Disable the dual bank boot option first.
 - On devices with TrustZone the jump only works with TZEN=0.
 - The bootloader configures its own clocks and leaves some peripherals enabled
-  when it exits via the Go command. Reset the device to leave the bootloader.
+  when it exits via the Go command, including the DFU leave request. Reset the
+  device to leave the bootloader, except on the STM32H5, see below.
+
+## Leaving the Bootloader on STM32H5
+
+The STM32H5 bootloader exits by jumping to the application instead of resetting
+the device. After a start through the BOOT0 pin, the secure firmware (SFSP) has
+mapped only the resources of the bootloader into the non-secure domain, so that
+"a jump from the BL to an application using other resources does not work"
+(AN2606 §4.10, Boot_V3_2). On the STM32H563 the application then hangs during
+its startup. So on the STM32H5 this module checks the reset flags first: the
+bootloader clears them and every real reset sets at least one, so without a flag
+the module resets the device once, before anything else is initialized.
+
+An application that is started by your own bootloader sees the same condition if
+that bootloader clears the reset flags. It then starts after at most two extra
+resets, which a value in `.noinit` counts, so that this cannot become a loop.
+The bootloader may overwrite that value, which only means one more reset.
+
+A wake-up from Standby sets no reset flag either, so the module does not reset
+while the `SBF` flag in `PWR_PMSR` is set. This flag survives resets: clear it
+with `CSSF` after a wake-up, otherwise the next bootloader exit is not detected.

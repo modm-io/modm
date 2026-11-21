@@ -16,6 +16,9 @@
 /// Vector table of the bootloader in system memory (AN2606 Table 226)
 static constexpr uintptr_t BootloaderAddress{ {{ "0x%08X" | format(address) }} };
 static constexpr uint32_t BootloaderMagic{0xb007'10ad};
+%% if reset_on_exit
+static constexpr uint32_t ExitMagic{0xb007'e417};
+%% endif
 modm_section(".noinit") static volatile uint32_t bootloader_magic;
 %% if target.family == "h7"
 // The SRAM holds a write smaller than its ECC word until the next write to a
@@ -52,7 +55,32 @@ modm::platform::SystemBootloader::id()
 static void
 modm_system_bootloader_enter()
 {
+%% if reset_on_exit
+	// After a start through BOOT0, the secure firmware (SFSP) maps only the
+	// resources of the bootloader, so that its Go command cannot start an
+	// application that uses others (AN2606 §4.10). The jump also clears the
+	// reset flags, while every real reset sets one, so without a flag this is
+	// that jump: reset. A wake-up from Standby sets no reset flag either, but
+	// SBF. The magic allows two resets in a row: a custom bootloader that
+	// always clears the flags must not cause a reset loop, and a reset that
+	// lands in the bootloader again, because BOOT0 is still high, leaves the
+	// first magic behind for the next exit.
+	static constexpr uint32_t ResetFlags{RCC_RSR_LPWRRSTF | RCC_RSR_WWDGRSTF | RCC_RSR_IWDGRSTF |
+										 RCC_RSR_SFTRSTF | RCC_RSR_BORRSTF | RCC_RSR_PINRSTF};
+	const uint32_t magic = bootloader_magic;
+	if (not (RCC->RSR & ResetFlags) and not (PWR->PMSR & PWR_PMSR_SBF) and magic != ExitMagic + 1)
+	{
+		bootloader_magic = (magic == ExitMagic) ? ExitMagic + 1 : ExitMagic;
+		NVIC_SystemReset();
+	}
+	if (magic != BootloaderMagic)
+	{
+		bootloader_magic = 0;
+		return;
+	}
+%% else
 	if (bootloader_magic != BootloaderMagic) return;
+%% endif
 	bootloader_magic = 0;
 
 	// Undo what the modm startup configured before the hardware init hooks
