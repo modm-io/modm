@@ -12,6 +12,7 @@
 #pragma once
 
 #include <modm/architecture/interface/fiber.hpp>
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <limits>
@@ -41,9 +42,9 @@ class barrier
 	using count_t = uint16_t;
 
 	const CompletionFunction completion;
-	count_t expected;
-	count_t count;
-	count_t sequence{};
+	std::atomic<count_t> expected;
+	std::atomic<count_t> count;
+	std::atomic<count_t> sequence{};
 
 public:
 	using arrival_token = count_t;
@@ -60,14 +61,13 @@ public:
 	arrival_token
 	arrive(count_t n=1)
 	{
-		count_t last_arrival{sequence};
-		if (n < count) count -= n;
-		else
+		const count_t last_arrival = sequence.load(std::memory_order_acquire);
+		if (count.fetch_sub(n, std::memory_order_acq_rel) <= n)
 		{
 			// the waiting fibers continue only after the completion returned
 			completion();
-			count = expected;
-			sequence++;
+			count.store(expected.load(std::memory_order_relaxed), std::memory_order_relaxed);
+			sequence.store(last_arrival + 1, std::memory_order_release);
 		}
 		return last_arrival;
 	}
@@ -75,7 +75,7 @@ public:
 	void
 	wait(arrival_token arrival) const
 	{
-		while (arrival == sequence) modm::this_fiber::yield();
+		while (arrival == sequence.load(std::memory_order_acquire)) modm::this_fiber::yield();
 	}
 
 	void
@@ -87,7 +87,9 @@ public:
 	void
 	arrive_and_drop()
 	{
-		if (expected) expected--;
+		count_t value = expected.load(std::memory_order_relaxed);
+		while (value and not expected.compare_exchange_weak(value, value - 1,
+				std::memory_order_relaxed)) {}
 		(void) arrive();
 	}
 };

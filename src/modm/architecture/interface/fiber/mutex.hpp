@@ -78,11 +78,6 @@ public:
 	}
 };
 
-#if defined(__clang__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wdeprecated-volatile"
-#endif
-
 /// Implements the `std::recursive_mutex` interface for fibers.
 /// @see https://en.cppreference.com/w/cpp/thread/recursive_mutex
 class recursive_mutex
@@ -91,9 +86,10 @@ class recursive_mutex
 	recursive_mutex& operator=(const recursive_mutex&) = delete;
 	using count_t = uint16_t;
 
-	volatile fiber::id owner{fiber::invalid_id};
+	std::atomic<fiber::id> owner{fiber::invalid_id};
 	static constexpr count_t countMax{count_t(-1)};
-	volatile count_t count{1};
+	// Only accessed by the owner
+	count_t count{1};
 
 public:
 	constexpr recursive_mutex() = default;
@@ -104,13 +100,11 @@ public:
 	try_lock()
 	{
 		const auto id = modm::this_fiber::get_id();
-		modm::atomic::Lock _;
-		if (owner == fiber::invalid_id) {
-			owner = id;
-			// count = 1; is implicit
-			return true;
-		}
-		if (owner == id and count < countMax) {
+		fiber::id expected{fiber::invalid_id};
+		// count = 1; is implicit
+		if (owner.compare_exchange_strong(expected, id,
+				std::memory_order_acquire, std::memory_order_relaxed)) return true;
+		if (expected == id and count < countMax) {
 			count++;
 			return true;
 		}
@@ -127,18 +121,11 @@ public:
 	void inline
 	unlock()
 	{
-		modm::atomic::Lock _;
 		if (count > 1) count--;
-		else {
-			// count = 1; is implicit
-			owner = fiber::invalid_id;
-		}
+		// count = 1; is implicit
+		else owner.store(fiber::invalid_id, std::memory_order_release);
 	}
 };
-
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#endif
 
 /// Implements the `std::recursive_timed_mutex` interface for fibers.
 /// @see https://en.cppreference.com/w/cpp/thread/recursive_timed_mutex
