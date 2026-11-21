@@ -17,11 +17,19 @@
 static constexpr uintptr_t BootloaderAddress{ {{ "0x%08X" | format(address) }} };
 static constexpr uint32_t BootloaderMagic{0xb007'10ad};
 modm_section(".noinit") static volatile uint32_t bootloader_magic;
+%% if target.family == "h7"
+// The SRAM holds a write smaller than its ECC word until the next write to a
+// different address, and a reset discards it (RM0433 §2.4).
+modm_section(".noinit") static volatile uint32_t bootloader_magic_commit;
+%% endif
 
 void
 modm::platform::SystemBootloader::reboot()
 {
 	bootloader_magic = BootloaderMagic;
+%% if target.family == "h7"
+	bootloader_magic_commit = 0;
+%% endif
 %% if enable_dcache
 	// The reset discards the write-back cache
 	SCB_CleanDCache();
