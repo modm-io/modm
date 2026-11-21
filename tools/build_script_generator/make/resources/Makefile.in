@@ -129,6 +129,11 @@ program-bossac: bin
 			--offset $(if $($(MODM_BOSSAC_OFFSET) < 4096),4096,$(MODM_BOSSAC_OFFSET)) \
 			$(MODM_BOSSAC_OPTIONS) $(BIN_FILE)
 %% endif
+%% if platform in ["rp"]
+.PHONY: program-picoboot
+program-picoboot: uf2
+	@picotool load --verify --execute $(UF2_FILE) $(if $(serial),--ser $(serial))
+%% endif
 %#
 .PHONY: reset
 reset:

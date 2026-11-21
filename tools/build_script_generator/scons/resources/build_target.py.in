@@ -69,6 +69,9 @@ def build_target(env, sources):
 		%% if platform in ["sam"]
 	env.Alias("program-bossac", [env.ProgramBossac(env.Bin(chosen_program)){{ artifact }}])
 		%% endif
+		%% if platform in ["rp"]
+	env.Alias("program-picoboot", [env.ProgramPicoboot(env.UF2(chosen_program)){{ artifact }}])
+		%% endif
 
 	env.Alias("debug-openocd", env.DebugOpenOcd(chosen_program))
 	env.Alias("debug-remote", env.DebugGdbRemote(chosen_program))
