@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/hosted-tsan/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/hosted-tsan/modm-test</option>
+  </options>
+  <collectors>
+    <collect name="modm:build:ccflags">-fsanitize=thread</collect>
+    <collect name="modm:build:ccflags">-fno-omit-frame-pointer</collect>
+    <collect name="modm:build:linkflags">-fsanitize=thread</collect>
+    <collect name="modm:build:linkflags">-fno-omit-frame-pointer</collect>
+  </collectors>
+  <modules>
+    <module>modm:platform:core</module>
+    <module>modm:driver:terminal</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>

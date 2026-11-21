@@ -48,6 +48,13 @@ run-hosted-linux-sanitize:
 run-hosted-darwin-arm64-sanitize: export PATH := $(shell brew --prefix llvm@20)/bin:$(PATH)
 run-hosted-darwin-arm64-sanitize:
 	$(call compile-test,hosted-sanitize,run,-D":target=hosted-darwin-arm64" -D"modm:build:compiler=clang")
+run-hosted-linux-tsan:
+	$(call compile-test,hosted-tsan,run,-D":target=hosted-linux")
+run-hosted-linux-arm64-tsan:
+	$(call compile-test,hosted-tsan,run,-D":target=hosted-linux-arm64")
+run-hosted-darwin-arm64-tsan: export PATH := $(shell brew --prefix llvm@20)/bin:$(PATH)
+run-hosted-darwin-arm64-tsan:
+	$(call compile-test,hosted-tsan,run,-D":target=hosted-darwin-arm64" -D"modm:build:compiler=clang")
 
 
 compile-nucleo-f091rc_A:
