@@ -10,10 +10,12 @@
 // ----------------------------------------------------------------------------
 
 // Hammers one std::atomic from the main loop and a fast timer interrupt, which
-// on the Cortex-M0+ both go through modm::atomic::Lock. The first phase only
-// runs on core 0, so that a hang cannot be caused by the other core holding
-// the spinlock. The second phase runs on both cores. Lost increments or an
-// interrupt that stopped firing fail the test, a deadlock never finishes it.
+// on the Cortex-M0+ both go through modm::atomic::Lock, nested inside another
+// lock that protects a plain counter. The inner locks must neither release the
+// spinlock nor unmask the interrupts. The first phase only runs on core 0, so
+// that a hang cannot be caused by the other core holding the spinlock. The
+// second phase runs on both cores. Lost increments or an interrupt that stopped
+// firing fail the test, a deadlock never finishes it.
 
 #include <modm/board.hpp>
 #include <modm/platform/core/multicore.hpp>
@@ -34,6 +36,8 @@ static volatile uint32_t deadline{0};
 static volatile uint32_t main_count[2]{};
 static volatile uint32_t isr_count[2]{};
 static uint32_t random[2]{};
+static volatile uint32_t nested_count{0};
+static volatile uint32_t nested_errors{0};
 
 static bool
 running()
@@ -41,12 +45,26 @@ running()
 	return int32_t(deadline - timer_hw->timerawl) > 0;
 }
 
+static void
+increment()
+{
+	modm::atomic::Lock outer;
+	const uint32_t value = nested_count;
+	counter.fetch_add(1);
+	{
+		modm::atomic::Lock inner;
+	}
+	if (not __get_PRIMASK() or not (sio_hw->spinlock_st & 1))
+		nested_errors = nested_errors + 1;
+	nested_count = value + 1;
+}
+
 template<uint8_t Core>
 static void
 tick()
 {
 	timer_hw->intr = 1u << Core;
-	counter.fetch_add(1);
+	increment();
 	isr_count[Core] = isr_count[Core] + 1;
 	// xorshift32, so that the interrupt hits every instruction of the lock
 	uint32_t x = random[Core];
@@ -67,7 +85,7 @@ hammer()
 	timer_hw->alarm[Core] = timer_hw->timerawl + PeriodUs[Core];
 	while (running())
 	{
-		counter.fetch_add(1);
+		increment();
 		main_count[Core] = main_count[Core] + 1;
 	}
 	NVIC_DisableIRQ(irq);
@@ -105,10 +123,12 @@ main()
 	const uint32_t main0 = main_count[0], main1 = main_count[1];
 	const uint32_t isr0 = isr_count[0], isr1 = isr_count[1];
 	const uint32_t total = counter.load(), expected = main0 + main1 + isr0 + isr1;
+	const uint32_t nested = nested_count, errors = nested_errors;
 	MODM_LOG_INFO << "main " << main0 << " " << main1 << " isr " << isr0 << " " << isr1
-				  << " counter " << total << " expected " << expected << modm::endl;
+				  << " counter " << total << " nested " << nested << " errors " << errors
+				  << " expected " << expected << modm::endl;
 
-	const bool passed = total == expected and
+	const bool passed = total == expected and nested == expected and errors == 0 and
 						isr0 > 2 * PhaseUs / (PeriodUs[0] + 7) / 4 and
 						isr1 > PhaseUs / (PeriodUs[1] + 7) / 4;
 	return finishTest(passed);

@@ -105,25 +105,42 @@ public:
 	}
 };
 
-/// This class will disable interrupts prior to acquiring the spinlock
+/// This class will disable interrupts prior to acquiring the spinlock.
+/// The lock can be nested on the same core, like disabling the interrupts.
 /// @ingroup modm_platform_multicore
 template <uint8_t instance>
 class SpinLockBlocking : public SpinLockUnsafe<instance>
 {
 	using Base = SpinLockUnsafe<instance>;
+	// PRIMASK only uses bit 0
+	static constexpr uint32_t Nested{1u << 1};
+	// Core ID + 1 of the holder, only written while holding the spinlock
+	static inline volatile uint8_t holder{0};
 
 public:
+	static void init()
+	{
+		holder = 0;
+		Base::init();
+	}
 	static inline uint32_t lock()
 	{
 		uint32_t is = __get_PRIMASK();
 		__disable_irq();
+		const uint8_t core = sio_hw->cpuid + 1;
+		if (holder == core) return is | Nested;
 		Base::lock();
+		holder = core;
 		return is;
 	}
 	static inline void unlock(uint32_t is)
 	{
-		Base::unlock();
-		__set_PRIMASK(is);
+		if (not (is & Nested))
+		{
+			holder = 0;
+			Base::unlock();
+		}
+		__set_PRIMASK(is & ~Nested);
 	}
 };
 /// @ingroup modm_platform_multicore
