@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:pcal6524"
-    module.description = """\
+    module.description = """
 # PCAL6524 24-Bit I2C I/O Expander
 
 Ultra low-voltage translating 24-bit Fm+ I2C-bus/SMBus I/O expander with

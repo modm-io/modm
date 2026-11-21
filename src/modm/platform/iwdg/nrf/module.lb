@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":platform:wdt"
-    module.description = """\
+    module.description = """
 # Watchdog Timer (WDT)
 
 `Wdt::initialize()` configures and starts the watchdog. Call it once after

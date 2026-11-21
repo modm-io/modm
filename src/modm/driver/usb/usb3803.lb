@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:usb3803"
-    module.description = """\
+    module.description = """
 # USB3803 USB 2.0 Hub
 
 The Microchip USB3803 is a high-speed USB 2.0 hub with three downstream ports

@@ -14,7 +14,7 @@
 
 def init(module):
     module.name = ":driver:adc_sampler"
-    module.description = """\
+    module.description = """
 # ADC Sampler
 
 This template class stores 8, 16 or 32bit ADC values in a buffer and

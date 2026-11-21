@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:sx128x"
-    module.description = """\
+    module.description = """
 Semtech SX1280/SX1281 Driver
 
 Long Range, Low Power, 2.4 GHz Transceiver with Ranging Capability

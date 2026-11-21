@@ -55,7 +55,7 @@ class BlockDeviceMirror(Module):
 class BlockDeviceSpiFlash(Module):
     def init(self, module):
         module.name = "spi.flash"
-        module.description = """\
+        module.description = """
 # SPI Flash Block Device
 
 Microchip SST26VF064B 64MBit flash chip in SOIJ-8, WDFN-8 or SOIC-16.

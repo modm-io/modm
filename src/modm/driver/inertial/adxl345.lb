@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:adxl345"
-    module.description = """\
+    module.description = """
 # ADXL345 3-Axis Digital Accelerometer
 
 For further information on the special sensing functions, consult the

@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:max14661"
-    module.description = """\
+    module.description = """
 # MAX14661 Beyond-the-Rails 16:2 Multiplexer
 
 The MAX14661 is a serially controlled, dual-channel analog multiplexer

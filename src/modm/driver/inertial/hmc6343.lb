@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:hmc6343"
-    module.description = """\
+    module.description = """
 # HMC6343 3-Axis Compass
 
 The Honeywell HMC6343 is a fully integrated compass module that

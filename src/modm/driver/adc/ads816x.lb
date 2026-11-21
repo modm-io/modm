@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ads816x"
-    module.description = """\
+    module.description = """
 # ADS816x ADC
 
 The ADS8166/ADS8167/ADS8168 are, 16 bit analog-digital converters with, sample

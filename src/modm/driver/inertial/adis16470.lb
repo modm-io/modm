@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:adis16470"
-    module.description = """\
+    module.description = """
 # ADIS16470 Inertial Measurement Unit
 
 [Datasheet](https://www.analog.com/media/en/technical-documentation/data-sheets/ADIS16470.pdf)

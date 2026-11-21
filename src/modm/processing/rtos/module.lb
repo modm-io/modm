@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":processing:rtos"
-    module.description = """\
+    module.description = """
 # RTOS Abstractions
 
 Basic building blocks of an RTOS abstracted as C++ classes and implemented

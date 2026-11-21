@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":board:nucleo-g0b1re"
-    module.description = """\
+    module.description = """
 # NUCLEO-G0B1RE
 
 [Nucleo kit for STM32G0B1RE](https://www.st.com/en/evaluation-tools/nucleo-g0b1re.html)

@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:tmp102"
-    module.description = """\
+    module.description = """
 # TMP102 Thermometer
 
 The TMP102 is a digital temperature sensor with an I2C interface

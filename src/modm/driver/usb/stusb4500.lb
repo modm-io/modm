@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:stusb4500"
-    module.description = """\
+    module.description = """
 # STUSB4500 USB PD controller
 
 ## Standalone USB PD controller for power sinking devices

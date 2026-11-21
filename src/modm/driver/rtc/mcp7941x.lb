@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:mcp7941x"
-    module.description = """\
+    module.description = """
 # MCP79410/MCP79411/MCP79412
 
 Battery-Backed I2C Real-Time Clock/Calendar with SRAM, EEPROM and Protected EEPROM

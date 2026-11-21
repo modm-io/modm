@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":platform:iwdg"
-    module.description = """\
+    module.description = """
 # Independent Watchdog (IWDG)
 
 `Iwdg::initialize()` configures and starts the watchdog. Call it once after

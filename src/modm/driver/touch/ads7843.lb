@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ads7843"
-    module.description = """\
+    module.description = """
 # ADS7843 Resistive Touch Controller
 
 The ADS7843 by Texas Instruments is the de-facto standard for cheap

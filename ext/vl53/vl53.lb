@@ -42,7 +42,7 @@ class Vl53lmz(Module):
 
 def init(module):
     module.name = ":vl53"
-    module.description = """\
+    module.description = """
 # ST's VL53 Time-of-Flight ULD Drivers
 
 Currently supported sensors:

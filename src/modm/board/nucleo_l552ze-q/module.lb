@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:nucleo-l552ze-q"
-    module.description = """\
+    module.description = """
 # NUCLEO-L552ZE-Q
 
 [Nucleo kit for STM32L552ZE-Q](https://www.st.com/en/evaluation-tools/nucleo-l552ze-q.html)

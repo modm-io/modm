@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:hx711"
-    module.description = """\
+    module.description = """
 # HX711 Load Cell Amplifier and ADC
 
 The HX711 is an integrated load cell amplifier designed for weight scales and

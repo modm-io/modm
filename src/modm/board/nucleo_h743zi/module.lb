@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:nucleo-h743zi"
-    module.description = """\
+    module.description = """
 # NUCLEO-H743ZI
 
 [Nucleo kit for STM32H743ZI](https://www.st.com/en/evaluation-tools/nucleo-h743zi.html)

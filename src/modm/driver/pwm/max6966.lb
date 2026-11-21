@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:max6966"
-    module.description = """\
+    module.description = """
 # MAX6966 8-bit PWM Driver
 
 10-channel, daisy-chainable, constant-current sink, 8bit PWM LED driver.

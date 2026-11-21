@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ads7828"
-    module.description = """\
+    module.description = """
 # ADS7828 ADC
 The ADS7828 is a single-supply, low-power, 12-bit data acquisition device
 """

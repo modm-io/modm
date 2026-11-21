@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:mcp23x17"
-    module.description = """\
+    module.description = """
 # MCP23x17 16-Bit I/O Expander
 
 Port GPB is the high byte, GPA the low byte.

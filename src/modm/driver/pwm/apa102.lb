@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:apa102"
-    module.description = """\
+    module.description = """
 # APA102 RGB LED Driver
 
 Drives any number of chained APA102 RGB LEDs using SPI signals SCK and MOSI up
