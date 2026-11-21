@@ -36,4 +36,7 @@ public:
 
 	void
 	testConditionVariable();
+
+	void
+	testThreadLocal();
 };

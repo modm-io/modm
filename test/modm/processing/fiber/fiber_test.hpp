@@ -61,4 +61,13 @@ public:
 
 	void
 	testStackUsage();
+
+	void
+	testThreadLocal();
+
+	void
+	testThreadLocalDestructor();
+
+	void
+	testClosureDestructor();
 };

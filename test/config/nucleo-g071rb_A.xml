@@ -4,6 +4,7 @@
   <options>
     <option name="modm:build:build.path">../../build/generated-unittest/nucleo-g071rb_A/</option>
     <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-g071rb_A/modm-test</option>
+    <option name="modm:processing:fiber:thread_local">yes</option>
   </options>
   <modules>
     <module>modm:platform:heap</module>
