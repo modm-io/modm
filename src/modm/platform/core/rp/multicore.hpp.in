@@ -176,6 +176,8 @@ public:
 /// @ingroup modm_platform_multicore
 using SystemSpinLockGuard = SpinLockGuard<SystemSpinLock>;
 
+/// @warning Waiting blocks the whole core without yielding. Use
+///          `modm::fiber::mutex` if the holder can yield to a fiber on this core.
 /// @ingroup modm_platform_multicore
 class Mutex
 {
