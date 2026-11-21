@@ -145,6 +145,9 @@ def generate(env, **kw):
         env['PROGRAM_DFU_COMSTR'] =      "%s╭────────────── %s$SOURCE\n" \
                                          "%s╰─────DFU─────> %s$CONFIG_DEVICE_NAME%s" % install
 
+        env["PROGRAM_PICOBOOT_COMSTR"] = "%s╭────────────── %s$SOURCE\n" \
+                                         "%s╰──PICOBOOT───> %s$CONFIG_DEVICE_NAME%s" % install
+
         env["PROGRAM_REMOTE_COMSTR"] =   "%s╭────────────── %s$SOURCE\n" \
                                          "%s╰─Rem─OpenOCD─> %s$CONFIG_DEVICE_NAME%s" % install
 

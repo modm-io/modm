@@ -30,6 +30,13 @@ format by calling `scons uf2` or `make uf2` and copy the generated `.uf2` file
 to the mounted virtual disk.
 
 
+### PICOBOOT
+
+With [`picotool`](https://github.com/raspberrypi/picotool) installed, call
+`scons program-picoboot` or `make program-picoboot` to program, verify and start
+your application on a device in BOOTSEL mode without using the virtual disk.
+
+
 ### OpenOCD
 
 Another option is to use Picoprobe and custom version of OpenOCD provided by RPi.

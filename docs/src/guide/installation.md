@@ -88,6 +88,9 @@ sudo apt install openocd
     some targets (STM32L5, STM32U5). You can manually install an up-to-date
     version of OpenOCD by [following the instructions here][openocd-install].
 
+To program the RP2040 via PICOBOOT, install `picotool` from your distribution or
+the [pre-built binaries][picotool-binaries], and its [udev rules][udev-rules-picotool].
+
 
 #### Microchip AVR
 
@@ -163,6 +166,12 @@ To program Microchip SAM devices via the bootloader, install the `bossac` tool:
 
 ```sh
 brew cask install bossa
+```
+
+To program the RP2040 via PICOBOOT, install the `picotool` tool:
+
+```sh
+brew install picotool
 ```
 
 
@@ -258,6 +267,10 @@ Close the PowerShell and open a new command prompt to test openocd:
 ```sh
 openocd --version
 ```
+
+To program the RP2040 via PICOBOOT, add the [pre-built `picotool`][picotool-binaries]
+to your path and use [Zadig][zadig] to install the WinUSB driver for
+`RP2 Boot (Interface 1)`.
 
 #### Microchip AVR
 
@@ -389,10 +402,13 @@ picocom --baud 115200 --imap lfcrlf --echo /dev/ttyACM0
 [7_zip]: https://www.7-zip.org
 [modm-avr-gcc]: https://github.com/modm-io/avr-gcc
 [openocd-install]: https://github.com/rleh/openocd-build
+[picotool-binaries]: https://github.com/raspberrypi/pico-sdk-tools/releases
 [udev-rules-openocd]: https://github.com/openocd-org/openocd/blob/master/contrib/60-openocd.rules#L84-L99
+[udev-rules-picotool]: https://github.com/raspberrypi/picotool/blob/master/udev/60-picotool.rules
 [usbipd]: https://github.com/dorssel/usbipd-win
 [winavr]: https://github.com/ZakKemble/avr-gcc-build/releases
 [windows-store-ubuntu-22-04-1-lts]: https://www.microsoft.com/store/productId/9PN20MSR04DW
+[zadig]: https://zadig.akeo.ie
 [wingit]: https://git-scm.com/download/win
 [winterm]: https://github.com/Microsoft/Terminal
 [winwsl]: https://docs.microsoft.com/en-us/windows/wsl/about

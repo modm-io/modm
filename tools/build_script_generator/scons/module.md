@@ -227,6 +227,18 @@ scons: done building targets.
 ```
 
 
+#### scons program-picoboot
+
+```
+scons program-picoboot profile={debug|release} [firmware={hash or file}] [serial={flash-id}]
+```
+
+Writes, verifies and starts the executable on a device in BOOTSEL mode via
+`picotool`. Hold the BOOTSEL button during reset to enter this mode. To select
+one of several devices, set `serial` to its flash ID from `picotool info -d`.
+(\* *only RP2040 targets*)
+
+
 #### scons program-bmp
 
 ```

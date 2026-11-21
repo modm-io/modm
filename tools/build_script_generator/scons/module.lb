@@ -107,6 +107,8 @@ def build(env):
                       "gdb", "bmp", "crashdebug", "dfu", "jlink"})
         if device["platform"] in ["sam"]:
             tools.update({"bossac"})
+        if device["platform"] in ["rp"]:
+            tools.update({"picoboot"})
     elif device["core"].startswith("avr"):
         tools.update({"size", "avrdude"})
 
