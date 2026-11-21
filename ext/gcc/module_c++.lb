@@ -80,7 +80,10 @@ def build(env):
     is_avr = core.startswith("avr")
     is_cortex_m = core.startswith("cortex-m")
 
-    if "hosted" in core:
+    # Apple's libc++ has the atomics built-in and there is no libatomic for clang
+    is_darwin_clang = (env[":target"].identifier.family == "darwin" and
+                       env.get(":build:compiler", "gcc") == "clang")
+    if "hosted" in core and not is_darwin_clang:
         env.collect(":build:library", "atomic")
 
     if not (is_avr or is_cortex_m):

@@ -106,7 +106,9 @@ AtomicsTest::testAtomicArray3()
 	using T = Array3;
 	constexpr size_t size = sizeof(T);
 
+#ifndef _LIBCPP_VERSION // libc++ uses lock-free instructions here
 	TEST_ASSERT_FALSE(array3.is_lock_free());
+#endif
 
 	TEST_ASSERT_EQUALS_ARRAY(array3.load().v, T{}.v, size);
 	array3.store(T{1,2,3}, std::memory_order_relaxed);
@@ -139,7 +141,9 @@ AtomicsTest::testAtomicArray()
 	using T = Array;
 	constexpr size_t size = sizeof(T);
 
+#ifndef _LIBCPP_VERSION // libc++ uses lock-free instructions here
 	TEST_ASSERT_FALSE(array.is_lock_free());
+#endif
 
 	TEST_ASSERT_EQUALS_ARRAY(array.load().v, T{}.v, size);
 	array.store(T{1,2,3,4,5,6,7,8}, std::memory_order_relaxed);

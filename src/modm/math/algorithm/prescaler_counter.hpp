@@ -82,7 +82,8 @@ public:
 		double out_error{std::numeric_limits<double>::infinity()};
 		auto fn_compare = [&](uint32_t idx, uint32_t pre, uint32_t cnt)
 		{
-			if (const double err = std::abs(desired - pre * cnt); err < out_error) {
+			// libc++ std::abs is not constexpr
+			if (const double err = __builtin_fabs(desired - pre * cnt); err < out_error) {
 				out_error = err;
 				out_prescaler = pre;
 				out_counter = cnt;

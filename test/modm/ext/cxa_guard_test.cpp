@@ -74,13 +74,13 @@ CxaGuardTest::testGuard()
 #endif
 
 	__cxa_guard_release(&guard);
-	TEST_ASSERT_EQUALS(guard, guard_t(1));
+	TEST_ASSERT_EQUALS(uint8_t(guard), uint8_t(1)); // libc++abi uses the upper bytes
 
 	TEST_ASSERT_EQUALS(__cxa_guard_acquire(&guard), 0);
-	TEST_ASSERT_EQUALS(guard, guard_t(1));
+	TEST_ASSERT_EQUALS(uint8_t(guard), uint8_t(1)); // libc++abi uses the upper bytes
 
 	__cxa_guard_release(&guard);
-	TEST_ASSERT_EQUALS(guard, guard_t(1));
+	TEST_ASSERT_EQUALS(uint8_t(guard), uint8_t(1)); // libc++abi uses the upper bytes
 }
 
 void
