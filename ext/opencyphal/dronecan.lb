@@ -34,7 +34,8 @@ def prepare(module, options):
         PathOption(name="path", default="generated/dronecan", absolute=True,
                    description="Path to the generated code"))
     module.depends(":libcanard")
-    return True
+    # like modm:libcanard, which needs o1heap
+    return options[":target"].has_driver("core:cortex-m*")
 
 def build(env):
     env.collect(":build:path.include", "modm/ext")
