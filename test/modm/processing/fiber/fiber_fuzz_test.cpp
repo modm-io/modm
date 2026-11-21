@@ -23,6 +23,10 @@ namespace
 constexpr uint8_t Seeds{40};
 constexpr uint8_t Steps{20};
 uint32_t random_state;
+// FNV-1a over which fiber resumes after every yield. All fiber implementations
+// must schedule identically, so this value is the same on every target!
+uint32_t schedule;
+modm::fiber::id first_fiber;
 
 uint32_t
 next_random()
@@ -38,20 +42,27 @@ void
 random_yield()
 {
 	for (uint8_t count = next_random() % 4; count; count--)
+	{
 		modm::this_fiber::yield();
+		schedule = (schedule ^ uint8_t(modm::this_fiber::get_id() == first_fiber)) * 16777619ul;
+	}
 }
 
-/// Calls function(seed, fiber) in two fibers for every seed.
+/// Calls function(seed, fiber) in two fibers for every seed and compares the
+/// resulting schedule.
 void
-fuzz(auto &&function)
+fuzz(uint32_t expected_schedule, auto &&function)
 {
+	schedule = 2166136261ul;
 	for (uint8_t seed = 0; seed < Seeds; seed++)
 	{
-		random_state = (seed + 1) * 2654435761u;
+		random_state = (seed + 1) * 2654435761ul;
 		modm::fiber::Task fiber0(stack1, [&]{ function(seed, 0); });
 		modm::fiber::Task fiber1(stack2, [&]{ function(seed, 1); });
+		first_fiber = fiber0.get_id();
 		modm::fiber::Scheduler::run();
 	}
+	TEST_ASSERT_EQUALS(schedule, expected_schedule);
 }
 
 }
@@ -62,7 +73,7 @@ FiberFuzzTest::testMutex()
 	modm::fiber::mutex mutex;
 	modm::fiber::recursive_mutex recursive;
 	uint8_t inside{}, inside_recursive{};
-	fuzz([&](uint8_t, uint8_t)
+	fuzz(3265865098ul, [&](uint8_t, uint8_t)
 	{
 		for (uint8_t step = 0; step < Steps; step++)
 		{
@@ -91,7 +102,7 @@ FiberFuzzTest::testSharedMutex()
 {
 	modm::fiber::shared_mutex mutex;
 	uint8_t readers{}, writers{};
-	fuzz([&](uint8_t, uint8_t)
+	fuzz(3560066811ul, [&](uint8_t, uint8_t)
 	{
 		for (uint8_t step = 0; step < Steps; step++)
 		{
@@ -126,7 +137,7 @@ FiberFuzzTest::testCallOnce()
 	modm::fiber::once_flag flags[Seeds];
 	bool done[Seeds]{};
 	uint8_t calls{};
-	fuzz([&](uint8_t seed, uint8_t)
+	fuzz(1024557508ul, [&](uint8_t seed, uint8_t)
 	{
 		random_yield();
 		modm::fiber::call_once(flags[seed], [&]
@@ -146,7 +157,7 @@ FiberFuzzTest::testBarrier()
 {
 	uint16_t completions{};
 	modm::fiber::barrier barrier{2, [&]{ random_yield(); completions++; }};
-	fuzz([&](uint8_t seed, uint8_t)
+	fuzz(1661557593ul, [&](uint8_t seed, uint8_t)
 	{
 		for (uint8_t step = 0; step < Steps; step++)
 		{
@@ -164,7 +175,7 @@ FiberFuzzTest::testSemaphore()
 {
 	modm::fiber::binary_semaphore semaphore{1};
 	uint8_t inside{};
-	fuzz([&](uint8_t, uint8_t)
+	fuzz(1222929258ul, [&](uint8_t, uint8_t)
 	{
 		for (uint8_t step = 0; step < Steps; step++)
 		{
@@ -187,7 +198,7 @@ FiberFuzzTest::testConditionVariable()
 	modm::fiber::condition_variable cv;
 	uint8_t items{};
 	uint16_t produced{}, consumed{};
-	fuzz([&](uint8_t, uint8_t fiber)
+	fuzz(2017731572ul, [&](uint8_t, uint8_t fiber)
 	{
 		for (uint8_t step = 0; step < Steps; step++)
 		{
@@ -236,7 +247,7 @@ FiberFuzzTest::testThreadLocal()
 {
 #ifdef MODM_CONTEXT_TLS
 	tls_constructed = tls_errors = 0;
-	fuzz([&](uint8_t seed, uint8_t fiber)
+	fuzz(2872973855ul, [&](uint8_t seed, uint8_t fiber)
 	{
 		// every fiber starts with fresh storage
 		for (auto word : tls_words) if (word) tls_errors++;
