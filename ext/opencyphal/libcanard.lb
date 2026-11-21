@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":libcanard"
+    module.description = FileReader("libcanard.md")
+
+def prepare(module, options):
+    module.depends(
+        ":architecture:assert",
+        ":architecture:can",
+        ":architecture:clock",
+        ":o1heap")
+    # o1heap is only available on Cortex-M
+    return options[":target"].has_driver("core:cortex-m*")
+
+def build(env):
+    env.collect(":build:path.include", "modm/ext/canard")
+    env.outbasepath = "modm/ext/canard"
+    env.copy("cyphal/libcanard/LICENSE", "LICENSE")
+    env.copy("cyphal/libcanard/libcanard/canard.h", "canard.h")
+    env.copy("cyphal/libcanard/lib/cavl2/cavl2.h", "cavl2.h")
+    # compiled through canard.c, which maps the assertions to modm
+    # newlib has no <stdbit.h> yet, which libcanard only needs for an optimization
+    env.copy("cyphal/libcanard/libcanard/canard.c", "canard.c.inc", patch="libcanard_stdbit.patch")
+    env.copy("canard.c")
+    # modm::canard::Node connects libcanard to the modm CAN drivers
+    env.copy("canard.hpp")

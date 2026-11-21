@@ -1,0 +1,18 @@
+<library>
+  <extends>modm:nucleo-f429zi</extends>
+  <!-- <extends>modm:nucleo-g474re</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- CI: expect "Allocated node-ID 125 from 42" -->
+  <!-- CI: expect "node-ID 125, status [0-9]+ info [1-9][0-9]* errors 0" -->
+  <!-- CI: limit 10 -->
+  <options>
+    <option name="modm:dronecan:types">uavcan.protocol.NodeStatus,uavcan.protocol.GetNodeInfo,uavcan.protocol.dynamic_node_id.Allocation</option>
+  </options>
+  <modules>
+    <module>modm:platform:can</module>
+    <module>modm:platform:can:*</module>
+    <module>modm:dronecan</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

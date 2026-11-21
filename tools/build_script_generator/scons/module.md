@@ -769,6 +769,47 @@ cpp_sources += env.NanopbProtofile(
 The generated files are available as a top-level `#include <protofile.pb.hpp>`.
 
 
+## Cyphal DSDL Generator Tool
+
+The `modm:nunavut` module translates the Cyphal DSDL namespaces of the
+public regulated data types and of the `modm:nunavut:sources` option into C
+headers with the `nnvg` tool of [Nunavut](https://github.com/OpenCyphal/nunavut),
+which must be installed with `pip install nunavut`.
+This module contains a SCons wrapper tool that asks `nnvg` for the files it
+generates, so that they are updated when the DSDL files change:
+
+```py
+env.NunavutDsdl(
+    namespaces=["modm/ext/dsdl/uavcan", "modm/ext/dsdl/reg", "dsdl/mycompany"],
+    path=options[":nunavut:path"],
+)
+```
+
+The generated headers are available as `#include <uavcan/node/Heartbeat_1_0.h>`.
+The `NNVG` environment variable selects another `nnvg` executable.
+
+
+## DroneCAN DSDL Generator Tool
+
+The `modm:dronecan` module translates the DroneCAN DSDL namespaces of the
+`modm:dronecan:namespaces` and `modm:dronecan:sources` options into C headers
+with the `modm_tools.dronecan_dsdl` generator, which parses the DSDL with
+pydronecan and renders the code with jinja2 (`pip install dronecan jinja2`).
+The SCons wrapper tool asks the generator for the files it writes, so that they
+are updated when the DSDL files change:
+
+```py
+env.DronecanDsdl(
+    namespaces=["modm/ext/dronecan/dsdl/uavcan"],
+    types=["uavcan.protocol.NodeStatus"],
+    path=options[":dronecan:path"],
+)
+```
+
+The generated headers are available as `#include <uavcan.protocol.NodeStatus.h>`.
+pydronecan and jinja2 must be installed in the Python interpreter of SCons.
+
+
 ## XPCC Generator Tool
 
 !!! warning "Deprecated"

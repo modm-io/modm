@@ -71,12 +71,15 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [CMSIS-DAP][]: USB to SWD/JTAG bridge.
 	- [CMSIS-DSP][]: Embedded compute library.
 	- [CrashCatcher][]: Crash reports for HardFaults.
+	- [DroneCAN][] data types and serialization functions.
 	- [Eigen][]: Linear Algebra Library.
 	- [ETL][]: Embedded Template Library.
 	- [FatFS][]: FAT/exFAT filesystem.
 	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
+	- [libcanard][]: Cyphal/CAN and DroneCAN protocol stack.
 	- [LVGL][]: Embedded Graphics Library.
 	- [Nanopb][]: Embedded Protocol Buffers.
+	- [Nunavut][]: Cyphal DSDL code generator for the [Cyphal public regulated data types][].
 	- [o1heap][]: Constant-time memory allocator.
 	- [printf][]: Small printf implementation.
 	- [ROSserial][]: Embedded ROS client.
@@ -1227,8 +1230,12 @@ and [many more contributors][contributors].
 [FatFS]:           http://elm-chan.org/fsw/ff/00index_e.html
 [ROSserial]:       https://wiki.ros.org/rosserial
 [CrashCatcher]:    https://github.com/adamgreen/CrashCatcher
+[DroneCAN]:        https://dronecan.github.io
 [printf]:          https://github.com/eyalroz/printf
 [Nanopb]:          https://github.com/nanopb/nanopb
+[Nunavut]:         https://github.com/OpenCyphal/nunavut
+[Cyphal public regulated data types]: https://github.com/OpenCyphal/public_regulated_data_types
+[libcanard]:       https://github.com/OpenCyphal/libcanard
 [LVGL]:            https://lvgl.io
 [RTT]:             https://kb.segger.com/RTT
 [Eigen]:           https://libeigen.gitlab.io
