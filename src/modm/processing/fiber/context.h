@@ -113,8 +113,12 @@ modm_context_stack_size(const modm_context_t *ctx);
 /**
  * Reserves the thread-local storage block below the top of the stack, and
  * asserts that the remaining stack is larger than the minimum stack size.
+%% if is_avr
+ * The block starts at the new top of the stack.
+%% else
  * The thread pointer of this block is 8B below the new top of the stack, so
  * that the two words stored below the top overlap the thread control block.
+%% endif
  * @returns the new top of the stack, which must be passed to `modm_context_init()`.
  */
 uintptr_t*
