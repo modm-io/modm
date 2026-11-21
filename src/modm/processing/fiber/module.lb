@@ -18,10 +18,15 @@ def init(module):
 
 def prepare(module, options):
     module.depends(":architecture:clock", ":architecture:atomic",
-                   ":architecture:assert", ":architecture:fiber", ":stdc++")
+                   ":architecture:assert", ":architecture:fiber",
+                   ":architecture:interrupt", ":stdc++")
 
     core = options[":target"].get_driver("core")["type"]
     if core.startswith("cortex-m"): module.depends(":cmsis:device")
+    if core.startswith("cortex-m") or core.startswith("avr"):
+        module.add_option(
+            BooleanOption(name="thread_local", default=False,
+                          description=descr_thread_local))
     return (core.startswith("cortex-m") or core.startswith("avr") or
             "x86_64" in core or "arm64" in core)
 
@@ -43,6 +48,9 @@ def build(env):
         "with_fpu": with_fpu,
         "target": env[":target"].identifier,
         "multicore": env.has_module(":platform:multicore"),
+        "with_tls": env.get("thread_local", False),
+        # AVR emulates TLS by calling __emutls_get_address()
+        "with_emutls": env.get("thread_local", False) and core.startswith("avr"),
         "num_cores": 1,
     }
     if env.has_module(":platform:multicore"):
@@ -58,6 +66,10 @@ def build(env):
         env.substitutions["stack_minimum"] = 4 + 18 + 6 # -2 if PC only 2B
         env.substitutions["default_stack_size"] = 512
         env.copy("context_avr.cpp")
+        if env.get("thread_local", False):
+            env.copy("tls_avr.cpp")
+            # Sorting groups the TLS control objects in .data, see tls_avr.cpp
+            env.collect(":build:linkflags", "-Wl,--sort-section=name")
 
     elif "x86_64" in core:
         env.substitutions["stack_minimum"] = (30 + 2) * 8
@@ -69,9 +81,16 @@ def build(env):
         env.substitutions["default_stack_size"] = 2**20 # 1MB
         env.copy("context_arm64.cpp")
 
-    env.copy("context.h")
+    env.template("context.h")
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
     env.copy("scheduler.cpp")
-    env.copy("task.hpp")
-    env.copy("task_impl.hpp")
+    env.template("task.hpp.in")
+    env.template("task_impl.hpp.in")
+
+
+descr_thread_local = """# Thread-local storage per fiber
+
+Gives each fiber its own copy of all `thread_local` variables.
+Their destructors are never called.
+"""

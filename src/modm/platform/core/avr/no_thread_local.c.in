@@ -1,0 +1,16 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+// GCC calls this for every thread_local access. Without a TLS implementation,
+// the linker discards this section and reports its name as the error, instead
+// of linking the libgcc version, which shares one heap allocated copy.
+__attribute__((weak, used, section("{{ no_thread_local_section }}")))
+void* __emutls_get_address(void* obj) { return obj; }

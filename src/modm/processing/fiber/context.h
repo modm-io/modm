@@ -105,6 +105,30 @@ modm_context_stack_usage(const modm_context_t *ctx);
  */
 size_t
 modm_context_stack_size(const modm_context_t *ctx);
+
+%% if with_tls
+/// Fibers have their own `thread_local` storage.
+#define MODM_CONTEXT_TLS 1
+
+/**
+ * Reserves the thread-local storage block below the top of the stack, and
+ * asserts that the remaining stack is larger than the minimum stack size.
+%% if is_avr
+ * The block starts at the new top of the stack.
+%% else
+ * The thread pointer of this block is 8B below the new top of the stack, so
+ * that the two words stored below the top overlap the thread control block.
+%% endif
+ * @returns the new top of the stack, which must be passed to `modm_context_init()`.
+ */
+uintptr_t*
+modm_context_tls_reserve(uintptr_t *bottom, uintptr_t *top);
+
+/// Initializes the thread-local storage block above the top of the stack.
+void
+modm_context_tls_init(uintptr_t *top);
+%% endif
+
 /// @}
 
 #ifdef __cplusplus

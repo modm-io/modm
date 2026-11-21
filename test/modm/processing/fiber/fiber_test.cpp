@@ -506,3 +506,146 @@ FiberTest::testStackUsage()
 	stack[0] = 1;
 	TEST_ASSERT_EQUALS(modm_context_stack_usage(&ctx), usage(0));
 }
+
+// =============================== THREAD LOCAL ===============================
+#ifdef MODM_CONTEXT_TLS
+static constinit thread_local uint32_t tls_data{0x1234'5678};	// .tdata
+static constinit thread_local uint32_t tls_bss[3];				// .tbss
+alignas(16) static constinit thread_local uint8_t tls_aligned{7};
+struct TlsObject
+{
+	uint32_t value;
+	TlsObject() : value{tls_data} {}
+};
+static thread_local TlsObject tls_object;					// dynamic init
+
+static void
+tls_fiber(uint32_t id)
+{
+	TEST_ASSERT_EQUALS(tls_data, 0x1234'5678u);
+	TEST_ASSERT_EQUALS(tls_bss[2], 0u);
+	TEST_ASSERT_EQUALS(tls_aligned, 7u);
+	TEST_ASSERT_EQUALS(uintptr_t(&tls_aligned) % 16, 0u);
+	for (uint32_t ii = 0; ii < 3; ii++)
+	{
+		tls_data += id;
+		tls_bss[ii] = id;
+		tls_aligned += id;
+		modm::this_fiber::yield();
+	}
+	TEST_ASSERT_EQUALS(tls_data, 0x1234'5678u + 3 * id);
+	TEST_ASSERT_EQUALS(tls_bss[0] + tls_bss[1] + tls_bss[2], 3 * id);
+	TEST_ASSERT_EQUALS(tls_aligned, 7u + 3 * id);
+	// constructed on first use with this fiber's value
+	TEST_ASSERT_EQUALS(tls_object.value, tls_data);
+	state += id;
+}
+
+static uint8_t tls_constructed, tls_destroyed;
+struct TlsTracked
+{
+	uint8_t id{};
+	TlsTracked() { tls_constructed++; }
+	~TlsTracked() { tls_destroyed++; }
+};
+static thread_local TlsTracked tls_tracked_a, tls_tracked_b;
+
+static void
+tls_plain()
+{
+	TEST_ASSERT_EQUALS(tls_data, 0x1234'5678u);
+	TEST_ASSERT_EQUALS(tls_bss[1], 0u);
+	tls_bss[1] = 10;
+	modm::this_fiber::yield();
+	TEST_ASSERT_EQUALS(tls_bss[1], 10u);
+	state += 10;
+}
+#endif
+
+void
+FiberTest::testThreadLocal()
+{
+#ifdef MODM_CONTEXT_TLS
+	tls_data = 1;
+	uint32_t *const main_bss = tls_bss;
+	modm::fiber::Task fiber1(stack1, tls_fiber, 1u);
+	modm::fiber::Task fiber2(stack2, tls_fiber, 2u);
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(state, 3u);
+	// the main context is unchanged
+	TEST_ASSERT_EQUALS(tls_data, 1u);
+	TEST_ASSERT_TRUE(main_bss == tls_bss);
+	TEST_ASSERT_FALSE(fiber1.joinable());
+
+	// restarting a fiber resets its thread-local storage
+	TEST_ASSERT_TRUE(fiber1.start());
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(state, 4u);
+
+	// a plain function without closure also has its own storage
+	TEST_ASSERT_TRUE(fiber1.start(tls_plain));
+	TEST_ASSERT_TRUE(fiber2.start(tls_plain));
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(state, 24u);
+	TEST_ASSERT_EQUALS(tls_bss[1], 0u);
+#endif
+}
+
+void
+FiberTest::testThreadLocalDestructor()
+{
+#ifdef MODM_CONTEXT_TLS
+	tls_constructed = tls_destroyed = 0;
+	// all thread_local objects of a translation unit are constructed together
+	modm::fiber::Task fiber1(stack1, [] { tls_tracked_a.id = 1; });
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(tls_constructed, 2u);
+	// every start constructs them again, but they are never destroyed
+	for (uint8_t ii = 0; ii < 5; ii++)
+	{
+		TEST_ASSERT_TRUE(fiber1.start([] { tls_tracked_b.id = 2; }));
+		modm::fiber::Scheduler::run();
+	}
+	TEST_ASSERT_EQUALS(tls_constructed, 12u);
+	TEST_ASSERT_EQUALS(tls_destroyed, 0u);
+#endif
+}
+
+static uint8_t closure_alive, closure_errors;
+struct CountedClosure
+{
+	static constexpr uint32_t Magic{0x600D'C0DE};
+	uint32_t magic{Magic};
+	CountedClosure() { closure_alive++; }
+	CountedClosure(const CountedClosure&) { closure_alive++; }
+	CountedClosure(CountedClosure&&) { closure_alive++; }
+	~CountedClosure() { if (magic != Magic) closure_errors++; magic = 0; closure_alive--; }
+	void operator()() const { state++; }
+};
+
+void
+FiberTest::testClosureDestructor()
+{
+	auto &alive = closure_alive;
+	auto &errors = closure_errors;
+	using Closure = CountedClosure;
+	alive = errors = 0;
+	{
+		modm::fiber::Task fiber1(stack1, Closure{});
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(alive, 1u);
+		// replacing the closure destroys the previous one
+		TEST_ASSERT_TRUE(fiber1.start(Closure{}));
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(alive, 1u);
+		TEST_ASSERT_TRUE(fiber1.start([] { state++; }));
+		modm::fiber::Scheduler::run();
+		TEST_ASSERT_EQUALS(alive, 0u);
+		TEST_ASSERT_TRUE(fiber1.start(Closure{}));
+		modm::fiber::Scheduler::run();
+	}
+	// destroying the task destroys the closure
+	TEST_ASSERT_EQUALS(alive, 0u);
+	TEST_ASSERT_EQUALS(errors, 0u);
+	TEST_ASSERT_EQUALS(state, 4u);
+}
