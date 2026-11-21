@@ -493,7 +493,7 @@ modm::Matrix<T, ROWS, COLUMNS>::addRow(uint8_t index, const modm::Matrix<T, 1, C
 		m.replaceRow(ri++, getRow(i));
 	}
 	m.replaceRow(ri++, r);
-	for (; i < ROWS+1; ++i) {
+	for (; i < ROWS; ++i) {
 		m.replaceRow(ri++, getRow(i));
 	}
 
@@ -512,7 +512,7 @@ modm::Matrix<T, ROWS, COLUMNS>::addColumn(uint8_t index, const modm::Matrix<T, R
 		m.replaceColumn(ci++, getColumn(i));
 	}
 	m.replaceColumn(ci++, c);
-	for (; i < COLUMNS+1; ++i) {
+	for (; i < COLUMNS; ++i) {
 		m.replaceColumn(ci++, getColumn(i));
 	}
 
