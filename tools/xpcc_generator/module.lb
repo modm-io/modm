@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":communication:xpcc:generator"
-    module.description = """\
+    module.description = """
 # XPCC Generator
 
 Translates the XPCC XML declarations into C++ code. See the SCons build script

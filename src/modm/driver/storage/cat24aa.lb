@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:cat24aa"
-    module.description = """\
+    module.description = """
 # CAT24AAxx I2C Eeprom
 
 Compatible with the OnSemi CAT24AA I2C eeprom (1 kBit to 16 kBit).

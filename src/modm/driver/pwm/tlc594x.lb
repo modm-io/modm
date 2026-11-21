@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:tlc594x"
-    module.description = """\
+    module.description = """
 # TLC594* 12-bit PWM Driver
 
 TLC594* multi-channel, daisy-chainable, constant-current sink, 12bit PWM LED driver.

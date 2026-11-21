@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:l3gd20"
-    module.description = """\
+    module.description = """
 # L3GD20 3-Axis Gyroscope
 
 The L3GD20 is a low-power three-axis angular rate sensor.

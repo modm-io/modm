@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ams5915"
-    module.description = """\
+    module.description = """
 # AMS 5915 Pressure Sensor
 
 Driver for the AMS 5915 differential and absolute pressure sensors.

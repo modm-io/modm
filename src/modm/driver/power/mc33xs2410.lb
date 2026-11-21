@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:mc33xs2410"
-    module.description = """\
+    module.description = """
 # MC33XS2410 Power Switch
 
 MC33XS2410 quad 100 mOhm / dual 50 mOhm, 3.0 V to 60 V high-side switch.

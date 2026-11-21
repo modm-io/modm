@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":ui:menu"
-    module.description = """\
+    module.description = """
 # Display Menu
 
 Simple to use classes for implementing menu structures on graphic displays.

@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":math:units"
-    module.description = """\
+    module.description = """
 # SI Units
 
 modm uses a couple of common SI units for configuration of peripherals:

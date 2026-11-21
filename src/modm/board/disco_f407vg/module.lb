@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:disco-f407vg"
-    module.description = """\
+    module.description = """
 # STM32F4DISCOVERY
 
 [Discovery kit for STM32F407](https://www.st.com/en/evaluation-tools/stm32f4discovery.html)

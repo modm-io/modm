@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:nucleo-c031c6"
-    module.description = """\
+    module.description = """
 # NUCLEO-C031C6
 
 [Nucleo kit for STM32C031C6](https://www.st.com/en/evaluation-tools/nucleo-c031c6.html)

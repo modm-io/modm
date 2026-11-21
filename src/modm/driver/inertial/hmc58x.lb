@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:hmc58x"
-    module.description = """\
+    module.description = """
 # HMC58x3 3-Axis Digital Magnetometer
 
 The HMC58x3 is a surface-mount, multi-chip module designed for low-field

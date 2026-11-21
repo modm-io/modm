@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:tmp12x"
-    module.description = """\
+    module.description = """
 # TMP121/123/125 Thermometer
 
 TMP121/123/125 temperature sensor driver

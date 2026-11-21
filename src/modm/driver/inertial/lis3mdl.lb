@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:lis3mdl"
-    module.description = """\
+    module.description = """
 # LIS3MDL Magnetic Sensor
 
 The LIS3MDL is an ultra-low-power high-performance three-axis magnetic sensor.

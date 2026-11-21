@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:nucleo-f439zi"
-    module.description = """\
+    module.description = """
 # NUCLEO-F439ZI
 
 [Nucleo kit for STM32F439ZI](https://www.st.com/en/evaluation-tools/nucleo-f439zi.html)

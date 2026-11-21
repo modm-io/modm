@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":board:weact-g030f6"
-    module.description = """\
+    module.description = """
 # WeAct Studio STM32G030F6 Core Board
 
 [Documentation](https://github.com/WeActStudio/WeActStudio.STM32G0xxC0xxCoreBoard)

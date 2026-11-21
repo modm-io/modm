@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:feather-rp2040"
-    module.description = """\
+    module.description = """
 # Adafruit Feather RP2040
 
 A board with RP2040 chip and 8MB of flash memory.

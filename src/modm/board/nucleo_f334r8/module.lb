@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":board:nucleo-f334r8"
-    module.description = """\
+    module.description = """
 # NUCLEO-F334R8
 
 [Nucleo kit for STM32F334R8](https://www.st.com/en/evaluation-tools/nucleo-f334r8.html)

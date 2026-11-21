@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ms5837"
-    module.description = """\
+    module.description = """
 # MS5837 Pressure Sensor
 
 This sensor is optimized for water depth measurement systems with a resolution of 0.2cm.

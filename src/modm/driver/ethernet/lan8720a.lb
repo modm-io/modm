@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:lan8720a"
-    module.description = """\
+    module.description = """
 # LAN8720A Ethernet Transceiver
 
 Microchip's LAN8720A/LAN8720Ai are high-performance, small-footprint,

@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:pca9685"
-    module.description = """\
+    module.description = """
 # PCA9685 12-bit PWM Driver
 
 PCA9685 16-channel, 12-bit PWM LED controller via I2C-Bus.

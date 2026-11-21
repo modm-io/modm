@@ -13,7 +13,7 @@
 
 def init(module):
 	module.name = ":driver:iwr6843aop"
-	module.description = """\
+	module.description = """
 # TI IWR6843AOP mmWave Radar Driver
 
 Control and data UART driver for TLV point cloud output.

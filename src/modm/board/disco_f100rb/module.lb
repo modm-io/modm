@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:disco-f100rb"
-    module.description = """\
+    module.description = """
 # STM32VLDISCOVERY
 
 [Discovery kit for STM32F100](https://www.st.com/en/evaluation-tools/stm32vldiscovery.html)

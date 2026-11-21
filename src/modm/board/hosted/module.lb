@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":board:hosted"
-    module.description = """\
+    module.description = """
 # Hosted
 
 Board support for Linux, macOS and Windows, so that examples can use the same

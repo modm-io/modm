@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":board:stm32_f4ve"
-    module.description = """\
+    module.description = """
 # STM32_F4VE
 
 https://stm32-base.org/boards/STM32F407VET6-STM32-F4VE-V2.0.html

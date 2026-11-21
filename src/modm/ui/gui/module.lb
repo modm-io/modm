@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":ui:gui"
-    module.description = """\
+    module.description = """
 # Graphical User Interface
 
 Various classes for creating GUI applications.

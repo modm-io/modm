@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":board:disco-f769ni"
-    module.description = """\
+    module.description = """
 # STM32F769IDISCOVERY
 
 [Discovery kit for STM32F769 line](https://www.st.com/en/evaluation-tools/32f769idiscovery.html)

@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ad7280a"
-    module.description = """\
+    module.description = """
 # AD7280A Lithium Ion Battery Monitoring System
 
 The AD7280A is monitor for lithium ion battery packs with up to six

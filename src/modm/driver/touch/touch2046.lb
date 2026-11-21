@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:touch2046"
-    module.description = """\
+    module.description = """
 # TSC2046/x2046 Resistive Touch Controller
 
 The TSC2046 by Texas Instruments is a popular touchscreen controller

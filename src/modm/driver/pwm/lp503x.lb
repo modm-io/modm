@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:lp503x"
-    module.description = """\
+    module.description = """
 # LP503x 30/36 channel LED PWM driver
 
 LP5030/LP5036 30/36-channel, 12-bit PWM LED driver with I2C interface.

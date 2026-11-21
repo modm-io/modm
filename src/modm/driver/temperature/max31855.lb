@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:max31855"
-    module.description = """\
+    module.description = """
 # MAX31855 Thermocouple-to-Digital Converter
 
 [Datasheet](https://datasheets.maximintegrated.com/en/ds/MAX31855.pdf)

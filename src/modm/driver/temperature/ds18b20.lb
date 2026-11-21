@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ds18b20"
-    module.description = """\
+    module.description = """
 # 1-Wire Thermometer
 
 Programmable resolution 1-wire digital thermometer.

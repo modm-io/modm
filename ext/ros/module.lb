@@ -12,7 +12,7 @@
 
 def init(module):
     module.name = ":ros"
-    module.description = """\
+    module.description = """
 # ROS Library
 
 Repository of generated messages headers for rosserial.

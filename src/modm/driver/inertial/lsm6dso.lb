@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:lsm6dso"
-    module.description = """\
+    module.description = """
 # LSM6DSO 3D accelerometer and 3D gyroscope
 
 iNEMO inertial module: always-on 3D accelerometer and 3D gyroscope

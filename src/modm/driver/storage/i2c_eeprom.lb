@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:i2c.eeprom"
-    module.description = """\
+    module.description = """
 # I2C Eeprom
 
 Compatible with the 24C256 (ST) and 24FC1025 (Microchip) family and other

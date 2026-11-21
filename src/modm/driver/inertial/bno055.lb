@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:bno055"
-    module.description = """\
+    module.description = """
 # BNO055 9-DOF Inertial Measurement Unit
 
 The BNO055 is a System in Package (SiP), integrating a triaxial 14-bit

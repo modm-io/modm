@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:bmp581"
-    module.description = """\
+    module.description = """
 # BMP581 Barometric Pressure Sensor
 
 The BMP581 is a high-performance barometric pressure sensor from Bosch Sensortec

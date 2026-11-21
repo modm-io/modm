@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:ixm42xxx"
-    module.description = """\
+    module.description = """
 # InvenSense 6-Axis IMU
 
 High Precision 6-Axis MEMS MotionTracking Device

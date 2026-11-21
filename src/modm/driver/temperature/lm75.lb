@@ -13,7 +13,7 @@
 
 def init(module):
     module.name = ":driver:lm75"
-    module.description = """\
+    module.description = """
 # LM75 Thermometer
 
 LM75 digital temperature sensor driver.
