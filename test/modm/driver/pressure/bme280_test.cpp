@@ -175,7 +175,9 @@ Bme280Test::testConversion()
 
 		MODM_LOG_DEBUG.printf("ADC --double--\t--int--\t--error--\n");
 
-		for (uint32_t adc = adc_temp_min[jj]; adc <= adc_temp_max[jj]; ++adc)
+		// Sample about 1000 values, the odd step varies the low ADC bits
+		const uint32_t adc_step = ((adc_temp_max[jj] - adc_temp_min[jj]) / 1024) | 1;
+		for (uint32_t adc = adc_temp_min[jj]; adc <= adc_temp_max[jj]; adc += adc_step)
 		{
 			dataDouble->raw[3] = adc >> 12;
 			dataDouble->raw[4] = adc >> 4;
@@ -205,7 +207,7 @@ Bme280Test::testConversion()
 		MODM_LOG_DEBUG.printf(" max = %" PRId32 "\n", max_error);
 		MODM_LOG_DEBUG.printf(" sum = %" PRId32 "\n", total_error);
 
-		TEST_ASSERT_TRUE(total_error < 51000);
+		TEST_ASSERT_TRUE(total_error < 150);
 		TEST_ASSERT_TRUE(max_error <= 1);
 
 
