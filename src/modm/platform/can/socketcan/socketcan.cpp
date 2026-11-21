@@ -141,7 +141,7 @@ modm::platform::SocketCan::getMessage(can::Message& message)
 			MODM_LOG_ERROR << "Received can frame too big for configured buffer." << modm::endl;
 			return false;
 		}
-		message.identifier = frame.can_id;
+		message.identifier = frame.can_id & ((frame.can_id & CAN_EFF_FLAG) ? CAN_EFF_MASK : CAN_SFF_MASK);
 		message.setLength(frame.len);
 		message.setExtended(frame.can_id & CAN_EFF_FLAG);
 		message.setRemoteTransmitRequest(frame.can_id & CAN_RTR_FLAG);
