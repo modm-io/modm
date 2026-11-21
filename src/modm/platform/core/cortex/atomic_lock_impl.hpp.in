@@ -25,11 +25,18 @@ namespace modm::atomic
 {
 
 class Lock
-%% if with_multicore
-	: public modm::platform::multicore::CoreLock
-%% endif
 {
 public:
+%% if with_multicore
+	modm_always_inline
+	Lock() : cpsr(modm::platform::multicore::SystemSpinLock::lock()) {}
+
+	modm_always_inline
+	~Lock()
+	{
+		modm::platform::multicore::SystemSpinLock::unlock(cpsr);
+	}
+%% else
 	modm_always_inline
 	Lock() : cpsr(__get_PRIMASK())
 	{
@@ -41,6 +48,7 @@ public:
 	{
 		__set_PRIMASK(cpsr);
 	}
+%% endif
 
 private:
 	uint32_t cpsr;

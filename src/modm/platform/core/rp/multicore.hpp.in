@@ -105,15 +105,6 @@ public:
 	}
 };
 
-/// @cond
-// for use in modm::atomic::Lock
-struct CoreLock
-{
-	CoreLock() { SpinLockUnsafe<0>::lock(); }
-	~CoreLock() { SpinLockUnsafe<0>::unlock(); }
-};
-/// @endcond
-
 /// This class will disable interrupts prior to acquiring the spinlock
 /// @ingroup modm_platform_multicore
 template <uint8_t instance>
