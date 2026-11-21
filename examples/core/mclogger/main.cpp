@@ -12,6 +12,7 @@
 #include <modm/board.hpp>
 #include <modm/debug/logger.hpp>
 #include <modm/processing.hpp>
+#include <modm/architecture/interface/fiber/mutex.hpp>
 #include <mutex>
 
 // ----------------------------------------------------------------------------
@@ -19,20 +20,10 @@
 #undef MODM_LOG_LEVEL
 #define MODM_LOG_LEVEL modm::log::INFO
 
-//
-#if 0
-// with simple case we can use directly SpinLockUnsafe
-using LockMutex = modm::platform::multicore::SpinLockUnsafe<1>;
-#define LOG_GUARD()  modm::platform::multicore::SpinLockGuard<LockMutex> g
-#define INIT_GUARD() LockMutex::init()
-#else
-// more extensive, but work at any case
-static multicore::Mutex log_mutex;
-#define LOG_GUARD() std::lock_guard<multicore::Mutex> g(log_mutex)
-#define INIT_GUARD() \
-	do {             \
-	} while (false)
-#endif
+// The logger yields while the UART is full, so waiting for this lock must yield
+// too. A spinlock or multicore::Mutex would block the fiber holding it.
+static modm::fiber::mutex log_mutex;
+#define LOG_GUARD() std::lock_guard g(log_mutex)
 
 template<size_t Core, size_t Instance>
 class Thread : public modm::Fiber<>
@@ -99,8 +90,6 @@ main()
 	MODM_LOG_INFO << "info" << modm::endl;
 	MODM_LOG_WARNING << "warning" << modm::endl;
 	MODM_LOG_ERROR << "error" << modm::endl;
-
-	INIT_GUARD();
 
 	multicore::Core1::run(core1_main);
 	modm::fiber::Scheduler::run();
