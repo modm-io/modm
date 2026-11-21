@@ -18,4 +18,11 @@
 #	define O1HEAP_ASSERT(x) ((void)0)
 #endif
 
+// o1heap uses __builtin_clzl, which is too narrow for size_t on 64-bit Windows
+#include <limits.h>
+#include <stdint.h>
+#if SIZE_MAX > ULONG_MAX
+#	define O1HEAP_CLZ __builtin_clzll
+#endif
+
 #include "o1heap.c.inc"
