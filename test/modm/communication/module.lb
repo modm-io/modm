@@ -45,6 +45,20 @@ class Sab(Module):
         env.copy("sab")
 
 
+class Canard(Module):
+    def init(self, module):
+        module.name = "canard"
+        module.description = "Tests for libcanard"
+
+    def prepare(self, module, options):
+        module.depends("modm:ext:libcanard", ":mock:clock", ":mock:can_driver")
+        return options[":target"].identifier.platform == "hosted"
+
+    def build(self, env):
+        env.outbasepath = "modm-test/src/modm-test/communication"
+        env.copy("canard")
+
+
 class Xpcc(Module): # DEPRECATED: 2027q4
     def init(self, module):
         module.name = "xpcc"
@@ -69,6 +83,7 @@ def init(module):
 
 def prepare(module, options):
     module.add_submodule(Amnb())
+    module.add_submodule(Canard())
     module.add_submodule(Sab())
     module.add_submodule(Xpcc())
     return True
