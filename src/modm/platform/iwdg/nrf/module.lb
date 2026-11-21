@@ -12,7 +12,32 @@
 
 def init(module):
     module.name = ":platform:wdt"
-    module.description = "Watchdog Timer"
+    module.description = """\
+# Watchdog Timer (WDT)
+
+`Wdt::initialize()` configures and starts the watchdog. Call it once after
+reset, when the application is ready to call `Wdt::trigger()` periodically:
+
+```cpp
+Wdt::initialize<SystemClock, 4s>();
+while (true)
+{
+    do_work();
+    Wdt::trigger();
+}
+```
+
+Measured on the nRF5340, the running watchdog behaves as follows:
+
+- The timeout is locked: calling `initialize()` again keeps the first timeout.
+- A soft reset does **not** stop it, including `NVIC_SystemReset()` and the
+  reset of most debuggers. The new firmware then runs with the old timeout and
+  is reset unless it triggers the watchdog in time.
+- A pin reset or the watchdog reset itself stops it. For this reason,
+  `modm_tools.jlink` programs and resets the nRF53 application core via the pin.
+
+Use `Wdt::isRunning()` after reset to detect a watchdog left running.
+"""
 
 
 def prepare(module, options):
