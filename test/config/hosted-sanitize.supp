@@ -1,0 +1,2 @@
+# modm::Scheduler allocates one list node per task and has no way to remove them
+leak:modm::Scheduler::scheduleTask

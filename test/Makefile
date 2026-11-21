@@ -41,6 +41,14 @@ run-hosted-darwin-arm64:
 run-hosted-windows:
 	$(call compile-test,hosted,run,-D":target=hosted-windows")
 
+# ASan + UBSan, macOS needs `brew install llvm@20`, since GCC has no libasan there
+run-hosted-linux-sanitize: export LSAN_OPTIONS = suppressions=$(CURDIR)/config/hosted-sanitize.supp
+run-hosted-linux-sanitize:
+	$(call compile-test,hosted-sanitize,run,-D":target=hosted-linux")
+run-hosted-darwin-arm64-sanitize: export PATH := $(shell brew --prefix llvm@20)/bin:$(PATH)
+run-hosted-darwin-arm64-sanitize:
+	$(call compile-test,hosted-sanitize,run,-D":target=hosted-darwin-arm64" -D"modm:build:compiler=clang")
+
 
 compile-nucleo-f091rc_A:
 	$(call compile-test,nucleo-f091rc_A,size)
