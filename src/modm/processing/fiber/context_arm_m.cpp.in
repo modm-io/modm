@@ -295,6 +295,87 @@ modm_context_end(uintptr_t)
 	);
 }
 
+%% if with_tls
+// ============================ Thread-Local Storage ============================
+#include "scheduler.hpp"
+#include <modm/architecture/interface/assert.hpp>
+
+extern "C"
+{
+// Defined by the linker script, see `modm:platform:cortex-m`
+extern const char __tdata_load[], __tdata_start[], __tdata_end[];
+extern char __tls_size[], __tls_tp_offset[];
+
+// GCC uses the local-exec TLS model on Cortex-M, which calls this function to
+// get the thread pointer. It must only clobber r0, ip, lr and the flags!
+// The thread pointer of the current fiber is `current->ctx.top - 8`, outside
+// of a fiber it points to the `.tdata` and `.tbss` sections in RAM.
+// It is `used`, since LTO cannot see the calls the compiler generates.
+void modm_naked modm_used
+__aeabi_read_tp()
+{
+	asm volatile
+	(
+%% if multicore
+		"mov ip, r1				\n\t"
+		"ldr r0, =0xd0000000	\n\t"	// SIO->CPUID
+		"ldr r0, [r0]			\n\t"
+		"mov r1, %2				\n\t"
+		"mul r0, r1				\n\t"	// CPUID * sizeof(Scheduler)
+		"ldr r1, =%c0			\n\t"
+		"ldr r0, [r1, r0]		\n\t"	// Load Scheduler::main[CPUID].current
+		"mov r1, ip				\n\t"
+%% else
+		"ldr r0, =%c0			\n\t"
+		"ldr r0, [r0]			\n\t"	// Load Scheduler::main.current
+%% endif
+		"cmp r0, #0				\n\t"
+		"beq 1f					\n\t"	// No fiber is running
+		"ldr r0, [r0, %1]		\n\t"	// Load current->ctx.top
+		"{{ "sub" if is_cm0 else "subs" }} r0, #8			\n\t"	// Thread pointer is 8B below
+		"bx lr					\n\t"
+	"1:	 ldr r0, =__tls_main_tp	\n\t"
+		"bx lr					\n\t"
+%% if multicore
+		:: "i" (&modm::fiber::Scheduler::main[0].current),
+%% else
+		:: "i" (&modm::fiber::Scheduler::main.current),
+%% endif
+		   "i" (offsetof(modm_context_t, top)), "i" (sizeof(modm::fiber::Scheduler))
+	);
+}
+}
+
+extern "C" uintptr_t*
+modm_context_tls_reserve(uintptr_t *bottom, uintptr_t *top)
+{
+	// The block is aligned to the TLS alignment, which is part of the offset
+	const uintptr_t offset = uintptr_t(__tls_tp_offset);
+	const uintptr_t block = (uintptr_t(top) - uintptr_t(__tls_size)) & ~(offset - 1);
+	// The thread control block of 8B is unused, so the stack top overlaps it
+	top = (uintptr_t*)(block - offset + 8);
+	modm_assert(uintptr_t(top) - uintptr_t(bottom) >= StackWordsAll * StackSizeWord, "fbr.tls",
+			"Stack size must be larger than minimum stack size + thread-local storage!");
+	return top;
+}
+
+// The TLS sections are 8B aligned and padded, so copy 8B words like the startup
+// code, since newlib-nano's memcpy and memset copy single bytes.
+extern "C" void __attribute__((optimize("no-tree-loop-distribute-patterns")))
+modm_context_tls_init(uintptr_t *top)
+{
+	auto *dst = (uint64_t*)(uintptr_t(top) - 8 + uintptr_t(__tls_tp_offset));
+	auto *const end = (uint64_t*)(uintptr_t(dst) + uintptr_t(__tls_size));
+	for (auto *src = (const uint64_t*)__tdata_load,
+		 *src_end = (const uint64_t*)(__tdata_load + (__tdata_end - __tdata_start));
+		 src < src_end;) *dst++ = *src++;
+	// also zeros the alignment gap between .tdata and .tbss
+	while (dst < end) *dst++ = 0;
+}
+
+// =============================================================================
+%% endif
+
 %% if with_psplim
 #include <modm/architecture/interface/fiber.hpp>
 #include <modm/platform.hpp>
