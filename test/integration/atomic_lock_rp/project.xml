@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:rp-pico</extends>
+  <options>
+    <option name="modm:board:rp-pico:with_logger">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:multicore</module>
+  </modules>
+</library>
