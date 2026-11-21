@@ -23,6 +23,10 @@ def prepare(module, options):
 
     core = options[":target"].get_driver("core")["type"]
     if core.startswith("cortex-m"): module.depends(":cmsis:device")
+    if core.startswith("cortex-m"):
+        module.add_option(
+            BooleanOption(name="thread_local", default=False,
+                          description=descr_thread_local))
     return (core.startswith("cortex-m") or core.startswith("avr") or
             "x86_64" in core or "arm64" in core)
 
@@ -44,6 +48,7 @@ def build(env):
         "with_fpu": with_fpu,
         "target": env[":target"].identifier,
         "multicore": env.has_module(":platform:multicore"),
+        "with_tls": env.get("thread_local", False),
         "num_cores": 1,
     }
     if env.has_module(":platform:multicore"):
@@ -70,9 +75,16 @@ def build(env):
         env.substitutions["default_stack_size"] = 2**20 # 1MB
         env.copy("context_arm64.cpp")
 
-    env.copy("context.h")
+    env.template("context.h")
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
     env.copy("scheduler.cpp")
-    env.copy("task.hpp")
-    env.copy("task_impl.hpp")
+    env.template("task.hpp.in")
+    env.template("task_impl.hpp.in")
+
+
+descr_thread_local = """# Thread-local storage per fiber
+
+Gives each fiber its own copy of all `thread_local` variables.
+Their destructors are never called.
+"""

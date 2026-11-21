@@ -13,7 +13,11 @@
 
 #ifndef MODM_FIBER_SCHEDULER_HPP
 #define MODM_FIBER_SCHEDULER_HPP
-
+%% if with_tls
+%#
+extern "C" void __aeabi_read_tp();
+%% endif
+%#
 #include "task.hpp"
 #include <utility>
 #include <modm/architecture/interface/assert.hpp>
@@ -49,6 +53,9 @@ protected:
 	friend class Task;
 	friend void modm::this_fiber::yield();
 	friend modm::fiber::id modm::this_fiber::get_id();
+%% if with_tls
+	friend void ::__aeabi_read_tp();
+%% endif
 	Scheduler(const Scheduler&) = delete;
 	Scheduler& operator=(const Scheduler&) = delete;
 
@@ -181,15 +188,18 @@ protected:
 %% if multicore
 	instance(uint8_t core=::modm::platform::multicore::Core::cpuId())
 	{
-		static constinit Scheduler main[{{num_cores}}];
 		return main[core];
 %% else
 	instance()
 	{
-		static constinit Scheduler main;
 		return main;
 %% endif
 	}
+%% if multicore
+	static Scheduler main[{{num_cores}}];
+%% else
+	static Scheduler main;
+%% endif
 
 public:
 	constexpr Scheduler() = default;
@@ -207,6 +217,12 @@ public:
 		instance().start(options);
 	}
 };
+
+%% if multicore
+constinit inline Scheduler Scheduler::main[{{num_cores}}];
+%% else
+constinit inline Scheduler Scheduler::main;
+%% endif
 
 } // namespace modm::fiber
 

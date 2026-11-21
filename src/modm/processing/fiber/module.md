@@ -347,6 +347,68 @@ On ARMv8-M devices, the stack overflow is checked in hardware via the PSPLIM
 register, therefore the context switch is a little faster.
 
 
+## Thread-Local Storage
+
+With the `modm:processing:fiber:thread_local` option on Cortex-M, each fiber
+has its own copy of all `thread_local` variables, while code outside of fibers
+uses its own copy:
+
+```cpp
+thread_local uint32_t counter;	// one per fiber
+modm::Fiber<> fiber1([] { counter++; });
+modm::Fiber<> fiber2([] { counter++; });
+```
+
+The thread-local storage is placed on the fiber stack directly below the
+closure and is initialized every time the fiber is started. Objects with dynamic
+initialization are constructed on first use in each fiber, together with all
+other such objects of the same translation unit. Declare plain data `constinit`
+to avoid the initialization check on every access.
+
+The option is disabled by default. Without it, using `thread_local` fails to
+link with an error that names the option.
+
+!!! warning "Destructors of `thread_local` objects are never called"
+    Neither when a fiber returns or is restarted, nor for the main context.
+    GCC discards them without a warning, since modm compiles with
+    `-fno-use-cxa-atexit`. Restarting a fiber initializes its storage again,
+    so any resource owned by the previous objects, like heap memory or a
+    registration somewhere else, is leaked. Use only trivially destructible
+    types, or keep the object as a local variable of the fiber function and
+    store a pointer to it:
+
+    ```cpp
+    constinit thread_local Context *context{nullptr};
+
+    void worker()
+    {
+        Context local;    // destroyed when the fiber function returns
+        context = &local; // accessible to all functions this fiber calls
+        process();
+    }
+    ```
+
+Further limitations:
+
+- Every fiber reserves storage for *all* `thread_local` variables of the
+  program, even the ones it never uses, which reduces the usable stack size of
+  every fiber.
+- Interrupts use the thread-local storage of the interrupted fiber or of the
+  main context.
+- A pointer to the thread-local storage of a fiber is only valid until the
+  fiber returns. The next fiber started on the same stack reuses the memory.
+- With `modm:platform:multicore`, the main contexts of all cores share one copy
+  of the `thread_local` variables, only fibers have their own.
+
+### Arm Cortex-M
+
+GCC accesses `thread_local` variables by calling `__aeabi_read_tp()`, which
+derives the thread pointer from the top of the stack of the current fiber, so
+the scheduler does not need to switch anything. Code outside of fibers uses the
+copy in the `.tdata` and `.tbss` sections. Each access costs a function call of
+~15-25 cycles and each fiber start copies the storage with ~1.1 cycles per byte.
+
+
 ## Scheduling
 
 The scheduler `run()` function will suspend execution of the call site, usually

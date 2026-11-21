@@ -70,6 +70,12 @@ class Task
 	void (*destroy)(uintptr_t*){nullptr};
 	// The top of the stack memory, since ctx.top is below the closure
 	uintptr_t *end;
+%% if with_tls
+
+	// Reserves the thread-local storage below the closure
+	uintptr_t*
+	tls_reserve(uintptr_t* top);
+%% endif
 
 protected:
 	/// Destroys the previous closure and constructs the new one with the
@@ -104,7 +110,7 @@ public:
 	{
 		request_stop();
 		join();
-		if (destroy and not isRunning()) destroy(ctx.top);
+		if (destroy and not isRunning()) destroy(end);
 	}
 
 	/// Returns the number of concurrent threads supported by the implementation.

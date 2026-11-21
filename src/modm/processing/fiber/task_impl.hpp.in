@@ -40,6 +40,16 @@ Task::Task(Stack<Size>& stack, T&& closure, Start start)
 	if (start == Start::Now) this->start();
 }
 
+%% if with_tls
+inline uintptr_t*
+Task::tls_reserve(uintptr_t* top)
+{
+	// The thread-local storage functions access ctx.top via the task pointer
+	static_assert(offsetof(Task, ctx) == 0);
+	return modm_context_tls_reserve(ctx.bottom, top);
+}
+%% endif
+
 template<size_t Size, class T, class... Args>
 void
 Task::emplace(T&& closure, Args&&... args)
@@ -65,7 +75,7 @@ Task::emplace(T&& closure, Args&&... args)
 					  std::is_invocable_v<std::decay_t<T>&, stop_token>,
 				"Closure must be callable as void() or void(stop_token), "
 				"arguments can only be given together with a closure!");
-		if (destroy) destroy(ctx.top);
+		if (destroy) destroy(end);
 		destroy = nullptr;
 
 		constexpr bool with_stop_token = std::is_invocable_r_v<void, T, stop_token>;
@@ -81,7 +91,7 @@ Task::emplace(T&& closure, Args&&... args)
 				} else fn();
 				fiber::Scheduler::instance().unschedule();
 			};
-			modm_context_init(&ctx, ctx.bottom, end, caller,
+			modm_context_init(&ctx, ctx.bottom, {{ "tls_reserve(end)" if with_tls else "end" }}, caller,
 							  (uintptr_t) static_cast<Callable>(closure));
 		}
 		else
@@ -102,7 +112,7 @@ Task::emplace(T&& closure, Args&&... args)
 			// construct closure in place
 			::new ((void*)ptr) Closure{std::forward<T>(closure)};
 			if constexpr (not std::is_trivially_destructible_v<Closure>)
-				destroy = +[](uintptr_t* closure) { std::destroy_at((Closure*) closure); };
+				destroy = +[](uintptr_t* end) { std::destroy_at((Closure*)(uintptr_t(end) - closure_size)); };
 			// Encapsulate the proper ABI function call into a simpler function
 			auto caller = (uintptr_t) +[](Closure* closure)
 			{
@@ -112,7 +122,7 @@ Task::emplace(T&& closure, Args&&... args)
 				fiber::Scheduler::instance().unschedule();
 			};
 			// initialize the stack below the allocated closure
-			modm_context_init(&ctx, ctx.bottom, (uintptr_t*)ptr, caller, ptr);
+			modm_context_init(&ctx, ctx.bottom, {{ "tls_reserve((uintptr_t*)ptr)" if with_tls else "(uintptr_t*)ptr" }}, caller, ptr);
 		}
 	}
 }
@@ -123,6 +133,9 @@ Task::start()
 	// Tasks without closure have never been initialized
 	if (isRunning() or not ctx.sp) return false;
 	modm_context_reset(&ctx);
+%% if with_tls
+	modm_context_tls_init(ctx.top);
+%% endif
 	stop.reset();
 	Scheduler::instance().add(this);
 	return true;

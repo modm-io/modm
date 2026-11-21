@@ -277,6 +277,10 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 		/* Catch use of printf without `modm:printf` module. */
 		*({{no_printf_section}})
 		%% endif
+		%% if not with_thread_local
+		/* Catch use of thread_local without a TLS implementation. */
+		*({{no_thread_local_section}})
+		%% endif
 	}
 %% endmacro
 
@@ -306,6 +310,42 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 	} >{{memory}} AT >{{rom}}
 	%% endfor
 	%#
+	%% if with_thread_local
+	/* Thread-local storage: the RAM copy is used by the main context, the
+	 * load image of .tdata and the size of .tbss initialize each fiber's copy */
+	%% do table_copy.append("tdata")
+	.tdata : ALIGN(8)
+	{
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+		. = ALIGN(8);
+	} >{{memory}} AT >{{rom}}
+	%#
+	%% do table_zero.append("tbss")
+	.tbss (NOLOAD) : ALIGN(8)
+	{
+		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+		. = ALIGN(8);
+	} >{{memory}}
+	/* .tbss takes no space in the address map, so reserve it explicitly */
+	.tbss_main (NOLOAD) :
+	{
+		. = . + SIZEOF(.tbss);
+	} >{{memory}}
+	/* Symbols inside TLS sections are offsets, so define them outside */
+	__tdata_load = LOADADDR(.tdata);
+	__tdata_start = ADDR(.tdata);
+	__tdata_end = ADDR(.tdata) + SIZEOF(.tdata);
+	__tbss_start = ADDR(.tbss);
+	__tbss_end = ADDR(.tbss) + SIZEOF(.tbss);
+	/* The linker computes TLS offsets from the first TLS section and the
+	 * thread pointer points to a 8B control block before the aligned TLS */
+	__tls_base = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss);
+	__tls_size = __tbss_end - __tls_base;
+	__tls_tp_offset = MAX(8, MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)));
+	__tls_main_tp = __tls_base - __tls_tp_offset;
+	%#
+	%% endif
 	%% do table_zero.append("bss")
 	.bss (NOLOAD) :
 	{
