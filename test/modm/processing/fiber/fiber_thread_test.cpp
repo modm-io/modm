@@ -15,6 +15,7 @@
 #include <modm/architecture/interface/fiber/shared_mutex.hpp>
 #include <modm/architecture/interface/fiber/semaphore.hpp>
 #include <modm/architecture/interface/fiber/latch.hpp>
+#include <modm/architecture/interface/fiber/barrier.hpp>
 #include <modm/architecture/interface/fiber/condition_variable.hpp>
 #include <atomic>
 #include <exception>
@@ -57,13 +58,14 @@ run_parallel(auto &&function)
 
 /// Runs a critical section that is protected by the lock functions.
 void
-test_exclusion(auto &&lock, auto &&unlock)
+test_exclusion(auto &&lock, auto &&unlock, uint8_t contexts = Contexts)
 {
 	std::atomic<uint8_t> inside{};
 	std::atomic<uint16_t> errors{};
 	uint32_t counter{}; // deliberately not atomic, is checked by TSan
-	run_parallel([&](uint8_t)
+	run_parallel([&](uint8_t context)
 	{
+		if (context >= contexts) return;
 		for (uint16_t ii = 0; ii < Iterations; ii++)
 		{
 			lock();
@@ -76,7 +78,7 @@ test_exclusion(auto &&lock, auto &&unlock)
 		}
 	});
 	TEST_ASSERT_EQUALS(errors.load(), 0u);
-	TEST_ASSERT_EQUALS(counter, uint32_t(Iterations) * Contexts);
+	TEST_ASSERT_EQUALS(counter, uint32_t(Iterations) * contexts);
 }
 
 struct TlsDestructor
@@ -161,6 +163,33 @@ FiberThreadTest::testMutexAcrossSchedulers()
 {
 	modm::fiber::mutex mutex;
 	test_exclusion([&]{ mutex.lock(); }, [&]{ mutex.unlock(); });
+}
+
+void
+FiberThreadTest::testRecursiveMutexAcrossSchedulers()
+{
+	modm::fiber::recursive_mutex mutex;
+	test_exclusion([&]{ mutex.lock(); mutex.lock(); mutex.unlock(); mutex.lock(); },
+				   [&]{ mutex.unlock(); mutex.unlock(); }, 4); // only fibers have unique ids
+}
+
+void
+FiberThreadTest::testBarrierAcrossSchedulers()
+{
+	std::atomic<uint16_t> completions{}, errors{};
+	uint32_t plain{}; // deliberately not atomic, is checked by TSan
+	modm::fiber::barrier barrier{Contexts, [&]{ plain = plain + 1; completions++; }};
+	run_parallel([&](uint8_t)
+	{
+		for (uint16_t ii = 0; ii < Iterations; ii++)
+		{
+			barrier.arrive_and_wait();
+			if (completions.load() < ii + 1u) errors++;
+		}
+	});
+	TEST_ASSERT_EQUALS(errors.load(), 0u);
+	TEST_ASSERT_EQUALS(completions.load(), Iterations);
+	TEST_ASSERT_EQUALS(plain, uint32_t(Iterations));
 }
 
 void

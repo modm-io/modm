@@ -30,6 +30,12 @@ public:
 	testMutexAcrossSchedulers();
 
 	void
+	testRecursiveMutexAcrossSchedulers();
+
+	void
+	testBarrierAcrossSchedulers();
+
+	void
 	testSharedMutexAcrossSchedulers();
 
 	void

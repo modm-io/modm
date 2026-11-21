@@ -1,0 +1,29 @@
+<library>
+  <!-- RP2040: fibers on both cores -->
+  <extends>modm:rp-pico</extends>
+  <!-- AVR -->
+  <!-- <extends>modm:mega-2560-pro</extends> -->
+  <!-- Cortex-M0 -->
+  <!-- <extends>modm:nucleo-f091rc</extends> -->
+  <!-- Cortex-M0+ -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- Cortex-M3 -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- Cortex-M4 -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- Cortex-M7 -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- Cortex-M33 -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <options>
+    <!-- Required for modm:rp-pico -->
+    <option name="modm:board:rp-pico:with_logger">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:processing:timer</module>
+    <module>modm:processing:fiber</module>
+    <!-- Required for modm:rp-pico -->
+    <module>modm:platform:multicore</module>
+  </modules>
+</library>
