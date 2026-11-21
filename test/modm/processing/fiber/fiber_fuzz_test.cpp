@@ -214,3 +214,47 @@ FiberFuzzTest::testConditionVariable()
 	TEST_ASSERT_EQUALS(items, 0u);
 	TEST_ASSERT_EQUALS(consumed, produced);
 }
+
+#ifdef MODM_CONTEXT_TLS
+namespace
+{
+uint16_t tls_constructed;
+uint8_t tls_errors;
+struct TlsObject
+{
+	uint32_t pattern{0};
+	TlsObject() { tls_constructed++; }
+};
+constinit thread_local uint32_t tls_words[8];
+alignas(16) constinit thread_local uint8_t tls_aligned{0x5A};
+thread_local TlsObject tls_object;
+}
+#endif
+
+void
+FiberFuzzTest::testThreadLocal()
+{
+#ifdef MODM_CONTEXT_TLS
+	tls_constructed = tls_errors = 0;
+	fuzz([&](uint8_t seed, uint8_t fiber)
+	{
+		// every fiber starts with fresh storage
+		for (auto word : tls_words) if (word) tls_errors++;
+		if (tls_aligned != 0x5A or uintptr_t(&tls_aligned) % 16) tls_errors++;
+		const uint32_t pattern = (seed << 8) | (fiber + 1);
+		tls_object.pattern = pattern;
+		for (uint8_t step = 0; step < Steps; step++)
+		{
+			tls_words[next_random() % 8] = pattern ^ step;
+			random_yield();
+			// no other fiber wrote into this storage
+			for (auto word : tls_words) if (word and (word ^ pattern) >= Steps) tls_errors++;
+			if (tls_object.pattern != pattern) tls_errors++;
+		}
+		TEST_ASSERT_EQUALS(tls_errors, 0u);
+	});
+	// each fiber constructed its own object
+	TEST_ASSERT_EQUALS(tls_constructed, uint16_t(2 * Seeds));
+	TEST_ASSERT_EQUALS(tls_errors, 0u);
+#endif
+}
