@@ -33,7 +33,8 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/processing"
-    env.copy("fiber")
+    is_hosted = env[":target"].identifier.platform == "hosted"
+    env.copy("fiber", ignore=None if is_hosted else env.ignore_files("fiber_thread_test.*"))
     env.copy("scheduler")
     env.copy("timer")
     if not env.get("modm:processing:protothread:use_fiber", True):

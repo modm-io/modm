@@ -38,7 +38,9 @@ def build(env):
     env.outbasepath = "modm/src/modm/processing/fiber"
     core = env[":target"].get_driver("core")["type"]
     with_fpu = env.get(":platform:cortex-m:float-abi", "soft") != "soft"
+    is_hosted = env[":target"].identifier.platform == "hosted"
     env.substitutions = {
+        "is_hosted": is_hosted,
         "is_cm0": core.startswith("cortex-m0"),
         "is_avr": core.startswith("avr"),
         "is_windows": env[":target"].identifier.family == "windows",
@@ -71,15 +73,12 @@ def build(env):
             # Sorting groups the TLS control objects in .data, see tls_avr.cpp
             env.collect(":build:linkflags", "-Wl,--sort-section=name")
 
-    elif "x86_64" in core:
-        env.substitutions["stack_minimum"] = (30 + 2) * 8
+    elif is_hosted:
+        env.substitutions["stack_minimum"] = 2 * 8
         env.substitutions["default_stack_size"] = 2**20 # 1MB
-        env.template("context_x86_64.cpp.in")
-
-    elif "arm64" in core:
-        env.substitutions["stack_minimum"] = (20 + 2) * 8
-        env.substitutions["default_stack_size"] = 2**20 # 1MB
-        env.copy("context_arm64.cpp")
+        env.copy("context_hosted.cpp")
+        if env[":target"].identifier.family != "darwin":
+            env.collect(":build:library", "pthread")
 
     env.template("context.h")
     env.template("stack.hpp.in")

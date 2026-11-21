@@ -141,8 +141,14 @@ protected:
 			current = nullptr;
 			modm_context_end(0);
 		}
+%% if is_hosted
+		// Ends the thread of this fiber and continues with the next one
+		current = next;
+		modm_context_end(uintptr_t(&next->ctx));
+%% else
 		jump(next);
 		std::unreachable();
+%% endif
 	}
 
 	void inline
@@ -197,12 +203,19 @@ protected:
 %% else
 	instance()
 	{
+%% if is_hosted
+		// Every thread has a scheduler, fiber threads inherit the one that runs them
+		static constinit thread_local Scheduler main;
+		if (not modm_context_scheduler) modm_context_scheduler = &main;
+		return *static_cast<Scheduler*>(modm_context_scheduler);
+%% else
 		return main;
+%% endif
 %% endif
 	}
 %% if multicore
 	static Scheduler main[{{num_cores}}];
-%% else
+%% elif not is_hosted
 	static Scheduler main;
 %% endif
 
@@ -225,7 +238,7 @@ public:
 
 %% if multicore
 constinit inline Scheduler Scheduler::main[{{num_cores}}];
-%% else
+%% elif not is_hosted
 constinit inline Scheduler Scheduler::main;
 %% endif
 

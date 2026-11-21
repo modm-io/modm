@@ -349,9 +349,9 @@ register, therefore the context switch is a little faster.
 
 ## Thread-Local Storage
 
-With the `modm:processing:fiber:thread_local` option on Cortex-M and AVR, each
-fiber has its own copy of all `thread_local` variables, while code outside of
-fibers uses its own copy:
+With the `modm:processing:fiber:thread_local` option on Cortex-M and AVR, and
+always on hosted targets, each fiber has its own copy of all `thread_local`
+variables, while code outside of fibers uses its own copy:
 
 ```cpp
 thread_local uint32_t counter;	// one per fiber
@@ -368,7 +368,7 @@ to avoid the initialization check on every access.
 The option is disabled by default. Without it, using `thread_local` on Cortex-M
 and AVR fails to link with an error that names the option.
 
-!!! warning "Destructors of `thread_local` objects are never called"
+!!! warning "Destructors of `thread_local` objects are never called on Cortex-M and AVR"
     Neither when a fiber returns or is restarted, nor for the main context.
     GCC discards them without a warning, since modm compiles with
     `-fno-use-cxa-atexit`. Restarting a fiber initializes its storage again,
@@ -388,7 +388,7 @@ and AVR fails to link with an error that names the option.
     }
     ```
 
-Further limitations:
+Further limitations on Cortex-M and AVR:
 
 - Every fiber reserves storage for *all* `thread_local` variables of the
   program, even the ones it never uses, which reduces the usable stack size of
@@ -421,6 +421,16 @@ uses a copy at the top of the main stack. Each access costs a function call of
     GCC stores the size of each variable in the 8-bit word mode of AVR, so
     larger `thread_local` variables are silently truncated by the compiler.
 
+### Hosted
+
+The option does not exist on hosted targets, since every fiber is a thread with
+its own `thread_local` variables. A restarted fiber gets new variables.
+
+!!! warning "Destructors of `thread_local` objects are called on hosted targets"
+    They run when the fiber ends and before the next fiber continues, unlike on
+    Cortex-M and AVR, so code that relies on them works on hosted targets but
+    leaks on embedded ones. A `yield()` inside of them does not switch fibers.
+
 
 ## Scheduling
 
@@ -449,9 +459,9 @@ threads from interrupt context is a bad idea!
 
 ## Platforms
 
-Fibers are implemented by saving callee registers to the current stack, then
-switching to a new stack and restoring callee registers from this stack.
-The static `modm::this_fiber::yield()` function wraps this functionality in a
+On embedded targets, fibers are implemented by saving callee registers to the
+current stack, then switching to a new stack and restoring callee registers from
+this stack. The static `modm::this_fiber::yield()` function wraps this functionality in a
 transparent way.
 
 
@@ -477,9 +487,22 @@ The default stack size is **1KiB**.
 
 ### Hosted
 
-Two implementations for x86_64 and ARM64 are provided.
+Each fiber is an OS thread. The scheduler is the same as on all other targets
+and the context switch hands execution from one thread to the next, so that only
+one fiber per scheduler is running and fibers are scheduled in exactly the same
+order as on the embedded targets. Therefore `thread_local` variables, `errno`
+and exceptions are per fiber without any further support.
 
-The default stack size is **1MiB**.
+Every thread that calls `modm::fiber::Scheduler::run()` has its own scheduler,
+and fibers started from a fiber belong to its scheduler. Schedulers and other
+threads run in parallel and are never blocked by each other. They can share the
+synchronization primitives, except for `modm::fiber::recursive_mutex` and
+`modm::fiber::barrier`, which only work within one scheduler.
+
+!!! warning "Threads use the stack of the operating system"
+    The fiber stack only stores the closure, so its size does not limit the
+    fiber, `stack_usage()` always returns zero, and a stack overflow crashes in
+    the guard page of the thread instead of the `fbr.stkof` assertion.
 
 
 ### Multi-Core Scheduling

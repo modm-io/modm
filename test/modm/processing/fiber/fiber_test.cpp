@@ -13,6 +13,7 @@
 #include "fiber_test.hpp"
 #include "shared.hpp"
 
+#include <modm/architecture/detect.hpp>
 #include <modm/processing/timer.hpp>
 #include <modm/io/iodevice_wrapper.hpp>
 #include <modm-test/mock/clock.hpp>
@@ -478,6 +479,7 @@ FiberTest::testIODeviceLine()
 void
 FiberTest::testStackUsage()
 {
+#ifndef MODM_OS_HOSTED // threads do not run on the fiber stack
 	constexpr size_t words = 128;
 	alignas(modm::fiber::StackAlignment) static uintptr_t stack[words];
 	const auto usage = [&](size_t word) { return (words - word) * sizeof(uintptr_t); };
@@ -505,6 +507,7 @@ FiberTest::testStackUsage()
 	// the bottom word is also the stack overflow check
 	stack[0] = 1;
 	TEST_ASSERT_EQUALS(modm_context_stack_usage(&ctx), usage(0));
+#endif
 }
 
 // =============================== THREAD LOCAL ===============================
@@ -600,14 +603,18 @@ FiberTest::testThreadLocalDestructor()
 	modm::fiber::Task fiber1(stack1, [] { tls_tracked_a.id = 1; });
 	modm::fiber::Scheduler::run();
 	TEST_ASSERT_EQUALS(tls_constructed, 2u);
-	// every start constructs them again, but they are never destroyed
+	// every start constructs them again, but they are only destroyed on hosted
 	for (uint8_t ii = 0; ii < 5; ii++)
 	{
 		TEST_ASSERT_TRUE(fiber1.start([] { tls_tracked_b.id = 2; }));
 		modm::fiber::Scheduler::run();
 	}
 	TEST_ASSERT_EQUALS(tls_constructed, 12u);
+#ifdef MODM_OS_HOSTED
+	TEST_ASSERT_EQUALS(tls_destroyed, 12u);
+#else
 	TEST_ASSERT_EQUALS(tls_destroyed, 0u);
+#endif
 #endif
 }
 

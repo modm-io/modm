@@ -128,6 +128,13 @@ modm_context_tls_reserve(uintptr_t *bottom, uintptr_t *top);
 void
 modm_context_tls_init(uintptr_t *top);
 %% endif
+%% if is_hosted
+/// Fibers are threads and have their own `thread_local` storage.
+#define MODM_CONTEXT_TLS 1
+
+/// The scheduler of this thread, which is inherited by the threads of its fibers.
+extern constinit thread_local void *modm_context_scheduler;
+%% endif
 
 /// @}
 
