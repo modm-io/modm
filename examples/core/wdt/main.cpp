@@ -30,7 +30,6 @@ int
 main()
 {
 	Board::initialize();
-	Wdt::initialize<SystemClock, 4s>();
 	auto startupDelay = 100ms;
 
 	MODM_LOG_INFO << "nRF5340-DK watchdog example" << modm::endl;
@@ -49,7 +48,8 @@ main()
 		MODM_LOG_INFO << "startup: " << counter++ << modm::endl;
 	}
 
-	Wdt::enable();
+	// start the watchdog with a timeout of 4 seconds
+	Wdt::initialize<SystemClock, 4s>();
 	MODM_LOG_INFO << "Watchdog started." << modm::endl;
 
 	while (true)

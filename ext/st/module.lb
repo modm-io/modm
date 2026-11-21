@@ -172,8 +172,13 @@ def build(env):
     env.copy(localpath(bprops["folder"]), ".", patch=patch if Path(patch).exists() else None,
              ignore=lambda path, files: [f for f in files if f not in headers])
 
+    # The device file marks vectors whose handler name the header aliases to another handler, which silently renames
+    # the function MODM_ISR(vector) defines (H7: COMP -> COMP1, F302/F303: USBWakeUp -> USBWakeUp_RMP, F373: -> CEC)
+    aliases = sorted(v["name"] for v in env[":target"].get_driver("core")["vector"] if "alias" in v)
+
     env.substitutions = bprops
     env.substitutions.update({
+        "irq_aliases": aliases,
         "headers": [bprops["device_header"], bprops["system_header"]],
         "defines": [bprops["define"]],
         "target": env[":target"].identifier,

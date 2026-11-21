@@ -153,12 +153,23 @@ def rtt(backend, channel=0, port=None):
 
 
 # -----------------------------------------------------------------------------
+def _reset_commands(device):
+    # A soft reset does not stop a running nRF53 watchdog, so the new firmware
+    # would inherit its locked timeout. A pin reset stops it. Toggle the pin
+    # directly, since RSetType 2 pulses it three times and boots the firmware
+    # each time.
+    device = device.lower()
+    if device.startswith("nrf53") and device.endswith("_app"):
+        return ["connect", "r0", "sleep 20", "r1"]
+    return ["reset"]
+
+
 def program(device, source, serial=None):
-    return _call_commander(device, ["reset", f"loadfile {source}", "reset", "exit"], serial=serial)
+    return _call_commander(device, ["reset", f"loadfile {source}"] + _reset_commands(device) + ["exit"], serial=serial)
 
 
 def reset(device, serial=None):
-    return _call_commander(device, ["reset", "exit"], serial=serial)
+    return _call_commander(device, _reset_commands(device) + ["exit"], serial=serial)
 
 
 # -----------------------------------------------------------------------------

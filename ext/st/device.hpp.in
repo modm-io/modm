@@ -35,6 +35,13 @@
 %% for header in headers
 #include <{{ header }}>
 %% endfor
+%% if irq_aliases
+
+// The device header aliases these handler names to other vectors, so MODM_ISR() would define the wrong handler
+%% for name in irq_aliases
+#undef {{ name }}_IRQHandler
+%% endfor
+%% endif
 
 %% if target.family in ["g0"]
 // these defines are missing from the STM32G0 header files

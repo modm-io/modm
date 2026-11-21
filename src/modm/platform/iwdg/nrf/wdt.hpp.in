@@ -29,6 +29,7 @@ public:
 	{
 		{{ peripheral }}->CRV = reload;
 		{{ peripheral }}->RREN = WDT_RREN_RR0_Enabled;
+		{{ peripheral }}->TASKS_START = 1ul;
 	}
 
 	template< class SystemClock, milliseconds_t timeout, percent_t tolerance=pct(1) >
@@ -42,11 +43,9 @@ public:
 		initialize(result.prescaler - 1);
 	}
 
+	[[deprecated("initialize() starts the watchdog now!")]]
 	static inline void
-	enable()
-	{
-		{{ peripheral }}->TASKS_START = 1ul;
-	}
+	enable() {} // DEPRECATED: 2027q4
 
 	static inline void
 	trigger()

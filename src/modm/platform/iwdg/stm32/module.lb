@@ -12,7 +12,28 @@
 
 def init(module):
     module.name = ":platform:iwdg"
-    module.description = "Independent watchdog"
+    module.description = """\
+# Independent Watchdog (IWDG)
+
+`Iwdg::initialize()` configures and starts the watchdog. Call it once after
+reset, when the application is ready to call `Iwdg::trigger()` periodically:
+
+```cpp
+Iwdg::initialize<SystemClock, 4s>();
+while (true)
+{
+    do_work();
+    Iwdg::trigger();
+}
+```
+
+Once started, the watchdog can only be stopped by a reset. The prescaler and
+reload value remain writable, so calling `initialize()` again while it is
+running changes the timeout.
+
+On the STM32F429, both a software reset and a pin reset stop the watchdog. If
+the hardware watchdog option byte is set, it starts again after every reset.
+"""
 
 
 def prepare(module, options):

@@ -57,29 +57,33 @@ FLASH_STORAGE_STRING({{test.instance}}Name) = "{{test.file[:-5]}}";
 FLASH_STORAGE_STRING({{test.instance}}_{{test_case}}Name) = "{{test_case[4:]}}";
 {% endfor -%}
 {% endif -%}
+{% endfor %}
+// Not inlined, so that LTO cannot merge the stack frames of all test suites
+{% for test in tests -%}
+modm_noinline void run_{{test.instance}}()
+{
+    using namespace modm::accessor;
+
+    unittest::reporter.nextTestSuite(asFlash({{test.instance}}Name));
+    {{test.class}} {{test.instance}};
+    {%- for test_case in test.test_cases %}
+
+    {% if functions -%}
+    unittest::reporter.nextTestFunction(asFlash({{test.instance}}_{{test_case}}Name));
+    {% endif -%}
+    {{test.instance}}.setUp();
+    {{test.instance}}.{{test_case}}();
+    {{test.instance}}.tearDown();
+    {%- endfor %}
+}
 {% endfor -%}
 }
 
 int run_modm_unit_test()
 {
-    using namespace modm::accessor;
-
 {% for test in tests -%}
-    unittest::reporter.nextTestSuite(asFlash({{test.instance}}Name));
-    {
-        {{test.class}} {{test.instance}};
-    {%- for test_case in test.test_cases %}
-
-    {% if functions -%}
-        unittest::reporter.nextTestFunction(asFlash({{test.instance}}_{{test_case}}Name));
-    {% endif -%}
-        {{test.instance}}.setUp();
-        {{test.instance}}.{{test_case}}();
-        {{test.instance}}.tearDown();
-    {% endfor -%}
-    }
-{%- endfor %}
-
+    run_{{test.instance}}();
+{% endfor %}
     return unittest::reporter.printSummary();
 }
 """
