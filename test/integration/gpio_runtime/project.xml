@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- <extends>modm:nucleo-g071rb</extends> -->
+  <!-- <extends>modm:nucleo-h563zi</extends> -->
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-l152re</extends> -->
+  <!-- <extends>modm:nucleo-l476rg</extends> -->
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:spi.bitbang</module>
+  </modules>
+</library>
