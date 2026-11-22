@@ -63,10 +63,13 @@ SpiHal{{ id }}::initialize(Prescaler prescaler,
 	SPI{{ id }}->CFG2 = static_cast<uint32_t>(dataMode)
 		| static_cast<uint32_t>(dataOrder)
 		| static_cast<uint32_t>(masterSelection)
-		| SPI_CFG2_SSOE; // disable multi-master support to prevent spurious mode fault
+		| SPI_CFG2_SSOE // disable multi-master support to prevent spurious mode fault
+		| SPI_CFG2_AFCNTR; // keep driving SCK at its idle level while SPE = 0
 
+	// Errata: CRCSIZE < 7 corrupts the last received data if TSIZE > 0, even with CRCEN = 0
 	SPI{{ id }}->CFG1 = static_cast<uint32_t>(prescaler)
-		| static_cast<uint32_t>(dataSize);
+		| static_cast<uint32_t>(dataSize)
+		| (7ul << SPI_CFG1_CRCSIZE_Pos);
 }
 
 inline void
