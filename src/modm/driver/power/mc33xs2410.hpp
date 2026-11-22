@@ -387,12 +387,12 @@ struct mc33xs2410
 	buildReadFrame(uint8_t address, bool controlBank)
 	{ return (uint16_t(address & 0x3F) << 8) | (controlBank ? 0x0080 : 0x0000); }
 
-	/// A read of the global status register, which is the only entirely
-	/// side-effect free frame, used to pad the chain slots of the devices that
-	/// a command does not address
+	/// A read of IN_OUT_STA, which has no latched bits, used to pad the chain
+	/// slots of the devices that a command does not address. GLB_STA must not
+	/// be used here: reading it clears its latched supply and warning bits.
 	static constexpr uint16_t
 	buildNopFrame()
-	{ return buildReadFrame(0x00, false); }
+	{ return buildReadFrame(uint8_t(DiagnosticRegister::IN_OUT_STA), false); }
 
 	/// Scaling of the embedded 12-bit ADC measurements reported in the
 	/// diagnostic bank, which carries them as raw unitless codes.

@@ -172,10 +172,11 @@ uint16_t
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::readRegister(uint8_t device, uint8_t address, bool controlBank)
 {
 	setCommand(device, buildReadFrame(address, controlBank));
-
-	// The requested register is only reported in the *next* SS window for
-	// the whole chain, so the same command must be shifted through twice.
 	transferChain();
+
+	// The value arrives in the next frame. Repeating the read here would clear
+	// a read-to-clear register a second time and lose what latched in between.
+	setCommand(device, buildNopFrame());
 	transferChain();
 	return rx[device] & 0x3FFF;
 }
