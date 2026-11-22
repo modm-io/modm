@@ -14,6 +14,7 @@
 #define MODM_MC33XS2410_HPP
 
 #include <cstddef>
+#include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
 #include <modm/architecture/interface/spi_device.hpp>
@@ -502,6 +503,11 @@ public:
 	/// Whether the output pair of \c output is in parallel mode
 	bool
 	getParallelMode(Output output, uint8_t device = 0);
+
+	/// Selects the MISO driver: MEDIUM after reset allows up to 4 MHz SPI,
+	/// STRONG is required for up to 10 MHz (datasheet table 57).
+	void
+	setStrongMisoDrive(bool enable, uint8_t device = 0);
 
 	/// Configures switching slew rate and on/off state for all four outputs at once
 	void

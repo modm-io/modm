@@ -64,6 +64,17 @@ Mc33xs2410<SpiMaster, Cs, MaxDevices>::getParallelMode(Output output, uint8_t de
 
 template <class SpiMaster, class Cs, size_t MaxDevices>
 void
+Mc33xs2410<SpiMaster, Cs, MaxDevices>::setStrongMisoDrive(bool enable, uint8_t device)
+{
+	GlobalControl_t control(readRegister(device, Register::GLB_CTRL));
+	TransitMode_t::set(control, TransitMode::None); // see setParallelMode()
+	control.update(GlobalControl::DriveStrengthMedium, not enable);
+	writeRegister(device, Register::GLB_CTRL, control.value);
+}
+
+
+template <class SpiMaster, class Cs, size_t MaxDevices>
+void
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::setOutput(Output output, bool enable, uint8_t device)
 {
 	const auto bit = OutputControl(uint8_t(OutputControl::Output1) << uint8_t(output));
@@ -188,10 +199,15 @@ Mc33xs2410<SpiMaster, Cs, MaxDevices>::transferChain()
 
 	modm::this_fiber::poll([&]{ return this->acquireMaster(); });
 	Cs::reset();
+	modm::delay_ns(100); // TLEAD
 
 	SpiMaster::transfer(buffer, buffer, 2 * devices_);
 
-	if (this->releaseMaster()) Cs::set();
+	if (this->releaseMaster())
+	{
+		Cs::set();
+		modm::delay_ns(300); // TW_SS
+	}
 
 	for (size_t ii = 0; ii < devices_; ii++)
 	{
