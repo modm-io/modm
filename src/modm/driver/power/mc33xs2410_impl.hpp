@@ -101,8 +101,8 @@ template <class SpiMaster, class Cs, size_t MaxDevices>
 bool
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::getOutput(Output output, uint8_t device)
 {
-	const InputOutputStatus_t status{readRegister(device, DiagnosticRegister::IN_OUT_STA)};
-	return status.any(InputOutputStatus(uint16_t(InputOutputStatus::Output1) << uint8_t(output)));
+	const OutputControl_t control(readRegister(device, Register::OUT1_4_CTRL));
+	return control.any(OutputControl(uint8_t(OutputControl::Output1) << uint8_t(output)));
 }
 
 

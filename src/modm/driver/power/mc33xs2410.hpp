@@ -548,7 +548,10 @@ public:
 	void
 	setOutput(Output output, bool enable, uint8_t device = 0);
 
-	/// Reads back the logic state of an output pin from IN_OUT_STA
+	/// Whether the output is commanded on by its ON_OFFx bit in OUT1_4_CTRL.
+	/// This is not the pin state: safe mode, PWM and a latch-off override this
+	/// bit, see readGlobalStatus() and readOutputVoltage(). OUTx_LS in
+	/// IN_OUT_STA cannot replace it, since only the voltage warnings change it.
 	bool
 	getOutput(Output output, uint8_t device = 0);
 
