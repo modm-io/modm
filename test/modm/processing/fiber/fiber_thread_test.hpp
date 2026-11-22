@@ -33,6 +33,9 @@ public:
 	testRecursiveMutexAcrossSchedulers();
 
 	void
+	testJoinAcrossSchedulers();
+
+	void
 	testBarrierAcrossSchedulers();
 
 	void

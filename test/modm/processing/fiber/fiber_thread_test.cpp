@@ -58,14 +58,13 @@ run_parallel(auto &&function)
 
 /// Runs a critical section that is protected by the lock functions.
 void
-test_exclusion(auto &&lock, auto &&unlock, uint8_t contexts = Contexts)
+test_exclusion(auto &&lock, auto &&unlock)
 {
 	std::atomic<uint8_t> inside{};
 	std::atomic<uint16_t> errors{};
 	uint32_t counter{}; // deliberately not atomic, is checked by TSan
-	run_parallel([&](uint8_t context)
+	run_parallel([&](uint8_t)
 	{
-		if (context >= contexts) return;
 		for (uint16_t ii = 0; ii < Iterations; ii++)
 		{
 			lock();
@@ -78,7 +77,7 @@ test_exclusion(auto &&lock, auto &&unlock, uint8_t contexts = Contexts)
 		}
 	});
 	TEST_ASSERT_EQUALS(errors.load(), 0u);
-	TEST_ASSERT_EQUALS(counter, uint32_t(Iterations) * contexts);
+	TEST_ASSERT_EQUALS(counter, uint32_t(Iterations) * Contexts);
 }
 
 struct TlsDestructor
@@ -170,7 +169,37 @@ FiberThreadTest::testRecursiveMutexAcrossSchedulers()
 {
 	modm::fiber::recursive_mutex mutex;
 	test_exclusion([&]{ mutex.lock(); mutex.lock(); mutex.unlock(); mutex.lock(); },
-				   [&]{ mutex.unlock(); mutex.unlock(); }, 4); // only fibers have unique ids
+				   [&]{ mutex.unlock(); mutex.unlock(); });
+}
+
+void
+FiberThreadTest::testJoinAcrossSchedulers()
+{
+	for (uint8_t ii = 0; ii < 100; ii++)
+	{
+		TlsDestructor::destroyed = 0;
+		std::atomic<bool> started{};
+		uint32_t plain{}; // deliberately not atomic, is checked by TSan
+		modm::Fiber<> fiber;
+		std::thread scheduler([&]
+		{
+			(void) fiber.start([&]
+			{
+				static thread_local TlsDestructor object;
+				object.used = 1;
+				plain = 1;
+				started = true;
+				modm::this_fiber::yield();
+			});
+			modm::fiber::Scheduler::run();
+		});
+		while (not started) ;
+		fiber.join();
+		// The fiber has completely ended, including its destructors
+		TEST_ASSERT_EQUALS(plain, 1u);
+		TEST_ASSERT_EQUALS(TlsDestructor::destroyed, 1u);
+		scheduler.join();
+	}
 }
 
 void
