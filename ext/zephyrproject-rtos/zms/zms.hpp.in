@@ -117,9 +117,16 @@ inline bool
 setup(zms_fs &fs, uint32_t offset, uint32_t sector_count, uint32_t min_sector_size = 0)
 {
 	if (not setup<flash>(fs, offset, sector_count, min_sector_size)) return false;
-	const uint64_t start = modm::platform::Flash::OriginAddr + fs.offset;
-	const uint64_t end = start + uint64_t(fs.sector_size) * fs.sector_count;
-	if (start < uintptr_t(__rom_end) and uintptr_t(__rom_start) < end) { fs = {}; return false; }
+	using Flash = modm::platform::Flash;
+	// Compare pages, since the image may be linked to a flash alias (ITCM on F7)
+	const uint8_t *const start = Flash::Origin + fs.offset;
+	const auto first = Flash::getPage(start);
+	const auto last = Flash::getPage(start + fs.sector_size * fs.sector_count - 1);
+	if (first <= Flash::getPage(__rom_end - 1) and Flash::getPage(__rom_start) <= last)
+	{
+		fs = {};
+		return false;
+	}
 	return true;
 }
 %% endif
