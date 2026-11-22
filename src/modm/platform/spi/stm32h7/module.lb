@@ -51,11 +51,19 @@ class Instance(Module):
             properties["max_crc_bits"] = 32
             properties["max_transfer_size"] = 2**16 - 1
             properties["i2s"] = device.identifier.family == "c5" or self.instance in (1, 2)
+        elif device.identifier.family in ["u3", "u5"]:
+            # RM0487 Table 577, RM0456 Table 696: SPI1/2 are full-featured, SPI3/4 are limited
+            full = self.instance in (1, 2)
+            properties["fifo_size"] = 16 if full else 8
+            properties["max_data_bits"] = 32 if full else 16
+            properties["max_crc_bits"] = properties["max_data_bits"]
+            properties["max_transfer_size"] = 2**16 - 1 if full else 2**10 - 1
+            properties["i2s"] = False
         elif device.identifier.family in ["h7"]:
             properties["fifo_size"] = 16 if self.instance in (1, 2, 3) else 8
             properties["max_data_bits"] = 32 if self.instance in (1, 2, 3) else 16
             properties["max_crc_bits"] = properties["max_data_bits"]
-            properties["max_transfer_size"] = 2**16 - 1  # is smaller for some instances on U5
+            properties["max_transfer_size"] = 2**16 - 1
             properties["i2s"] = self.instance in (1, 2, 3, 6)
         else:
             raise NotImplementedError("Unsupported device")
@@ -80,8 +88,7 @@ def prepare(module, options):
     device = options[":target"]
     if not device.has_driver("spi:stm32-extended"):
         return False
-    if device.identifier.family not in ["c5", "g5", "h5", "h7"]:
-        # U5 is not supported yet
+    if device.identifier.family not in ["c5", "g5", "h5", "h7", "u3", "u5"]:
         return False
 
     module.depends(
