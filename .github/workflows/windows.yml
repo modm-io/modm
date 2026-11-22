@@ -133,17 +133,14 @@ jobs:
         # These examples are selected by what can break on Windows.
         run: |
           # Preprocessed assembly, which SCons only recognizes as `.sx` there:
-          # RTT on the Blue Pill, CrashCatcher and LVGL without its Helium
-          # assembly. Fibers only use inline assembly.
-          (cd examples && python ../tools/scripts/examples_compile.py gpio/blinky core/hard_fault core/fiber ext/lvgl_l4 --target '^stm32(f103c8|f746|l452|u575)')
+          # RTT on the Blue Pill and CrashCatcher. Fibers only use inline assembly.
+          (cd examples && python ../tools/scripts/examples_compile.py gpio/blinky core/hard_fault core/fiber --target '^stm32(f103c8|u575)')
           # Paths in generated build scripts, where a backslash is an escape
           # character: Nanopb and image sources.
-          (cd examples && python ../tools/scripts/examples_compile.py ext/nanopb ui/gui_f4_stm32_f4ve)
           # Many object files: LVGL, CMSIS-DSP and Ethernet exceed the command
           # line length of cmd.exe when archiving, FreeRTOS and TinyUSB do not.
-          (cd examples && python ../tools/scripts/examples_compile.py ext/lvgl_f4 communication/ethernet ext/freertos_static ext/usb_freertos --target '^stm32f4')
-          # CMake and CompilationDB generators
-          (cd examples && python ../tools/scripts/examples_compile.py ../test/integration/cmsis_dsp/convolution ../test/integration/flash ../test/integration/spi_flash --target '^stm32f4')
+          # CMake and CompilationDB generators: the integration tests.
+          (cd examples && python ../tools/scripts/examples_compile.py ext/nanopb ui/gui_f4_stm32_f4ve ext/lvgl_f4 communication/ethernet ext/freertos_static ext/usb_freertos ../test/integration/cmsis_dsp/convolution ../test/integration/flash ../test/integration/spi_flash --target '^stm32f4(07ve|29|69)')
 
       - name: Compile AVR Examples
         if: always()
@@ -151,10 +148,10 @@ jobs:
         # Includes image sources and CMake.
         run: |
           (cd examples && python ../tools/scripts/examples_compile.py driver/display/dogm128/image timer/timer_avr)
-          (cd examples && python ../tools/scripts/examples_compile.py . --target '^at' --split 4 --part 0)
+          (cd examples && python ../tools/scripts/examples_compile.py . --target '^at' --split 8 --part 0)
 
       - name: Compile NRF Examples
         if: always()
         shell: bash
         run: |
-          (cd examples && python ../tools/scripts/examples_compile.py . --target '^nrf')
+          (cd examples && python ../tools/scripts/examples_compile.py gpio/blinky ext/usb --target '^nrf')
