@@ -109,7 +109,7 @@ def build(env):
     # The banks may not be continuous, e.g. the STM32G4 with 256 kB and the STM32H7 with 1 MB
     size = sum(s for _, b in banks for s in b)
 
-    subs = {"start": start, "size": size, "family": target.family,
+    subs = {"target": target, "start": start, "size": size, "family": target.family,
             "min_page": min(s for _, banks in layouts for _, b in banks for s in b),
             "max_page": max(s for _, banks in layouts for _, b in banks for s in b)}
     # Uniform pages or sectors of both organizations, the dual-bank mode is selected at runtime

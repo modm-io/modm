@@ -134,6 +134,9 @@ def common_memories(env):
             }
             for memory in core_driver["memory"]
         ])
+    # Dual-core STM32H7: same memories as the linkerscript of modm:platform:cortex-m
+    if device.identifier.get("core") == "m4":
+        memories = [m for m in memories if m["name"] not in ("d3_sram", "backup")]
     flash_size = env.get(":platform:core:boot2_size", 0)
     if flash_size:
         memories.append({

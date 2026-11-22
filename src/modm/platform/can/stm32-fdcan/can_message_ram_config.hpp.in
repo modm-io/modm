@@ -42,7 +42,9 @@ static constexpr MessageRamConfig Fdcan{{instance}}MessageRamConfig
 
 
 %% for instance in instances
-%% if loop.first
+%% if message_ram_slots
+static constexpr uint32_t Fdcan{{instance}}MessageRamBaseWords = {{message_ram_slots[instance][0]}};
+%% elif loop.first
 static constexpr uint32_t Fdcan{{instance}}MessageRamBaseWords = 0;
 %% else
 static constexpr uint32_t Fdcan{{instance}}MessageRamBaseWords = Fdcan{{loop.previtem}}MessageRamBaseWords + Fdcan{{loop.previtem}}MessageRamConfig.totalSectionWords();
@@ -50,7 +52,7 @@ static constexpr uint32_t Fdcan{{instance}}MessageRamBaseWords = Fdcan{{loop.pre
 
 static constexpr uint32_t Fdcan{{instance}}MessageRamBoundWords = Fdcan{{instance}}MessageRamBaseWords + Fdcan{{instance}}MessageRamConfig.totalSectionWords();
 
-static_assert(Fdcan{{instance}}MessageRamBoundWords <= {{message_ram_length_words}});
+static_assert(Fdcan{{instance}}MessageRamBoundWords <= {{message_ram_slots[instance][1] if message_ram_slots else message_ram_length_words}});
 %% endfor
 }  // modm::platform::fdcan
 

@@ -55,6 +55,7 @@ modm_gpio_enable(void)
 		RCC_{{ clock_tree }}{{enr}}_{{ prefix }}{{ port | upper }}EN{% if loop.last %};{% else %} |{% endif %}
 %% endfor
 
+%% if target.get("core") != "m4"
 	// Reset GPIO peripheral
 	RCC->{{ clock_tree }}{{rstr}} |=
 %% for port in options.enable_ports
@@ -65,6 +66,9 @@ modm_gpio_enable(void)
 %% for port in options.enable_ports
 		RCC_{{ clock_tree }}{{rstr}}_{{ prefix }}{{ port | upper }}RST{% if loop.last %});{% else %} |{% endif %}
 %% endfor
+%% else
+	// The Cortex-M7 resets the ports, which it may already use
+%% endif
 }
 
 MODM_HARDWARE_INIT_ORDER(modm_gpio_enable, 80);

@@ -224,7 +224,9 @@ Flash::erase(uint16_t sector)
 	if (second) cr |= Second;
 %% endif
 	const uint32_t err = run(nullptr, nullptr, nullptr, cr, {{ t_erase }});
+%% if target.get("core") != "m4"
 	SCB_InvalidateDCache_by_Addr(getAddr(sector), SectorSize);
+%% endif
 	return err;
 }
 
@@ -240,7 +242,9 @@ Flash::program(uintptr_t addr, MaxWordType data)
 	if (second) cr |= Second;
 %% endif
 	const uint32_t err = run(reinterpret_cast<volatile uint32_t *>(addr), data.data, data.data + FlashWordWords, cr, {{ t_prog }});
+%% if target.get("core") != "m4"
 	SCB_InvalidateDCache_by_Addr(reinterpret_cast<void *>(addr), FlashWordSize);
+%% endif
 	return err;
 }
 

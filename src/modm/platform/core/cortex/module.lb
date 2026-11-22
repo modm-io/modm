@@ -85,6 +85,9 @@ def common_memories(env):
     """
     device = env[":target"]
     memories = listify(device.get_driver("core")["memory"])
+    # Dual-core STM32H7: SRAM4 and the backup SRAM belong to the Cortex-M7
+    if device.identifier.get("core") == "m4":
+        memories = [m for m in memories if m["name"] not in ("d3_sram", "backup")]
 
     # Convert from string to int and add offsets
     if (flash_size := env.get(":platform:core:boot2_size", 0)):

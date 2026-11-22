@@ -72,6 +72,8 @@ def build(env):
         "pf": pf,
         "separate_flags": separate_flags,
         "exti_reg": exti_reg,
+        # The dual-core STM32H7 have one interrupt, event and pending register bank per core
+        "core_bank": "C2" if target.get("core") == "m4" else "",
         "target": target,
         "extimap": extimap,
         "lines": lines,

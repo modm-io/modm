@@ -146,6 +146,21 @@ Rcc::enable()
 	__DSB();
 	%% for peripheral, (st_per, bus) in rcc_enable.items() | sort
 	if constexpr (peripheral == Peripheral::{{ peripheral }})
+%% if dualcore and peripheral in rcc_reset
+	{
+		// Both cores have their own enable bits, but share the reset bits: reset
+		// the peripheral only if the other core does not use it already.
+		const bool used = (RCC_C1->{{bus}} | RCC_C2->{{bus}}) & RCC_{{bus}}_{{st_per}}EN;
+		RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;
+		if (not used) {
+			__DSB();
+			RCC->{{rcc_reset[peripheral][1]}} |= RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST; __DSB();
+			RCC->{{rcc_reset[peripheral][1]}} &= ~RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST;
+		}{% if peripheral == "Eth" %} __DSB();
+		RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
+		RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
+	}
+%% else
 		{% if peripheral in rcc_reset %}if (not Rcc::isEnabled<peripheral>()) {% endif %}{
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}EN;{% if peripheral in rcc_reset %} __DSB();
 			RCC->{{rcc_reset[peripheral][1]}} |= RCC_{{rcc_reset[peripheral][1]}}_{{rcc_reset[peripheral][0]}}RST; __DSB();
@@ -153,6 +168,7 @@ Rcc::enable()
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}RXEN; __DSB();
 			RCC->{{bus}} |= RCC_{{bus}}_{{st_per}}TXEN;{% endif %}
 		}
+%% endif
 	%% endfor
 	__DSB();
 }

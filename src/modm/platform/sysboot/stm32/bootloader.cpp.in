@@ -93,6 +93,10 @@ modm_system_bootloader_enter()
 	MPU->CTRL = 0;
 	%% endif
 %% endif
+%% if "m0" not in core
+	// The bootloader may divide by zero, which its fault handler turns into a reset
+	SCB->CCR &= ~SCB_CCR_DIV_0_TRP_Msk;
+%% endif
 %% if with_msplim
 	// The bootloader stack may be below the application stack limit
 	__set_MSPLIM(0);

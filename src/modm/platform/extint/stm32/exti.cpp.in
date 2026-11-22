@@ -19,11 +19,11 @@ Exti::handlers[Exti::Lines] modm_fastdata;
 
 void Exti::irq(uint32_t mask)
 {
-	uint32_t flags = EXTI->IMR{{pf}} & mask;
+	uint32_t flags = EXTI->{{core_bank}}IMR{{pf}} & mask;
 %% if separate_flags
 	flags &= (EXTI->FPR1 & EXTI->FTSR1) | (EXTI->RPR1 & EXTI->RTSR1);
 %% else
-	flags &= EXTI->PR{{pf}};
+	flags &= EXTI->{{core_bank}}PR{{pf}};
 %% endif
 	while(flags)
 	{
@@ -33,7 +33,7 @@ void Exti::irq(uint32_t mask)
 		EXTI->FPR1 = 1ul << lmb;
 		EXTI->RPR1 = 1ul << lmb;
 %% else
-		EXTI->PR{{pf}} = 1ul << lmb;
+		EXTI->{{core_bank}}PR{{pf}} = 1ul << lmb;
 %% endif
 		flags &= ~(1ul << lmb);
 	}

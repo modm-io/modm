@@ -89,7 +89,7 @@ public:
 	{
 		disableInterrupts<Pin>();
 		// Disable the IRQ vector if all pins are disabled
-		if (not (EXTI->IMR{{pf}} & getVectorMaskForLine(Pin::pin)))
+		if (not (EXTI->{{core_bank}}IMR{{pf}} & getVectorMaskForLine(Pin::pin)))
 			disableVector<Pin>();
 		handlers[Pin::pin] = nullptr;
 	}
@@ -173,67 +173,67 @@ public:
 	inline static void
 	enableInterrupts(MaskType mask)
 	{
-		EXTI->IMR{{pf}} |= mask;
+		EXTI->{{core_bank}}IMR{{pf}} |= mask;
 %% if extended
-		EXTI->IMR2 |= mask >> 32;
+		EXTI->{{core_bank}}IMR2 |= mask >> 32;
 %% endif
 	}
 	template< class... Pins > static void
 	enableInterrupts()
-	{ EXTI->IMR{{pf}} |= {{pins}}; }
+	{ EXTI->{{core_bank}}IMR{{pf}} |= {{pins}}; }
 
 	inline static MaskType
 	getInterruptEnabled()
 	{
-		return {% if extended %}(uint64_t(EXTI->IMR2) << 32) | {% endif %}EXTI->IMR{{pf}};
+		return {% if extended %}(uint64_t(EXTI->{{core_bank}}IMR2) << 32) | {% endif %}EXTI->{{core_bank}}IMR{{pf}};
 	}
 	template< class... Pins > static bool
 	areInterruptsEnabled()
-	{ return EXTI->IMR{{pf}} & {{pins}}; }
+	{ return EXTI->{{core_bank}}IMR{{pf}} & {{pins}}; }
 
 	inline static void
 	disableInterrupt(MaskType mask)
 	{
-		EXTI->IMR{{pf}} &= ~mask;
+		EXTI->{{core_bank}}IMR{{pf}} &= ~mask;
 %% if extended
-		EXTI->IMR2 &= ~mask >> 32;
+		EXTI->{{core_bank}}IMR2 &= ~mask >> 32;
 %% endif
 	}
 	template< class... Pins > static void
 	disableInterrupts()
-	{ EXTI->IMR{{pf}} &= ~{{pins}}; }
+	{ EXTI->{{core_bank}}IMR{{pf}} &= ~{{pins}}; }
 
 
 	// - - - EVENTS - - -
 	inline static void
 	enableEvent(MaskType mask)
 	{
-		EXTI->EMR{{pf}} |= mask;
+		EXTI->{{core_bank}}EMR{{pf}} |= mask;
 %% if extended
-		EXTI->EMR2 |= mask >> 32;
+		EXTI->{{core_bank}}EMR2 |= mask >> 32;
 %% endif
 	}
 	template< class... Pins > static void
-	enableEvents() { EXTI->EMR{{pf}} |= {{pins}}; }
+	enableEvents() { EXTI->{{core_bank}}EMR{{pf}} |= {{pins}}; }
 
 	inline static MaskType
 	getEventEnabled()
 	{
-		return {% if extended %}(uint64_t(EXTI->EMR2) << 32) | {% endif %}EXTI->EMR{{pf}};
+		return {% if extended %}(uint64_t(EXTI->{{core_bank}}EMR2) << 32) | {% endif %}EXTI->{{core_bank}}EMR{{pf}};
 	}
 	template< class... Pins > static void
-	areEventsEnabled() { return EXTI->EMR{{pf}} & {{pins}}; }
+	areEventsEnabled() { return EXTI->{{core_bank}}EMR{{pf}} & {{pins}}; }
 
 	inline static void
 	disableEvent(MaskType mask)
 	{
-		EXTI->EMR{{pf}} &= ~mask;
+		EXTI->{{core_bank}}EMR{{pf}} &= ~mask;
 %% if extended
-		EXTI->EMR2 &= ~mask >> 32;
+		EXTI->{{core_bank}}EMR2 &= ~mask >> 32;
 %% endif
 	}
 	template< class... Pins > static void
-	disableEvents() { EXTI->EMR{{pf}} &= ~{{pins}}; }
+	disableEvents() { EXTI->{{core_bank}}EMR{{pf}} &= ~{{pins}}; }
 
 	// - - - VECTORS - - -
 	inline static void
@@ -354,23 +354,23 @@ public:
 	inline static MaskType
 	getFlags()
 	{
-		return {% if extended_lines %}(uint64_t(EXTI->PR2) << 32) | {% endif %}EXTI->PR{{pf}};
+		return {% if extended_lines %}(uint64_t(EXTI->{{core_bank}}PR2) << 32) | {% endif %}EXTI->{{core_bank}}PR{{pf}};
 	}
 	template< class... Pins >
 	static bool areFlagsSet()
-	{ return EXTI->PR{{pf}} & {{pins}}; }
+	{ return EXTI->{{core_bank}}PR{{pf}} & {{pins}}; }
 
 	inline static void
 	acknowledgeFlags(MaskType mask)
 	{
-		EXTI->PR{{pf}} = mask;
+		EXTI->{{core_bank}}PR{{pf}} = mask;
 %% if extended_lines
-		EXTI->PR2 = mask >> 32;
+		EXTI->{{core_bank}}PR2 = mask >> 32;
 %% endif
 	}
 	template< class... Pins >
 	static void acknowledgeFlags()
-	{ EXTI->PR{{pf}} = {{pins}}; }
+	{ EXTI->{{core_bank}}PR{{pf}} = {{pins}}; }
 %% endif
 
 	inline static void

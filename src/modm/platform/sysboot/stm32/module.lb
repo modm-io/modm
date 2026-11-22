@@ -18,6 +18,9 @@ def prepare(module, options):
     # Only devices that can jump into their bootloader have an entry address
     if "entry" not in (options[":target"].get_driver("sysboot:stm32") or {}):
         return False
+    # The Cortex-M4 would run the bootloader next to the application of the Cortex-M7
+    if options[":target"].identifier.get("core") == "m4":
+        return False
     module.depends(":ext:cmsis:device", ":platform:core")
     return True
 

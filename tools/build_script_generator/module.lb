@@ -267,6 +267,7 @@ def post_build(env):
         env.substitutions["openocd_search_dirs"] = \
             [env.relcwdoutpath(path) for path in env.collector_values("path.openocd")]
         env.substitutions["openocd_sources"] = env.collector_values("openocd.source")
+        env.substitutions["debug_second_core"] = env[":target"].identifier.get("core") == "m4"
 
         linkerscript = env.query(":platform:cortex-m:linkerscript", {})
         all_rams = [m for m in linkerscript.get("memories", []) if "w" in m["access"]]

@@ -49,4 +49,11 @@ proc modm_rtt { {POLLING 1} {CHANNELS {{rtt_channels}}} {IDENTIFIER "SEGGER RTT"
 }
 %% endif
 
+%% if debug_second_core
+# The first GDB port belongs to the core of this project
+if {[lsearch -exact [target names] stm32h7x.cpu1] >= 0} {
+	stm32h7x.cpu0 configure -gdb-port disabled
+}
+
+%% endif
 init

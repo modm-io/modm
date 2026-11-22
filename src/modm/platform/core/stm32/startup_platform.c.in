@@ -83,6 +83,13 @@ __modm_initialize_platform(void)
 	RCC->DCKCFGR2 = 0;
 	// Enable Data Tighly Coupled Memory (DTCM) and backup SRAM (BKPSRAM)
 	RCC->AHB1ENR |= RCC_AHB1ENR_DTCMRAMEN | RCC_AHB1ENR_BKPSRAMEN;
+%% elif target.family == "h7" and target.get("core") == "m4"
+	// The D2 SRAMs are always enabled for the Cortex-M4 (RM0399 9.7.41)
+	// Cache the instruction fetches from flash bank 2 in the ART accelerator
+	RCC->AHB1ENR |= RCC_AHB1ENR_ARTEN;
+	__DSB();
+	ART->CTR = (ART->CTR & ~ART_CTR_PCACHEADDR) | ((FLASH_BANK2_BASE >> 20) << ART_CTR_PCACHEADDR_Pos);
+	ART->CTR |= ART_CTR_EN;
 %% elif target.family == "h7"
 	// Enable all SRAMs
 	%% if target.name[0].isnumeric() or target.name[0] in ["r", "s"]

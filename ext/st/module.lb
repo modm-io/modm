@@ -164,6 +164,9 @@ def validate(env):
 def build(env):
     env.collect(":build:path.include.system", "modm/ext/cmsis/device")
     env.collect(":build:cppdefines", bprops["family_define"])
+    # The dual-core devices share one header, which selects the core with CORE_CM4 or CORE_CM7
+    if core := env[":target"].identifier.get("core"):
+        env.collect(":build:cppdefines", "CORE_C" + core.upper())
 
     env.outbasepath = "modm/ext/cmsis/device"
     headers = [bprops["device_header"], bprops["system_header"], bprops["family_header"]]

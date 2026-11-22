@@ -30,6 +30,7 @@ def build(env):
     p = {}
     p["target"] = t = device.identifier
     p["max_frequency"] = int(device.get_driver("rcc")["max-frequency"][0])
+    p["dualcore"] = bool(t.get("core"))
     p["has_smps"] = t.family == "h7" and (t.name in ["25", "35", "45", "47", "55", "57"] or \
         (t.name in ["30", "a3", "b0", "b3"] and t.variant == "q"))
 

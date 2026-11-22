@@ -223,6 +223,13 @@ def build(env):
         driver = device.get_driver("fdcan")
         env.substitutions["instances"] = driver["instance"]
     env.substitutions["instances"].sort()
+    # Both cores share the message RAM, but each project only knows its own instances
+    slots = {}
+    if device.identifier.get("core"):
+        all_instances = sorted(int(i) for i in listify(device.get_driver("fdcan")["instance"]))
+        words = global_properties["message_ram_length_words"] // len(all_instances)
+        slots = {i: (index * words, (index + 1) * words) for index, i in enumerate(all_instances)}
+    env.substitutions["message_ram_slots"] = slots
 
     env.outbasepath = "modm/src/modm/platform/can"
 
