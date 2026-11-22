@@ -1,0 +1,31 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#include "dualcore.hpp"
+#include <modm/platform/core/hardware_init.hpp>
+
+// The Cortex-M4 has no D-Cache, so the Cortex-M7 must not cache the shared memory.
+// Normal memory, non-cacheable (TEX=001 C=0 B=0) and non-shareable, since the
+// Cortex-M7 would forward exclusive accesses of shareable memory to the bus.
+static void
+modm_dualcore_mpu()
+{
+	MPU->RNR = 0;
+	MPU->RBAR = modm::platform::dualcore::SharedMemory;
+	MPU->RASR = MPU_RASR_XN_Msk | (0b011 << MPU_RASR_AP_Pos) | (0b001 << MPU_RASR_TEX_Pos) |
+				((__builtin_ctz(modm::platform::dualcore::SharedMemorySize) - 1) << MPU_RASR_SIZE_Pos) |
+				MPU_RASR_ENABLE_Msk;
+	MPU->CTRL = MPU_CTRL_PRIVDEFENA_Msk | MPU_CTRL_ENABLE_Msk;
+	__DSB();
+	__ISB();
+}
+
+MODM_HARDWARE_INIT_ORDER(modm_dualcore_mpu, 1);

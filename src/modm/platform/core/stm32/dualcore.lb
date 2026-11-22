@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:dualcore"
+    module.description = FileReader("dualcore.md")
+
+
+def prepare(module, options):
+    target = options[":target"].identifier
+    if target.platform != "stm32" or not target.get("core"):
+        return False
+    module.depends(":platform:core", ":architecture:assert")
+    return True
+
+
+def build(env):
+    target = env[":target"]
+    sram4 = next(m for m in target.get_driver("core")["memory"] if m["name"] == "d3_sram")
+    env.substitutions = {
+        "core": target.identifier.core,
+        "start": int(sram4["start"], 0),
+        "size": int(sram4["size"], 0),
+    }
+    env.outbasepath = "modm/src/modm/platform/core"
+    env.template("dualcore.hpp.in")
+    if target.identifier.core == "m7":
+        env.template("dualcore.cpp.in")

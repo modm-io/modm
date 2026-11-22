@@ -1,0 +1,180 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/platform/device.hpp>
+#include <modm/architecture/interface/assert.hpp>
+#include <cstddef>
+#include <cstdint>
+#include <string_view>
+#include <type_traits>
+
+namespace modm::platform::dualcore
+{
+
+/// @ingroup modm_platform_dualcore
+/// @{
+
+/// SRAM4 is accessible by both cores and not cached by the Cortex-M7.
+/// Only the Cortex-M7 links into it, except for the mailbox at its start.
+inline constexpr uintptr_t SharedMemory{ {{ "0x%08x" % start }} };
+inline constexpr std::size_t SharedMemorySize{ {{ size }} };
+
+/**
+ * Locks the hardware semaphore `id` and disables interrupts on this core,
+ * so that both cores can modify shared memory with several accesses, for
+ * example with a read-modify-write.
+ *
+ * @warning Not recursive, and fibers on the same core must not yield while
+ *          they hold the lock, since the hardware semaphore only knows cores.
+ * @note    Requires `start()` or `wait()`, which enable the HSEM clock.
+ */
+template< uint8_t id >
+class Lock
+{
+	static_assert(0 < id and id < 32, "Semaphore 0 is used by start() and wait()!");
+	const uint32_t primask{__get_PRIMASK()};
+
+public:
+	Lock()
+	{
+		__disable_irq();
+		// Reading RLR locks a free semaphore and returns who holds it
+		while (HSEM->RLR[id] != (HSEM_RLR_LOCK | HSEM_CR_COREID_CURRENT)) ;
+		__DMB();
+	}
+
+	~Lock()
+	{
+		__DMB();
+		HSEM->R[id] = HSEM_CR_COREID_CURRENT;
+		__set_PRIMASK(primask);
+	}
+
+	Lock(const Lock&) = delete;
+	Lock& operator=(const Lock&) = delete;
+};
+
+/// @cond
+namespace detail
+{
+inline constexpr uint8_t BootSemaphore{0};
+// SRAM4 survives a reset, so the mailbox is only valid after start() or wait()
+inline constinit bool mailboxValid{false};
+
+struct Mailbox
+{
+	uintptr_t object;
+	uint32_t fingerprint;
+};
+inline volatile Mailbox&
+mailbox()
+{ return *reinterpret_cast<volatile Mailbox*>(SharedMemory); }
+
+// FNV-1a of the type name and size, so that a stale image of the other core is noticed
+template< class T >
+consteval uint32_t
+fingerprint()
+{
+	static_assert(not std::is_polymorphic_v<T>, "A vtable only exists in the flash of one core!");
+	static_assert(not std::is_copy_constructible_v<T>,
+				  "Delete the copy constructor, so that a missing & cannot copy the shared object!");
+	uint32_t hash{2166136261ul ^ sizeof(T)};
+	for (const char c : std::string_view{__PRETTY_FUNCTION__}) hash = (hash ^ uint8_t(c)) * 16777619ul;
+	return hash;
+}
+}	// namespace detail
+/// @endcond
+
+%% if core == "m7"
+/// @cond
+namespace detail
+{
+inline void
+release()
+{
+	mailboxValid = true;
+	RCC->AHB4ENR |= RCC_AHB4ENR_HSEMEN;
+	__DSB();
+	while (HSEM->RLR[BootSemaphore] != (HSEM_RLR_LOCK | HSEM_CR_COREID_CURRENT)) ;
+	// Unlocking sets the interrupt status of the semaphore for both cores, even if the
+	// interrupt is disabled, which only software clears (RM0399 11.4.5)
+	HSEM->R[BootSemaphore] = HSEM_CR_COREID_CURRENT;
+	// Boots the Cortex-M4 also if the option byte BCM4 holds it (RM0399 9.4.7)
+	RCC->GCR |= RCC_GCR_BOOT_C2;
+}
+}	// namespace detail
+/// @endcond
+
+/**
+ * Lets the Cortex-M4 continue from `wait()` without passing an object. Call
+ * this once after the system clock and the shared GPIO ports are configured.
+ */
+inline void
+start()
+{
+	// The mailbox may still hold the object of a previous program
+	detail::mailbox().fingerprint = 0;
+	__DMB();
+	detail::release();
+}
+
+/**
+ * Passes the address of `object` to the Cortex-M4, then lets it continue from
+ * `wait()`. The object must be placed into SRAM4, for example with
+ * `modm_section(".data_d3_sram")`, and is initialized by the startup code.
+ */
+template< class T >
+void
+start(T &object)
+{
+	const auto address = reinterpret_cast<uintptr_t>(&object);
+	modm_assert(SharedMemory <= address and address + sizeof(T) <= SharedMemory + SharedMemorySize,
+				"dualcore.start",
+				"The shared object must be placed into .data_d3_sram, .bss_d3_sram or .noinit_d3_sram!",
+				address);
+	detail::mailbox().object = address;
+	detail::mailbox().fingerprint = detail::fingerprint<T>();
+	__DMB();
+	detail::release();
+}
+%% else
+/// Waits until the Cortex-M7 calls `start()`, which also configures the system clock.
+inline void
+wait()
+{
+	RCC->AHB4ENR |= RCC_AHB4ENR_HSEMEN;
+	__DSB();
+	while (not (HSEM_COMMON->ISR & (1ul << detail::BootSemaphore))) ;
+	HSEM_COMMON->ICR = 1ul << detail::BootSemaphore;
+	__DMB();
+	detail::mailboxValid = true;
+}
+%% endif
+
+/**
+ * The object that the Cortex-M7 passed to `start(object)`. Call this only
+ * after `start()` or `wait()`, so not to initialize a global variable.
+ */
+template< class T >
+T&
+shared()
+{
+	modm_assert(detail::mailboxValid, "dualcore.early", "Call start() or wait() before shared()!");
+	modm_assert(detail::mailbox().fingerprint == detail::fingerprint<T>(), "dualcore.shared",
+				"Both cores must be built with the same shared type!");
+	return *reinterpret_cast<T*>(detail::mailbox().object);
+}
+
+/// @}
+
+}	// namespace modm::platform::dualcore

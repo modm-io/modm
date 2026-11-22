@@ -85,9 +85,14 @@ def common_memories(env):
     """
     device = env[":target"]
     memories = listify(device.get_driver("core")["memory"])
-    # Dual-core STM32H7: SRAM4 and the backup SRAM belong to the Cortex-M7
-    if device.identifier.get("core") == "m4":
+    # Dual-core STM32H7: SRAM4 and the backup SRAM belong to the Cortex-M7, except for the
+    # mailbox at the start of SRAM4, which passes the shared memory to the Cortex-M4.
+    if (core := device.identifier.get("core")) == "m4":
         memories = [m for m in memories if m["name"] not in ("d3_sram", "backup")]
+    elif core == "m7":
+        for m in (m for m in memories if m["name"] == "d3_sram"):
+            m["start"] = hex(int(m["start"], 0) + 8)
+            m["size"] = hex(int(m["size"], 0) - 8)
 
     # Convert from string to int and add offsets
     if (flash_size := env.get(":platform:core:boot2_size", 0)):
