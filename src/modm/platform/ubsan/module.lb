@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+def init(module):
+    module.name = ":platform:ubsan"
+    module.description = FileReader("module.md")
+
+def prepare(module, options):
+    if not options[":target"].has_driver("core:cortex-m*"):
+        return False
+
+    module.add_option(
+        EnumerationOption(
+            name="mode",
+            description=descr_mode,
+            enumeration=["trap", "report"],
+            default="trap",
+            dependencies=lambda mode: ":debug" if mode == "report" else None))
+    return True
+
+def build(env):
+    # The compiler must not link libubsan, so these are not added to the linkflags
+    # Not null and alignment: Address zero is valid memory on some devices and
+    # Thumb function pointers are odd. The flags are sorted, so -fno-sanitize
+    # cannot be used to remove them from -fsanitize=undefined.
+    checks = ["shift", "integer-divide-by-zero", "bounds", "return", "unreachable",
+              "bool", "enum", "pointer-overflow", "vla-bound", "builtin"]
+    if env["mode"] == "trap":
+        checks += ["object-size", "nonnull-attribute", "returns-nonnull-attribute"]
+        env.collect(":build:ccflags", "-fsanitize-trap=undefined")
+    else:
+        env.outbasepath = "modm/src/modm/platform/ubsan"
+        env.copy("ubsan.cpp")
+    env.collect(":build:ccflags", "-fsanitize=" + ",".join(checks))
+
+
+descr_mode = """# Reaction to undefined behavior
+
+- `trap`: Enables all checks except `null` and `alignment` and executes a
+  faulting instruction on the first failure. Needs no runtime and no additional
+  RAM.
+- `report`: Enables a reduced set of checks, logs every failing source location
+  once to `MODM_LOG_ERROR` and continues. Needs a lot more flash and RAM.
+"""

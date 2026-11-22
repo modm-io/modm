@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:nucleo-h723zg</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/nucleo-h723zg-ubsan/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/nucleo-h723zg-ubsan/modm-test</option>
+    <option name="modm:platform:ubsan:mode">report</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <module>modm:platform:ubsan</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>

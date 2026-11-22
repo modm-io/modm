@@ -137,6 +137,10 @@ compile-nucleo-h723zg:
 	$(call compile-test,nucleo-h723zg,size)
 run-nucleo-h723zg:
 	$(call run-test,nucleo-h723zg,size)
+compile-nucleo-h723zg-ubsan:
+	$(call compile-test,nucleo-h723zg-ubsan,size)
+run-nucleo-h723zg-ubsan:
+	$(call run-test,nucleo-h723zg-ubsan,size)
 
 
 compile-nucleo-l432kc:
