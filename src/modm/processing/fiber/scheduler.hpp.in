@@ -72,7 +72,10 @@ protected:
 	get_id() const
 	{
 		// Ensure that calling this in an interrupt gives a different ID
-		if (const auto irq = modm::activeExceptionNumber(); irq >= 16) return irq;
+		if (const auto irq = modm::activeExceptionNumber(); irq >= 16) return detail::context_id(irq);
+%% if multicore or is_hosted
+		if (current == nullptr) return detail::context_id();
+%% endif
 		return reinterpret_cast<uintptr_t>(current);
 	}
 

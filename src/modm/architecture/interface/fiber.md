@@ -138,14 +138,16 @@ function:
 
 ```cpp
 auto id = modm::this_fiber::get_id();
-// if (id == 0) called outside a fiber
-// else called from inside a fiber
+// if (id == 0) called from the main context of the first core or the main thread
+// else called from a fiber, an interrupt, another core or another thread
 ```
 
 The returned ID is the address of the currently running fiber object. If called
 outside of a fiber, for example, in the main function before the scheduler is
-running or if the scheduler is not included, the function returns `0`. On
-Cortex-M devices the function returns the interrupt number if called from
-inside an interrupt. The implementation ensures that all returned
-values are unique and thus allow the ID to be used for tracking ownership of
-various recursive locks, for example.
+running or if the scheduler is not included, the function returns `0` on the
+first core and the main thread, and a different value on other cores and
+threads. On Cortex-M devices the function returns the interrupt number if called
+from inside an interrupt, plus 512 for each further core. The implementation
+ensures that all returned values are unique across cores and threads and thus
+allow the ID to be used for tracking ownership of various recursive locks, for
+example.

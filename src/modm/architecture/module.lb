@@ -180,6 +180,8 @@ class Fiber(Module):
         env.substitutions = {
             "with_scheduler": env.has_module(":processing:fiber"),
             "core": env[":target"].get_driver("core")["type"],
+            "is_hosted": env[":target"].identifier.platform == "hosted",
+            "multicore": env.has_module(":platform:multicore"),
         }
         env.template("interface/fiber.hpp.in")
         env.copy("interface/fiber")
