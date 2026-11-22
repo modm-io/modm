@@ -13,6 +13,7 @@
 #ifndef MODM_STM32H7_SPI_MASTER{{ id }}_DMA_HPP
 #define MODM_STM32H7_SPI_MASTER{{ id }}_DMA_HPP
 
+#include <algorithm>
 #include <modm/platform/dma/dma.hpp>
 #include "spi_master_{{ id }}.hpp"
 

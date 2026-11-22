@@ -120,27 +120,40 @@ SpiMaster{{ id }}_Dma<DmaChannelRx, DmaChannelTx>::transfer(
 		const uint8_t* tx, uint8_t* rx, std::size_t length)
 {
 	using Flags = DmaChannelRx::InterruptFlags;
-	startDmaTransfer(tx, rx, length);
 
-	bool dmaRxFinished = (rx == nullptr);
-	while (!Hal::isTransferCompleted() or !dmaRxFinished) {
-		if(rx) {
-			const auto flags = DmaChannelRx::getInterruptFlags();
-			if (flags & Flags::Error) {
-				break;
+	// TSIZE = 0 means endless, so longer transfers must be split
+	while (length) {
+		const std::size_t chunk = std::min(length, Hal::MaxTransferSize);
+		startDmaTransfer(tx, rx, chunk);
+
+		bool error{false};
+		bool dmaRxFinished = (rx == nullptr);
+		while (!Hal::isTransferCompleted() or !dmaRxFinished) {
+			if(rx) {
+				const auto flags = DmaChannelRx::getInterruptFlags();
+				if (flags & Flags::Error) {
+					error = true;
+					break;
+				}
+				if (flags & Flags::TransferComplete) {
+					dmaRxFinished = true;
+				}
 			}
-			if (flags & Flags::TransferComplete) {
-				dmaRxFinished = true;
+			if(tx) {
+				if (const auto flags = DmaChannelTx::getInterruptFlags(); flags & Flags::Error) {
+					error = true;
+					break;
+				}
 			}
+			modm::this_fiber::yield();
 		}
-		if(tx) {
-			if (const auto flags = DmaChannelTx::getInterruptFlags(); flags & Flags::Error) {
-				break;
-			}
-		}
-		modm::this_fiber::yield();
+		finishTransfer();
+		if (error) { return; }
+
+		if (tx) { tx += chunk; }
+		if (rx) { rx += chunk; }
+		length -= chunk;
 	}
-	finishTransfer();
 }
 
 template <class DmaChannelRx, class DmaChannelTx>
