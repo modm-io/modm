@@ -84,27 +84,23 @@ public:
 	lock()
 	{ FLASH->CR |= FLASH_CR_LOCK; }
 
+	/// @return the page or sector that contains the absolute address ptr
 	static uint16_t
-	getSector(uint8_t *ptr)
-	{
-%% if has_dcache
-		// Code and constants are linked to the read-only ITCM alias
-		if (uintptr_t(ptr) < OriginAddr) return getSector(uintptr_t(ptr) - ItcmAddr + OriginAddr);
-%% endif
-		return getSector(uintptr_t(ptr));
-	}
+	getSector(const void *ptr);
 
-	/// @return the page or sector of the absolute address addr
+	[[deprecated("Pass the address as pointer: getSector(Flash::Origin + offset)")]] // DEPRECATED: 2027q4
 	static uint16_t
-	getSector(uintptr_t addr);
+	getSector(uintptr_t offset)
+	{ return getSector(Origin + offset); }
 
 	static uint16_t
-	getPage(uint8_t *ptr)
+	getPage(const void *ptr)
 	{ return getSector(ptr); }
 
+	[[deprecated("Pass the address as pointer: getPage(Flash::Origin + offset)")]] // DEPRECATED: 2027q4
 	static uint16_t
-	getPage(uintptr_t addr)
-	{ return getSector(addr); }
+	getPage(uintptr_t offset)
+	{ return getSector(Origin + offset); }
 
 	static uint8_t*
 	getAddr(uint16_t sector)

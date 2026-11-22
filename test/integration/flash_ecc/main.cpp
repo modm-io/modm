@@ -32,7 +32,7 @@ constexpr uint32_t Wanted = 3;
 struct State { uint32_t magic, index, step, ticks, found, errors; };
 modm_section(".noinit") State state;
 
-uint16_t page() { return Flash::getPage(Flash::OriginAddr + Flash::Size - 1); }
+uint16_t page() { return Flash::getPage(Flash::Origin + Flash::Size - 1); }
 uintptr_t address(uint32_t index) { return uintptr_t(Flash::getAddr(page())) + index * Flash::WriteSize; }
 
 /// Programs the word at index and resets after delay timer ticks, 0 measures the time

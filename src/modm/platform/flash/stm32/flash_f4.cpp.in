@@ -223,8 +223,13 @@ Flash::unlock()
 }
 
 uint16_t
-Flash::getSector(uintptr_t addr)
+Flash::getSector(const void *ptr)
 {
+	uintptr_t addr{uintptr_t(ptr)};
+%% if has_dcache
+	// Code and constants are linked to the read-only ITCM alias
+	if (addr < OriginAddr) addr += OriginAddr - ItcmAddr;
+%% endif
 	uintptr_t offset = addr - OriginAddr;
 	const Layout l = layout();
 	uint16_t index{0};

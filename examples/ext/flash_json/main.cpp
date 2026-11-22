@@ -101,7 +101,7 @@ main()
 		// put BSON in reserved flash
 		uint32_t err{0};
 		const size_t page_start =
-			Flash::getPage(reinterpret_cast<uint32_t>(&__flash_reserved_start));
+			Flash::getPage(__flash_reserved_start);
 		const size_t num_bytes = alice_binary.size();
 		const size_t flash_page_size = Flash::getSize(page_start);
 		const size_t end_page = page_start + (num_bytes + flash_page_size - 1) / flash_page_size;

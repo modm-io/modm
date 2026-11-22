@@ -98,8 +98,8 @@ check_for_update()
 					// continuous chunk and we cannot access FatFs code in ram_apply!!!
 					Flash::unlock();
 					uintptr_t dst_addr{Flash::OriginAddr + Flash::Size/2};
-					for (auto page{Flash::getPage(dst_addr)};
-						 page <= Flash::getPage(dst_addr+fno.fsize);
+					for (auto page{Flash::getPage(Flash::Origin + Flash::Size/2)};
+						 page <= Flash::getPage(Flash::Origin + Flash::Size/2 + fno.fsize);
 						 page++) Flash::erase(page);
 					for (FSIZE_t offset{0}; offset < fno.fsize;
 						 offset += sizeof(Flash::MaxWordType),
@@ -110,7 +110,7 @@ check_for_update()
 						Flash::program(dst_addr, buffer);
 					}
 					// Jump into RAM and copy from last flash page to first pages
-					ram_apply(Flash::getPage(Flash::OriginAddr + fno.fsize), Flash::Origin + Flash::Size/2, fno.fsize);
+					ram_apply(Flash::getPage(Flash::Origin + fno.fsize), Flash::Origin + Flash::Size/2, fno.fsize);
 				}
 				f_close(&fil);
 			}

@@ -89,8 +89,8 @@ public:
 		std::lock_guard lock{detail::bd_flash_mutex};
 		if (not Flash::unlock()) return false;
 		uint32_t error{};
-		const uint16_t last = Flash::getPage(Origin + address + size - 1);
-		for (uint16_t page = Flash::getPage(Origin + address); page <= last and not error; page++)
+		const uint16_t last = Flash::getPage(Flash::Origin + Offset + address + size - 1);
+		for (uint16_t page = Flash::getPage(Flash::Origin + Offset + address); page <= last and not error; page++)
 			error = Flash::erase(page);
 		Flash::lock();
 		return error == 0;
@@ -104,7 +104,7 @@ public:
 	EraseBlock
 	getEraseBlock(bd_address_t address) const
 	{
-		const uint16_t page = Flash::getPage(Origin + address);
+		const uint16_t page = Flash::getPage(Flash::Origin + Offset + address);
 		return {bd_address_t(Flash::getOffset(page) - Offset), bd_size_t(Flash::getSize(page))};
 	}
 
@@ -120,7 +120,7 @@ private:
 	isPageStart(bd_address_t address)
 	{
 		if (Offset + address == Flash::Size) return true;
-		return Flash::getOffset(Flash::getPage(Origin + address)) == Offset + address;
+		return Flash::getOffset(Flash::getPage(Flash::Origin + Offset + address)) == Offset + address;
 	}
 };
 

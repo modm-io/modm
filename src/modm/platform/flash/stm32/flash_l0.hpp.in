@@ -61,21 +61,23 @@ public:
 	{ FLASH->PECR |= FLASH_PECR_PELOCK; }
 
 	static uint16_t
-	getSector(uint8_t *ptr)
-	{ return getPage(uintptr_t(ptr)); }
+	getSector(const void *ptr)
+	{ return getPage(ptr); }
 
+	[[deprecated("Pass the address as pointer: getSector(Flash::Origin + offset)")]] // DEPRECATED: 2027q4
 	static uint16_t
-	getSector(uintptr_t addr)
-	{ return getPage(addr); }
+	getSector(uintptr_t offset)
+	{ return getPage(Origin + offset); }
 
+	[[deprecated("Pass the address as pointer: getPage(Flash::Origin + offset)")]] // DEPRECATED: 2027q4
 	static uint16_t
-	getPage(uint8_t *ptr)
-	{ return getPage(uintptr_t(ptr)); }
+	getPage(uintptr_t offset)
+	{ return getPage(Origin + offset); }
 
-	/// @return the page or sector of the absolute address addr
+	/// @return the page or sector that contains the absolute address ptr
 	static uint16_t
-	getPage(uintptr_t addr)
-	{ return (addr - OriginAddr) >> {{ shift }}; }
+	getPage(const void *ptr)
+	{ return (uintptr_t(ptr) - OriginAddr) >> {{ shift }}; }
 
 	static uint8_t*
 	getAddr(uint16_t page)

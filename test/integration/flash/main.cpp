@@ -137,8 +137,8 @@ geometry(uint32_t &errors)
 		const uint32_t offset = Flash::getOffset(page);
 		const size_t size = Flash::getSize(page);
 		if (offset < end or size < Flash::MinPageSize or size > Flash::MaxPageSize or
-			Flash::getPage(Flash::OriginAddr + offset) != page or
-			Flash::getPage(Flash::OriginAddr + offset + size - 1) != page or
+			Flash::getPage(Flash::Origin + offset) != page or
+			Flash::getPage(Flash::Origin + offset + size - 1) != page or
 			Flash::getAddr(page) != Flash::Origin + offset)
 		{
 			MODM_LOG_ERROR << "Geometry error at page " << page << " offset " << offset
@@ -157,7 +157,7 @@ geometry(uint32_t &errors)
 	}
 	MODM_LOG_INFO << count << " pages, " << Flash::Size << " bytes" << modm::endl;
 	// The F7 runs from the read-only ITCM alias of the flash
-	const uintptr_t rom_end = Flash::OriginAddr + (__rom_end - __rom_start);
+	const uint8_t *const rom_end = Flash::Origin + (__rom_end - __rom_start);
 	page_begin = Flash::getPage(rom_end + Flash::getSize(Flash::getPage(rom_end)) - 1);
 	if (page_begin >= count) return;
 	page_stride = (count - page_begin + MaxPages - 1) / MaxPages;

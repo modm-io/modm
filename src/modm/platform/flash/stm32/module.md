@@ -16,12 +16,14 @@ different flash controllers, each with its own implementation:
 | WB0        | WB0, WL3       | 2 KiB pages                    | 32-bit            |
 
 All controllers share the same interface: `Flash::unlock()` before any
-operation, `Flash::getPage(addr)` or `Flash::getSector(addr)` to find the
-erase unit of an address, `Flash::erase(index)` and
+operation, `Flash::getPage(ptr)` or `Flash::getSector(ptr)` to find the
+erase unit of a pointer into the flash, `Flash::erase(index)` and
 `Flash::program(addr, Flash::MaxWordType)`. The functions return the error
 flags of the controller, zero on success. Pages and sectors are numbered
 continuously over all banks. All addresses are absolute, only
 `Flash::getOffset(index)` returns the offset from `Flash::OriginAddr`.
+The overloads of `getPage()` and `getSector()` taking an integer offset from
+`Flash::OriginAddr` are deprecated, use `Flash::getPage(Flash::Origin + offset)`.
 `Flash::MinPageSize` and `Flash::MaxPageSize` are the smallest and largest
 page or sector of all flash organizations of the device, independent of the
 dual-bank option bits. If they are equal, all pages have the same size.
