@@ -1,0 +1,10 @@
+<library>
+  <extends>modm:nucleo-h745zi-q</extends>
+  <options>
+    <option name="modm:target">stm32h745zit6@m4</option>
+  </options>
+  <modules>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>
