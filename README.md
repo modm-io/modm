@@ -73,16 +73,18 @@ git clone --recurse-submodules --jobs 8 https://github.com/modm-io/modm.git
 	- [CrashCatcher][]: Crash reports for HardFaults.
 	- [Eigen][]: Linear Algebra Library.
 	- [ETL][]: Embedded Template Library.
-	- [FatFS][]: FAT/exFAT filesystem.
+	- [FatFS][] and [Petit FatFS][]: FAT/exFAT filesystems.
 	- [FreeRTOS][] and [FreeRTOS+TCP][] operating system.
 	- [LVGL][]: Embedded Graphics Library.
 	- [Nanopb][]: Embedded Protocol Buffers.
+	- [nlohmann JSON][]: Header-only JSON library.
 	- [o1heap][]: Constant-time memory allocator.
 	- [printf][]: Small printf implementation.
 	- [ROSserial][]: Embedded ROS client.
 	- [RTT][]: Segger Real-Time Transport.
 	- [TinyUSB][]: USB Host/Device stack.
 	- [Zephyr heap][]: Memory allocator for multiple memory regions.
+	- [ZMS][]: Zephyr Memory Storage, a key-value store for flash.
 
 
 ## Microcontrollers
@@ -1234,4 +1236,7 @@ and [many more contributors][contributors].
 [Eigen]:           https://libeigen.gitlab.io
 [o1heap]:          https://github.com/pavel-kirienko/o1heap
 [Zephyr heap]:     https://docs.zephyrproject.org/latest/kernel/memory_management/heap.html
+[nlohmann JSON]:   https://json.nlohmann.me/
+[Petit FatFS]:     http://elm-chan.org/fsw/ff/00index_p.html
+[ZMS]:             https://docs.zephyrproject.org/latest/services/storage/zms/zms.html
 <!--/links-->
