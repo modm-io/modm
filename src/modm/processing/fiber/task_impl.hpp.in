@@ -86,6 +86,7 @@ Task::emplace(T&& closure, Args&&... args)
 			using Callable = std::conditional_t<with_stop_token, void(*)(stop_token), void(*)()>;
 			auto caller = (uintptr_t) +[](Callable fn)
 			{
+				fiber::Scheduler::instance().releaseEnded();
 				if constexpr (with_stop_token) {
 					fn(fiber::Scheduler::instance().current->get_stop_token());
 				} else fn();
@@ -116,6 +117,7 @@ Task::emplace(T&& closure, Args&&... args)
 			// Encapsulate the proper ABI function call into a simpler function
 			auto caller = (uintptr_t) +[](Closure* closure)
 			{
+				fiber::Scheduler::instance().releaseEnded();
 				if constexpr (with_stop_token) {
 					(*closure)(fiber::Scheduler::instance().current->get_stop_token());
 				} else (*closure)();

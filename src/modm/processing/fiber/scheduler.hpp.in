@@ -67,6 +67,21 @@ protected:
 	Task* last{nullptr};
 	Task* current{nullptr};
 	Options options{0};
+%% if multicore or is_hosted
+	// Still uses its stack until the next context of this scheduler runs
+	Task* ended{nullptr};
+%% endif
+
+	// Other cores and threads may now restart or destroy the ended task
+	void inline
+	releaseEnded()
+	{
+%% if multicore or is_hosted
+		if (ended == nullptr) return;
+		ended->scheduler.store(nullptr, std::memory_order_release);
+		ended = nullptr;
+%% endif
+	}
 
 	uintptr_t inline
 	get_id() const
@@ -100,7 +115,11 @@ protected:
 		if (current == last) last = nullptr;
 		else last->next = current->next;
 		current->next = nullptr;
+%% if multicore or is_hosted
+		ended = current;
+%% else
 		current->scheduler = nullptr;
+%% endif
 		return current;
 	}
 
@@ -116,6 +135,7 @@ protected:
 		auto from = current;
 		current = other;
 		modm_context_jump(&from->ctx, &other->ctx);
+		releaseEnded();
 	}
 
 	void inline
@@ -191,6 +211,7 @@ protected:
 		if (overflow) current = nullptr;
 		modm_assert(not overflow, "fbr.stkof", "Fiber stack overflow", overflow);
 %% endif
+		releaseEnded();
 		this->options = Options(0);
 		return true;
 	}

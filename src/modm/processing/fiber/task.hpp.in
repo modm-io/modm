@@ -15,6 +15,9 @@
 #include "stack.hpp"
 #include <modm/architecture/interface/fiber/stop_token.hpp>
 #include <modm/architecture/interface/fiber.hpp>
+%% if multicore or is_hosted
+#include <atomic>
+%% endif
 #include <type_traits>
 
 namespace modm
@@ -64,7 +67,12 @@ class Task
 	// may get placed in the .data section including the whole stack!!!
 	modm_context_t ctx;
 	Task* next;
+%% if multicore or is_hosted
+	// Other cores and threads read this to join the task
+	std::atomic<Scheduler*> scheduler{nullptr};
+%% else
 	Scheduler *scheduler{nullptr};
+%% endif
 	stop_state stop{};
 	// Destroys the closure at the top of the stack, nullptr if trivial
 	void (*destroy)(uintptr_t*){nullptr};
@@ -193,7 +201,11 @@ public:
 	[[nodiscard]] bool inline
 	isRunning() const
 	{
+%% if multicore or is_hosted
+		return scheduler.load(std::memory_order_acquire);
+%% else
 		return scheduler;
+%% endif
 	}
 
 	/// @cond
