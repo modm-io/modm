@@ -155,7 +155,7 @@ def prepare(module, options):
         ":architecture:clock",
         ":architecture:delay",
         ":architecture:interrupt",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":debug",
         ":platform:can.common",
         ":platform:gpio",

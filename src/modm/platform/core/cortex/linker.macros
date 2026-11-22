@@ -274,7 +274,7 @@ EXCEPTION_FRAME_SIZE = {{ exception_frame_size }};
 		*({{no_heap_section}})
 		%% endif
 		%% if not with_printf
-		/* Catch use of printf without `modm:printf` module. */
+		/* Catch use of printf without `modm:ext:printf` module. */
 		*({{no_printf_section}})
 		%% endif
 		%% if not with_thread_local

@@ -11,7 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":o1heap"
+    module.name = ":ext:o1heap"
     module.description = FileReader("module.md")
 
 def prepare(module, options):
@@ -19,7 +19,6 @@ def prepare(module, options):
     return options[":target"].has_driver("core:cortex-m*")
 
 def build(env):
-    env.collect(":build:path.include", "modm/ext")
     env.outbasepath = "modm/ext/o1heap"
     env.copy("o1heap/LICENSE", "LICENSE")
     env.copy("o1heap/o1heap/o1heap.h", "o1heap.h")

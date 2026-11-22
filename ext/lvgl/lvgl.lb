@@ -11,7 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":lvgl"
+    module.name = ":ext:lvgl"
     module.description = """
 # LVGL graphics library
 

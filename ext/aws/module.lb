@@ -58,7 +58,7 @@ class FreeRTOS_TCP(Module):
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = "freertos"
+    module.name = ":ext:freertos"
     module.description = FileReader("freertos.md")
 
 def prepare(module, options):
@@ -81,7 +81,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:assert",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:clock")
 
     module.add_submodule(FreeRTOS_TCP())

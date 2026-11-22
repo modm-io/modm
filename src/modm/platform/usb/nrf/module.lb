@@ -36,7 +36,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio")
 
     module.add_query(EnvironmentQuery(name="irqs", factory=common_usb_irqs))
@@ -53,5 +53,5 @@ def build(env):
     }
     env.template("usb.hpp.in")
 
-    if env.has_module(":tinyusb:device:cdc"):
+    if env.has_module(":ext:tinyusb:device:cdc"):
         env.copy(repopath("ext/hathach/uart.hpp"), "uart.hpp")

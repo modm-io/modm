@@ -139,7 +139,7 @@ def common_peripherals(env):
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.name = ":cmsis:device"
+    module.name = ":ext:cmsis:device"
     module.description = FileReader("module.md")
 
 def prepare(module, options):
@@ -154,7 +154,7 @@ def prepare(module, options):
     module.add_query(
         EnvironmentQuery(name="headers", factory=common_header_file))
 
-    module.depends(":cmsis:core")
+    module.depends(":ext:cmsis:core")
     return True
 
 def validate(env):
@@ -162,7 +162,6 @@ def validate(env):
     env.query("peripherals")
 
 def build(env):
-    env.collect(":build:path.include", "modm/ext")
     env.collect(":build:path.include.system", "modm/ext/cmsis/device")
     env.collect(":build:cppdefines", bprops["family_define"])
 

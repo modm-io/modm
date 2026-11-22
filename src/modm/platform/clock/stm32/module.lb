@@ -21,7 +21,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("rcc:stm32*"):
         return False
 
-    module.depends(":cmsis:device", ":utils", ":platform:clock", ":architecture:delay", ":platform:gpio")
+    module.depends(":ext:cmsis:device", ":utils", ":platform:clock", ":architecture:delay", ":platform:gpio")
     return True
 
 def build(env):
@@ -71,8 +71,8 @@ def build(env):
         env.template(f"rcc_{t.family}.hpp.in", "rcc.hpp")
     env.copy("rcc_defs.cpp")
 
-    all_peripherals = env.query(":cmsis:device:peripherals")
-    rcc_map = env.query(":cmsis:device:rcc-map")
+    all_peripherals = env.query(":ext:cmsis:device:peripherals")
+    rcc_map = env.query(":ext:cmsis:device:rcc-map")
     rcc_enable = {}
     rcc_reset = {}
 

@@ -11,7 +11,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":printf"
+    module.name = ":ext:printf"
     module.description = FileReader("module.md")
 
 def prepare(module, options):
@@ -22,7 +22,6 @@ def build(env):
     with_long_long = env.get(":io:with_long_long",
             "avr" not in env[":target"].identifier.platform)
 
-    env.collect(":build:path.include", "modm/ext")
     env.outbasepath = "modm/ext/printf"
 
     env.copy("printf/src/printf/printf.h", "printf.h", patch="printf.h.patch")

@@ -86,7 +86,7 @@ class SharedMedium(Module):
         module.description = "Shared Medium Mockup"
 
     def prepare(self, module, options):
-        module.depends(":stdc++")
+        module.depends(":ext:stdc++")
         return True
 
     def build(self, env):
@@ -108,7 +108,7 @@ class LogicAnalyzer(Module):
         if options[":target"].identifier["platform"] != "stm32":
             return False
 
-        module.depends(":stdc++", ":driver:gpio_sampler", ":debug")
+        module.depends(":ext:stdc++", ":driver:gpio_sampler", ":debug")
         return True
 
     def build(self, env):

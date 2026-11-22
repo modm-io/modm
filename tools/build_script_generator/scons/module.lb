@@ -112,7 +112,7 @@ def build(env):
     elif device["core"].startswith("avr"):
         tools.update({"size", "avrdude"})
 
-    if env.has_module(":nanopb"):
+    if env.has_module(":ext:nanopb"):
         tools.add("nanopb")
 
     env.collect("path.tools", *toolpaths)
@@ -128,7 +128,7 @@ def build(env):
     # Copy support files
     env.copy("site_tools/qtcreator/")
 
-    if env.has_module(":nanopb"):
+    if env.has_module(":ext:nanopb"):
         env.copy("site_tools/nanopb_builder/")
         env.copy(repopath("ext/nanopb/nanopb/generator"), dest="site_tools/nanopb_builder/generator")
         env.copy(repopath("ext/nanopb/nanopb/tests/site_scons/site_tools/nanopb.py"), dest="site_tools/nanopb_builder/nanopb.py")
@@ -139,7 +139,7 @@ def build(env):
                    else "$BASEPATH/modm/link/linkerscript.ld"
     env.substitutions = env.query("::device")
     env.substitutions.update({
-        "upload_with_artifact": env.has_module(":crashcatcher"),
+        "upload_with_artifact": env.has_module(":ext:crashcatcher"),
         "with_compilation_db": env.has_module(":build:compilation_db"),
         "program_extension": ".exe" if env[":target"].identifier.family == "windows" else ".elf",
         "linkerscript": linkerscript,
@@ -152,7 +152,7 @@ def post_build(env):
     is_unittest = len(env["::unittest.source"])
     has_xpcc_generator = env.has_module(":communication:xpcc:generator") # DEPRECATED: 2027q4
     has_image_source = len(env["::image.source"])
-    has_nanopb = env.has_module(":nanopb")
+    has_nanopb = env.has_module(":ext:nanopb")
     repositories = [p for p in env.buildlog.repositories if isdir(env.real_outpath(p, basepath="."))]
     repositories.sort(key=lambda name: "0" if name == "modm" else name)
     generated_paths = [env.relcwdoutpath("") + "/" + r for r in repositories]
@@ -193,8 +193,8 @@ def post_build(env):
             "generator_namespace": env.get(":communication:xpcc:generator:namespace", ""),
         })
     if has_nanopb:
-        subs["nanopb_source"] = [env.relcwdoutpath(p) for p in env.get(":nanopb:sources", [])]
-        subs["nanopb_path"] = env.relcwdoutpath(env.get(":nanopb:path", "."))
+        subs["nanopb_source"] = [env.relcwdoutpath(p) for p in env.get(":ext:nanopb:sources", [])]
+        subs["nanopb_path"] = env.relcwdoutpath(env.get(":ext:nanopb:path", "."))
     if subs["platform"] == "avr":
         subs.update(env.query("::avrdude_options"))
     if subs["platform"] == "sam":

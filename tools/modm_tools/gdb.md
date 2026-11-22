@@ -46,7 +46,7 @@ python3 -m modm_tools.gdb --elf path/to/project.elf -x modm/gdbinit --ui=tui \
 ```
 
 To analyze a core dump, you can use the `CrashDebug` GDB backend.
-See the `modm:crashcatcher` module for details.
+See the `modm:ext:crashcatcher` module for details.
 
 ```sh
 # Using CrashDebug for Post-Mortem debugging

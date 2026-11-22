@@ -6,6 +6,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:i2c:1</module>
-    <module>modm:vl53:vl53l5cx</module>
+    <module>modm:ext:vl53:vl53l5cx</module>
   </modules>
 </library>

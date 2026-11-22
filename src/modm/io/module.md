@@ -2,7 +2,7 @@
 
 The `modm::IOStream` class contains efficient formatting that supports both
 C++ `std::basic_ostream`-like formatting via `operator <<` as well as
-implementing `printf` via the `modm:printf` module.
+implementing `printf` via the `modm:ext:printf` module.
 
 ```cpp
 modm::IOStream stream(device);

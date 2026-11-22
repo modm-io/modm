@@ -26,7 +26,7 @@ def prepare(module, options):
     device = options[":target"]
 
     module.depends(":architecture:assert", ":architecture:interrupt", ":architecture:register",
-                   ":cmsis:device", ":platform:rcc")
+                   ":ext:cmsis:device", ":platform:rcc")
 
     if (not device.has_driver("dma")) or device.get_driver("dma")["type"] not in \
             [

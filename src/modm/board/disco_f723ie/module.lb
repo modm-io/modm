@@ -26,8 +26,8 @@ however, you can reassign it to HS via this option:
 
 ```xml
 <options>
-  <option name="modm:tinyusb:config">device.cdc,device.msc</option>
-  <option name="modm:tinyusb:device:port">hs</option>
+  <option name="modm:ext:tinyusb:config">device.cdc,device.msc</option>
+  <option name="modm:ext:tinyusb:device:port">hs</option>
 </options>
 ```
 
@@ -37,9 +37,9 @@ if you assign them to different ports:
 ```xml
 ```xml
 <options>
-  <option name="modm:tinyusb:config">device.cdc,device.msc</option>
-  <option name="modm:tinyusb:device:port">fs</option>
-  <option name="modm:tinyusb:host:port">hs</option>
+  <option name="modm:ext:tinyusb:config">device.cdc,device.msc</option>
+  <option name="modm:ext:tinyusb:device:port">fs</option>
+  <option name="modm:ext:tinyusb:host:port">hs</option>
 </options>
 ```
 """

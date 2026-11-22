@@ -54,7 +54,7 @@ def prepare(module, options):
         ":architecture:assert",
         ":architecture:can",
         ":architecture:clock",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:can.common",
         ":platform:can.common.fdcan",
         ":platform:gpio")

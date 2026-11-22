@@ -28,7 +28,7 @@ The USB Type-C connector is connected to the OTG_HS port with the internal HS
 PHY, so you must configure TinyUSB to use the HS port:
 
 ```xml
-<option name="modm:tinyusb:device:port">hs</option>
+<option name="modm:ext:tinyusb:device:port">hs</option>
 ```
 """
 

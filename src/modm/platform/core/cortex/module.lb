@@ -219,10 +219,10 @@ def common_linkerscript(env):
 
         "with_thread_local": env.has_module(":processing:fiber") and
                              env.get(":processing:fiber:thread_local", False),
-        "with_cpp_exceptions": env.get(":stdc++:exceptions", False),
+        "with_cpp_exceptions": env.get(":ext:stdc++:exceptions", False),
         "with_heap": env.has_module(":platform:heap"),
-        "with_printf": env.has_module(":printf"),
-        "with_crashcatcher": env.has_module(":crashcatcher"),
+        "with_printf": env.has_module(":ext:printf"),
+        "with_crashcatcher": env.has_module(":ext:crashcatcher"),
         "no_heap_section": common_no_heap_section,
         "no_printf_section": common_no_printf_section,
         "no_thread_local_section": common_no_thread_local_section,
@@ -242,9 +242,9 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:utils",
-        ":stdc++")
+        ":ext:stdc++")
 
     module.add_option(
         NumericOption(
@@ -391,7 +391,7 @@ def build(env):
         "with_assert": env.has_module(":architecture:assert"),
         "with_fpu": env.get("float-abi", "soft") != "soft",
         "with_multicore": env.has_module(":platform:multicore"),
-        "with_rtt": env.has_module(":rtt"),
+        "with_rtt": env.has_module(":ext:rtt"),
         "with_msplim": sum(c.isnumeric() for c in core) == 2,
         "enable_icache": env.get("enable_icache", False),
         "enable_dcache": enable_dcache,
@@ -445,7 +445,7 @@ def build(env):
         env.template("../../heap/cortex/no_heap.c.in", "no_heap.c")
     # Deprecate printf functions if not implemented!
     env.collect(":build:ccflags", "-fno-builtin-printf")
-    if not env.has_module(":printf"):
+    if not env.has_module(":ext:printf"):
         env.substitutions["no_printf_section"] = common_no_printf_section
         env.template(repopath("ext/eyalroz/no_printf.c.in"), "no_printf.c")
     # The TLS implementation overrides this weak function

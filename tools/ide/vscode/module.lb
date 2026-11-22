@@ -77,7 +77,7 @@ def post_build(env):
     env.substitutions = {
         "configs": configs,
         "partname": env[":target"].partname.upper(),
-        "with_freertos": env.has_module(":freertos"),
+        "with_freertos": env.has_module(":ext:freertos"),
         "platform": core,
         "profiles": profiles,
         "include_paths": env.collector_values("::path.include") + env.collector_values("::path.include.system"),

@@ -24,30 +24,30 @@ class CmsisDspModule(Module):
                              .replace("Math", "_math").lower()
 
     def init(self, module):
-        module.name = ":cmsis:dsp:{}".format(self.name)
+        module.name = ":ext:cmsis:dsp:{}".format(self.name)
         module.description = "DSP {}".format(" ".join(s.capitalize()
                                              for s in self.name.split("_")))
 
     def prepare(self, module, options):
         dependencies = {
             "basic_math": [],
-            "bayes": [":cmsis:dsp:statistics"],
-            "complex_math": [":cmsis:dsp:fast_math"],
-            "controller": [":cmsis:dsp:tables"],
-            "distance": [":cmsis:dsp:statistics", ":cmsis:dsp:basic_math",
-                         ":cmsis:dsp:fast_math", ":cmsis:dsp:tables"],
-            "fast_math": [":cmsis:dsp:tables"],
-            "filtering": [":cmsis:dsp:fast_math", ":cmsis:dsp:tables", ":cmsis:dsp:support"],
+            "bayes": [":ext:cmsis:dsp:statistics"],
+            "complex_math": [":ext:cmsis:dsp:fast_math"],
+            "controller": [":ext:cmsis:dsp:tables"],
+            "distance": [":ext:cmsis:dsp:statistics", ":ext:cmsis:dsp:basic_math",
+                         ":ext:cmsis:dsp:fast_math", ":ext:cmsis:dsp:tables"],
+            "fast_math": [":ext:cmsis:dsp:tables"],
+            "filtering": [":ext:cmsis:dsp:fast_math", ":ext:cmsis:dsp:tables", ":ext:cmsis:dsp:support"],
             "interpolation": [],
-            "matrix": [":cmsis:dsp:basic_math", ":cmsis:dsp:fast_math"],
+            "matrix": [":ext:cmsis:dsp:basic_math", ":ext:cmsis:dsp:fast_math"],
             "quaternion_math": [],
-            "statistics": [":cmsis:dsp:basic_math", ":cmsis:dsp:fast_math"],
+            "statistics": [":ext:cmsis:dsp:basic_math", ":ext:cmsis:dsp:fast_math"],
             "support": [],
             "svm": [],
-            "tables": [":cmsis:dsp:transform"],
-            "transform": [":cmsis:dsp:basic_math", ":cmsis:dsp:complex_math",
-                          ":cmsis:dsp:matrix", ":cmsis:dsp:statistics",
-                          ":cmsis:dsp:tables"],
+            "tables": [":ext:cmsis:dsp:transform"],
+            "transform": [":ext:cmsis:dsp:basic_math", ":ext:cmsis:dsp:complex_math",
+                          ":ext:cmsis:dsp:matrix", ":ext:cmsis:dsp:statistics",
+                          ":ext:cmsis:dsp:tables"],
             "window": []
         }
         module.depends(*dependencies[self.name])
@@ -75,12 +75,12 @@ class CmsisDspModule(Module):
             includes.append(self.name)
             operations |= env.copy("cmsis-dsp/Include/dsp/{}_functions.h".format(self.name),
                                    "dsp/{}_functions.h".format(self.name))
-            if env[":cmsis:dsp:with_f16"]:
+            if env[":ext:cmsis:dsp:with_f16"]:
                 operations |= env.copy("cmsis-dsp/Include/dsp/{}_functions_f16.h".format(self.name),
                                        "dsp/{}_functions_f16.h".format(self.name))
 
         operations |= env.copy("cmsis-dsp/Source/{}".format(self.path), self.path,
-                               ignore=env.ignore_files("" if env[":cmsis:dsp:with_f16"] else "*_f16*"))
+                               ignore=env.ignore_files("" if env[":ext:cmsis:dsp:with_f16"] else "*_f16*"))
 
         # For all sources add these compile flags
         for key, values in metadata.items():
@@ -89,7 +89,7 @@ class CmsisDspModule(Module):
 
 # =============================================================================
 def init(module):
-    module.name = ":cmsis:dsp"
+    module.name = ":ext:cmsis:dsp"
     module.description = FileReader("dsp.md")
 
 def prepare(module, options):

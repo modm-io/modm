@@ -5,9 +5,9 @@
   <!-- <extends>modm:nucleo-l152re</extends> -->
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:cmsis:dsp:filtering</module>
-    <module>modm:cmsis:dsp:basic_math</module>
-    <module>modm:cmsis:dsp:statistics</module>
+    <module>modm:ext:cmsis:dsp:filtering</module>
+    <module>modm:ext:cmsis:dsp:basic_math</module>
+    <module>modm:ext:cmsis:dsp:statistics</module>
     <module>modm:platform:core</module>
     <module>modm:debug</module>
   </modules>

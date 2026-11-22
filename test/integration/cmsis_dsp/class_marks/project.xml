@@ -9,8 +9,8 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:cmsis:dsp:matrix</module>
-    <module>modm:cmsis:dsp:statistics</module>
+    <module>modm:ext:cmsis:dsp:matrix</module>
+    <module>modm:ext:cmsis:dsp:statistics</module>
     <module>modm:platform:core</module>
     <module>modm:debug</module>
     <!-- Required for modm:nucleo-f429zi -->

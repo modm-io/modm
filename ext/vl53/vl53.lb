@@ -41,7 +41,7 @@ class Vl53lmz(Module):
         env.collect(":build:path.include", "modm/ext/vl53/vl53lmz/inc")
 
 def init(module):
-    module.name = ":vl53"
+    module.name = ":ext:vl53"
     module.description = """
 # ST's VL53 Time-of-Flight ULD Drivers
 

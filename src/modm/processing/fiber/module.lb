@@ -19,10 +19,10 @@ def init(module):
 def prepare(module, options):
     module.depends(":architecture:clock", ":architecture:atomic",
                    ":architecture:assert", ":architecture:fiber",
-                   ":architecture:interrupt", ":stdc++")
+                   ":architecture:interrupt", ":ext:stdc++")
 
     core = options[":target"].get_driver("core")["type"]
-    if core.startswith("cortex-m"): module.depends(":cmsis:device")
+    if core.startswith("cortex-m"): module.depends(":ext:cmsis:device")
     if core.startswith("cortex-m") or core.startswith("avr"):
         module.add_option(
             BooleanOption(name="thread_local", default=False,

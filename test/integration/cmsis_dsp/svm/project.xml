@@ -5,7 +5,7 @@
   <!-- <extends>modm:nucleo-h563zi</extends> -->
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:cmsis:dsp:svm</module>
+    <module>modm:ext:cmsis:dsp:svm</module>
     <module>modm:platform:core</module>
     <module>modm:debug</module>
   </modules>

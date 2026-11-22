@@ -2,13 +2,13 @@
   <extends>modm:disco-f303vc</extends>
   <!-- <extends>modm:weact-u585ci</extends> -->
   <options>
-    <option name="modm:tinyusb:config">device.dfu_rt</option>
+    <option name="modm:ext:tinyusb:config">device.dfu_rt</option>
   </options>
   <modules>
     <module>modm:build:scons</module>
     <module>modm:build:make</module>
     <module>modm:platform:sysboot</module>
-    <module>modm:tinyusb</module>
+    <module>modm:ext:tinyusb</module>
     <module>modm:processing:timer</module>
     <module>modm:io</module>
   </modules>

@@ -14,8 +14,8 @@ buffer sizes indexed by channel. Here is an example of three channels:
 <!-- Channel0: TX only with 256B buffer -->
 <!-- Channel1: RX only with 128B buffer -->
 <!-- Channel2: TX with 512B and RX with 64B buffer -->
-<option name="modm:rtt:buffer.tx">256, 0, 512</option>
-<option name="modm:rtt:buffer.rx">0, 128, 64</option>
+<option name="modm:ext:rtt:buffer.tx">256, 0, 512</option>
+<option name="modm:ext:rtt:buffer.rx">0, 128, 64</option>
 ```
 
 You can set the buffer size to `0` if you don't want to use this channel

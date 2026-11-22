@@ -18,7 +18,7 @@ def prepare(module, options):
     # Only devices that can jump into their bootloader have an entry address
     if "entry" not in (options[":target"].get_driver("sysboot:stm32") or {}):
         return False
-    module.depends(":cmsis:device", ":platform:core")
+    module.depends(":ext:cmsis:device", ":platform:core")
     return True
 
 def build(env):

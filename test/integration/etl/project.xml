@@ -12,7 +12,7 @@
   <modules>
     <module>modm:platform:core</module>
     <module>modm:debug</module>
-    <module>modm:etl</module>
+    <module>modm:ext:etl</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

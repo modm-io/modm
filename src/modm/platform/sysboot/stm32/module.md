@@ -26,7 +26,7 @@ version 2).
 
 ## USB DFU Runtime
 
-With the TinyUSB DFU runtime class (`modm:tinyusb:config` = `device.dfu_rt`),
+With the TinyUSB DFU runtime class (`modm:ext:tinyusb:config` = `device.dfu_rt`),
 the host can request the reboot via `dfu-util -e`. Delay the reset so that
 TinyUSB can still answer the `DFU_DETACH` request:
 

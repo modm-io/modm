@@ -3,7 +3,7 @@
   <modules>
     <module>modm:driver:bme280</module>
     <module>modm:driver:ssd1306</module>
-    <module>modm:ros</module>
+    <module>modm:ext:ros</module>
     <module>modm:communication:ros</module>
     <module>modm:processing:fiber</module>
     <module>modm:platform:i2c:1</module>

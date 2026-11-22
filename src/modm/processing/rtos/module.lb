@@ -25,13 +25,13 @@ def prepare(module, options):
         return False
 
     if options[":target"].identifier["platform"] not in ["hosted"]:
-        module.depends(":freertos",":platform:heap")
+        module.depends(":ext:freertos",":platform:heap")
 
     return True
 
 def build(env):
     env.outbasepath = "modm/src/modm/processing/"
-    if env.has_module(":freertos"):
+    if env.has_module(":ext:freertos"):
         env.copy("freertos", "rtos")
     elif env[":target"].identifier["platform"] in ["hosted"]:
         env.copy("stdlib", "rtos")

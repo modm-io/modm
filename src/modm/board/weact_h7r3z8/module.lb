@@ -57,7 +57,7 @@ scons log-rtt
 ## USB
 
 Use `Board::initializeUsbFs()` or `Board::initializeUsbHs()` and select the
-TinyUSB port with `modm:tinyusb:device:port`. `Board::initializeUsb()`
+TinyUSB port with `modm:ext:tinyusb:device:port`. `Board::initializeUsb()`
 initializes both ports.
 """
 

@@ -15,14 +15,14 @@ from pathlib import Path
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.name = ":cmsis:device"
+    module.name = ":ext:cmsis:device"
 
 def prepare(module, options):
     device = options[":target"]
     if device.identifier["platform"] != "sam":
         return False
 
-    module.depends(":cmsis:core")
+    module.depends(":ext:cmsis:core")
 
     module.add_query(
         EnvironmentQuery(name="clock-map", factory=clock_map))
@@ -104,7 +104,6 @@ def validate(env):
 
 def build(env):
     global pp
-    env.collect(":build:path.include", "modm/ext")
     env.collect(":build:path.include.system", "modm/ext/cmsis/device")
 
     env.outbasepath = "modm/ext/cmsis/device"

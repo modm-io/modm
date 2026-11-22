@@ -47,7 +47,7 @@ For *debug builds*:
 
 - `-std=c++23`: use C++23
 
-For exception and RTTI flags, see `modm:stdc++` module.
+For exception and RTTI flags, see `modm:ext:stdc++` module.
 
 #### Linker
 

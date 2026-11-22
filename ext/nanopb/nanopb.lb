@@ -17,7 +17,7 @@ import tempfile
 from pathlib import Path
 
 def init(module):
-    module.name = ":nanopb"
+    module.name = ":ext:nanopb"
     module.description = """
 # Nanopb - Protocol Buffers for Embedded Systems
 
@@ -31,8 +31,8 @@ See https://github.com/nanopb/nanopb.
 ## Build System Integration
 
 You can optionally point the build system to multiple protofiles using a
-comma-separated list of paths in the `modm:nanopb:source` option.
-You can specify the output location using the `modm:nanopb:path` option.
+comma-separated list of paths in the `modm:ext:nanopb:source` option.
+You can specify the output location using the `modm:ext:nanopb:path` option.
 See the `modm:build` submodules for further details.
 
 !!! bug "Currently only with SCons support"

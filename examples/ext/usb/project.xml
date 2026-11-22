@@ -43,20 +43,20 @@
   <options>
     <!-- Required for modm:blue-pill-f103, modm:black-pill-f401, modm:black-pill-f411 -->
     <!-- <option name="modm:build:openocd.cfg">interface/stlink.cfg</option> -->
-    <option name="modm:tinyusb:config">device.cdc,device.msc</option>
+    <option name="modm:ext:tinyusb:config">device.cdc,device.msc</option>
     <!-- <option name="modm:board:weact-h562rg:logger">RTT</option> -->
     <!-- <option name="modm:board:weact-h503cb:with_rtt">yes</option> -->
-    <!-- <option name="modm:tinyusb:config">device.cdc,device.midi</option> -->
+    <!-- <option name="modm:ext:tinyusb:config">device.cdc,device.midi</option> -->
 
     <!-- Required for modm:disco-f429zi, modm:nucleo-h7s3l8, optional for modm:weact-h7r3z8 (HS connector) -->
-    <!-- <option name="modm:tinyusb:device:port">hs</option> -->
+    <!-- <option name="modm:ext:tinyusb:device:port">hs</option> -->
 
     <!-- Required for modm:nucleo-h723zg, modm:nucleo-h7a3zi-q, modm:disco-f429zi -->
-    <!-- <option name="modm:tinyusb:max-speed">full</option> -->
+    <!-- <option name="modm:ext:tinyusb:max-speed">full</option> -->
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:tinyusb</module>
+    <module>modm:ext:tinyusb</module>
     <module>modm:processing:timer</module>
     <module>modm:io</module>
   </modules>

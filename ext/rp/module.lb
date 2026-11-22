@@ -13,14 +13,14 @@
 import os
 
 def init(module):
-    module.name = ":cmsis:device"
+    module.name = ":ext:cmsis:device"
 
 def prepare(module, options):
     device = options[":target"]
     if not device.identifier["platform"] == "rp":
         return False
 
-    module.depends(":cmsis:core")
+    module.depends(":ext:cmsis:core")
     return True
 
 def build(env):
@@ -39,7 +39,7 @@ def build(env):
     env.copy("pico-sdk/rp2040", "")
     env.copy("address_mapped.h", "hardware/address_mapped.h")
 
-    if env.has_module(":tinyusb"):
+    if env.has_module(":ext:tinyusb"):
         env.substitutions = {
             "with_debug": env.has_module(":debug"),
             "with_multicore": env.has_module(":platform:multicore"),

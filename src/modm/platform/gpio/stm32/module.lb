@@ -157,7 +157,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:gpio",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:utils",
         ":platform:rcc")
 

@@ -47,7 +47,7 @@ def prepare(module, options):
         ":architecture:spi",
         ":architecture:assert",
         ":architecture:fiber",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:algorithm",
         ":platform:gpio",
         ":platform:clockgen")

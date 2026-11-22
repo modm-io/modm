@@ -5,7 +5,7 @@
     <option name="modm:build:build.path">../../build/generated-unittest/rp-pico/</option>
     <option name="modm:build:unittest.source">../../build/generated-unittest/rp-pico/modm-test</option>
     <option name="modm:board:rp-pico:with_logger">true</option>
-    <option name="modm:tinyusb:config">device.cdc</option>
+    <option name="modm:ext:tinyusb:config">device.cdc</option>
   </options>
   <modules>
     <module>modm:platform:heap</module>

@@ -49,7 +49,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:i2c",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:algorithm",
         ":platform:gpio")
 

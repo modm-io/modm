@@ -46,7 +46,7 @@ def prepare(module, options):
     if cluster(device.identifier) is None:
         return False
 
-    module.depends(":cmsis:device", ":platform:cortex-m",
+    module.depends(":ext:cmsis:device", ":platform:cortex-m",
                    ":architecture:register", ":architecture:fiber", ":architecture:atomic",
                    ":architecture:block.device")
     module.add_query(EnvironmentQuery(name="write_size", factory=write_size))
@@ -150,7 +150,7 @@ def build(env):
     subs["vtor_ram"] = env.get(":platform:cortex-m:vector_table_location", "rom") == "ram"
     subs["clock"] = env.has_module(":platform:clock")
     subs["tick"] = (not subs["basepri"] and subs["clock"] and
-                    not env.has_module(":freertos"))
+                    not env.has_module(":ext:freertos"))
 
     # Typical times in microseconds of programming a unit, a burst and erasing
     # a page or sector, from the datasheets. A fiber sleeps this long during an

@@ -71,7 +71,7 @@ def prepare(module, options):
         ":architecture:uart",
         ":architecture:fiber",
         ":math:algorithm",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio",
         ":platform:clockgen")
 

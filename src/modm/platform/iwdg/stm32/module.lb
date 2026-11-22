@@ -39,7 +39,7 @@ the hardware watchdog option byte is set, it starts again after every reset.
 def prepare(module, options):
     device = options[":target"]
 
-    module.depends(":cmsis:device", ":math:algorithm")
+    module.depends(":ext:cmsis:device", ":math:algorithm")
     return device.has_driver("iwdg:stm32")
 
 

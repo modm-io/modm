@@ -25,7 +25,7 @@ def prepare(module, options):
         ":architecture:clock",
         ":architecture:atomic",
         ":math:algorithm",
-        ":cmsis:device")
+        ":ext:cmsis:device")
 
     module.add_query(
         EnvironmentQuery(name="reference_clock", factory=systick_reference_clock))
@@ -85,8 +85,8 @@ def build(env):
         freq = 4
 
     env.substitutions = {
-        "systick_frequency": env.get(":freertos:frequency", freq),
-        "has_freertos": env.has_module(":freertos"),
+        "systick_frequency": env.get(":ext:freertos:frequency", freq),
+        "has_freertos": env.has_module(":ext:freertos"),
         # Keeps counting during flash operations, see :platform:flash
         "ramcode": target.platform == "stm32" and env.has_module(":platform:flash"),
         "lock_free": "m7" in core,

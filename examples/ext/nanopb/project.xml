@@ -7,10 +7,10 @@
   <!-- <extends>modm:nucleo-u575zi-q</extends> -->
   <!-- <extends>modm:nucleo-u5a5zj-q</extends> -->
   <options>
-    <option name="modm:nanopb:sources">protocol/simple.proto,protocol/complex.proto</option>
+    <option name="modm:ext:nanopb:sources">protocol/simple.proto,protocol/complex.proto</option>
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:nanopb</module>
+    <module>modm:ext:nanopb</module>
   </modules>
 </library>

@@ -18,7 +18,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("pmc:sam*"):
         return False
 
-    module.depends(":cmsis:device", ":platform:clock")
+    module.depends(":ext:cmsis:device", ":platform:clock")
     return True
 
 def build(env):

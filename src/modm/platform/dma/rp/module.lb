@@ -16,7 +16,7 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":cmsis:device", ":platform:clockgen")
+    module.depends(":ext:cmsis:device", ":platform:clockgen")
     return options[":target"].has_driver("dma:rp20*")
 
 

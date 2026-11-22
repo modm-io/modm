@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":cmsis:core"
+    module.name = ":ext:cmsis:core"
     module.description = FileReader("core.md")
 
 def prepare(module, options):

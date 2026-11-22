@@ -5,7 +5,7 @@
   </options>
   <modules>
     <module>modm:platform:flash</module>
-    <module>modm:nlohmann-json</module>
+    <module>modm:ext:nlohmann-json</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

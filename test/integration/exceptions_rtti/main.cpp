@@ -17,7 +17,7 @@
 
 /**
  * Tests that C++ exceptions and RTTI work on the microcontroller when the
- * `modm:stdc++:exceptions` and `modm:stdc++:rtti` options are enabled.
+ * `modm:ext:stdc++:exceptions` and `modm:ext:stdc++:rtti` options are enabled.
  */
 
 struct Base { virtual ~Base() = default; };

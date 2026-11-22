@@ -17,7 +17,7 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends(":cmsis:device")
+    module.depends(":ext:cmsis:device")
 
     device = options[":target"]
     return device.has_driver("power:nrf*") or device.has_driver("regulators:nrf*")

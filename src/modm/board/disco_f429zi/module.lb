@@ -28,10 +28,10 @@ firmware! See Section 6.3 "Embedded ST-LINK/V2-B" of UM1670.
 To use the USB port, you must configure TinyUSB to use the HS port in FS mode:
 
 ```xml
-<option name="modm:tinyusb:max-speed">full</option>
+<option name="modm:ext:tinyusb:max-speed">full</option>
 <!-- place either the device or host classes on the HS port -->
-<option name="modm:tinyusb:device:port">hs</option>
-<option name="modm:tinyusb:host:port">hs</option>
+<option name="modm:ext:tinyusb:device:port">hs</option>
+<option name="modm:ext:tinyusb:host:port">hs</option>
 ```
 """
 

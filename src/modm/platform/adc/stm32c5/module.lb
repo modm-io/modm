@@ -55,7 +55,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:adc",
         ":architecture:delay",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio",
         ":platform:rcc")
 

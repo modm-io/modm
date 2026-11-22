@@ -53,7 +53,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:register",
         ":architecture:spi",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:algorithm",
         ":platform:gpio",
         ":platform:clockgen")

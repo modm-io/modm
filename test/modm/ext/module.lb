@@ -16,7 +16,7 @@ def init(module):
 
 
 def prepare(module, options):
-    module.depends("modm:stdc++")
+    module.depends("modm:ext:stdc++")
     return True
 
 

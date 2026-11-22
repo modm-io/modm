@@ -235,7 +235,7 @@ def prepare(module, options):
         ":math:algorithm",
         ":architecture:delay",
         ":architecture:register",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio",
         ":platform:rcc")
 

@@ -32,7 +32,7 @@ def StrictVersion(v):
 
 # Check for miminum required lbuild version
 import lbuild
-min_lbuild_version = "1.24.1"
+min_lbuild_version = "1.24.2"
 if StrictVersion(getattr(lbuild, "__version__", "0.1.0")) < StrictVersion(min_lbuild_version):
     print("modm requires at least lbuild v{}, please upgrade!\n"
           "    pip3 install -U lbuild".format(min_lbuild_version))
@@ -186,6 +186,15 @@ def init(repo):
     repo.format_description = modm_format_description
     repo.format_short_description = modm_format_short_description
     repo.add_ignore_patterns("*/*.lb", "*/board.xml")
+
+    # DEPRECATED: 2027q4
+    # Redirect the old top-level names of the external modules
+    for old, new in {**{name: name for name in (
+            "cmsis", "crashcatcher", "eigen", "etl", "fatfs", "fatfs.petit", "freertos",
+            "lvgl", "nanopb", "nlohmann-json", "o1heap", "printf", "ros", "rtt", "stdc",
+            "stdc++", "tinyusb", "vl53", "zms")}, "zephyr-heap": "zheap"}.items():
+        repo.add_alias(Alias(name=old, destination=f":ext:{new}",
+                             description=f"Deprecated: use `modm:ext:{new}` instead."))
 
     # Add the board configuration files as their module name aliases
     for module in Path(repopath("src/modm/board")).glob("*/module.lb"):

@@ -137,11 +137,11 @@ integrated into modm. The lbuild configuration is as simple as this:
 ```xml
 <library>
   <options>
-    <option name="modm:tinyusb:config">device.vendor</option>
+    <option name="modm:ext:tinyusb:config">device.vendor</option>
   </options>
   <modules>
-    <module>modm:tinyusb</module>
-    <module>modm:cmsis:dap</module>
+    <module>modm:ext:tinyusb</module>
+    <module>modm:ext:cmsis:dap</module>
   </modules>
 </library>
 ```

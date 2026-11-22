@@ -10,11 +10,11 @@ microcontrollers.
 
 We use only use these parts of CMSIS:
 
-- The `modm:cmsis:core` module provides access to the ARM Cortex-M peripherals
+- The `modm:ext:cmsis:core` module provides access to the ARM Cortex-M peripherals
   via CMSIS-CORE.
-- The `modm:cmsis:device` module provides access to the peripherals of the
+- The `modm:ext:cmsis:device` module provides access to the peripherals of the
   `modm:target` devices via the vendor's CMSIS implementation.
-- The `modm:cmsis:dsp` module provides an optimized compute library via
+- The `modm:ext:cmsis:dsp` module provides an optimized compute library via
   CMSIS-DSP.
 
 [cmsis]: https://developer.arm.com/embedded/cmsis

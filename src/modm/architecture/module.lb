@@ -144,7 +144,7 @@ class Clock(Module):
         module.description = FileReader("interface/clock.md")
 
     def prepare(self, module, options):
-        module.depends(":stdc++")
+        module.depends(":ext:stdc++")
         return True
 
     def build(self, env):
@@ -171,7 +171,7 @@ class Fiber(Module):
         module.description = FileReader("interface/fiber.md")
 
     def prepare(self, module, options):
-        module.depends(":stdc++", ":architecture:atomic", ":architecture:clock",
+        module.depends(":ext:stdc++", ":architecture:atomic", ":architecture:clock",
                        ":architecture:interrupt")
         return True
 

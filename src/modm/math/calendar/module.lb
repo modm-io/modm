@@ -15,7 +15,7 @@ def init(module):
     module.description = "Calendar Operations"
 
 def prepare(module, options):
-    module.depends(":stdc++")
+    module.depends(":ext:stdc++")
     return True
 
 def build(env):

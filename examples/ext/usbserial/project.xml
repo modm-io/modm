@@ -3,12 +3,12 @@
    <!-- <extends>modm:samd21-mini</extends> -->
    <options>
      <option name="modm:build:lto">yes</option>
-    <option name="modm:tinyusb:config">device.cdc</option>
+    <option name="modm:ext:tinyusb:config">device.cdc</option>
    </options>
    <modules>
      <module>modm:build:scons</module>
      <module>modm:build:make</module>
-     <module>modm:tinyusb</module>
+     <module>modm:ext:tinyusb</module>
      <module>modm:processing:timer</module>
      <module>modm:io</module>
    </modules>

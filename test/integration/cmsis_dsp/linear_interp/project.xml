@@ -6,8 +6,8 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:build:make</module>
-    <module>modm:cmsis:dsp:fast_math</module>
-    <module>modm:cmsis:dsp:interpolation</module>
+    <module>modm:ext:cmsis:dsp:fast_math</module>
+    <module>modm:ext:cmsis:dsp:interpolation</module>
     <module>modm:platform:core</module>
     <module>modm:debug</module>
   </modules>

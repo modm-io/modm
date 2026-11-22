@@ -89,7 +89,7 @@ def prepare(module, options):
         ":architecture:delay",
         ":architecture:i2c",
         ":architecture:interrupt",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":container",
         ":math:utils",
         ":platform:gpio")

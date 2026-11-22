@@ -87,7 +87,7 @@ memory.
 
 ### Zephyr
 
-The `sys_heap` allocator of the Zephyr RTOS (see `modm:zephyr-heap`) manages
+The `sys_heap` allocator of the Zephyr RTOS (see `modm:ext:zheap`) manages
 memory in 8 byte chunks with power-of-two size buckets and searches only a
 bounded number of free blocks, so its execution time is bounded, while its
 fragmentation is close to newlib. Every memory region gets its own small heap
@@ -98,7 +98,7 @@ aligned `new` natively.
 
 ### O(1) Heap
 
-The o1heap allocator (see `modm:o1heap`) has the lowest and flattest execution
+The o1heap allocator (see `modm:ext:o1heap`) has the lowest and flattest execution
 time of all allocators, since it rounds every block up to the next power of
 two. This wastes up to half of the memory and limits the largest block to the
 largest power of two that fits into a region. Every memory region gets its own

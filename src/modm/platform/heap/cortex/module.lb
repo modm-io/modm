@@ -29,7 +29,7 @@ def continuous_ram_sizes(target):
 
 
 # Allocators with one instance per HeapTable region (heap_regions.cpp.in)
-REGION_ALLOCATORS = {"o1heap": ":o1heap", "zephyr": ":zephyr-heap"}
+REGION_ALLOCATORS = {"o1heap": ":ext:o1heap", "zephyr": ":ext:zheap"}
 # Removed allocators and their replacement
 DEPRECATED_ALLOCATORS = {"tlsf": "zephyr", "block": "newlib"} # DEPRECATED: 2027q4
 

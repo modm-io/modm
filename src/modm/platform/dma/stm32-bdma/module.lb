@@ -81,7 +81,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    module.depends(":cmsis:device", ":platform:rcc")
+    module.depends(":ext:cmsis:device", ":platform:rcc")
 
     if not device.identifier.platform == "stm32":
         return False

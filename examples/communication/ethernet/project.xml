@@ -7,7 +7,7 @@
   </options>
   <modules>
     <module>modm:build:scons</module>
-    <module>modm:freertos:tcp:lan8720a</module>
+    <module>modm:ext:freertos:tcp:lan8720a</module>
     <module>modm:processing:rtos</module>
   </modules>
 </library>

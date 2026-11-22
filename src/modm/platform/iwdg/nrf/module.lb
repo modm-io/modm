@@ -43,7 +43,7 @@ Use `Wdt::isRunning()` after reset to detect a watchdog left running.
 def prepare(module, options):
     device = options[":target"]
 
-    module.depends(":cmsis:device", ":math:algorithm")
+    module.depends(":ext:cmsis:device", ":math:algorithm")
     return device.has_driver("wdt:nrf*")
 
 

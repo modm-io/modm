@@ -100,7 +100,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:units",
         ":platform:gpio",
         ":platform:rcc")
@@ -114,7 +114,7 @@ def build(env):
     if not (env[":target"].has_driver("usb_otg_fs") or
             env[":target"].has_driver("usb_otg_hs")):
         generate_instance(env, "fs")
-    if env.has_module(":tinyusb:device:cdc"):
+    if env.has_module(":ext:tinyusb:device:cdc"):
         env.copy(repopath("ext/hathach/uart.hpp"), "uart.hpp")
 
 

@@ -3,17 +3,17 @@
   <!-- <extends>modm:nucleo-f429zi</extends> -->
   <options>
     <option name="modm:build:lto">yes</option>
-    <option name="modm:tinyusb:config">device.msc, device.cdc</option>
+    <option name="modm:ext:tinyusb:config">device.msc, device.cdc</option>
   </options>
   <modules>
     <module>modm:processing:timer</module>
-    <module>modm:tinyusb</module>
-    <module>modm:fatfs</module>
+    <module>modm:ext:tinyusb</module>
+    <module>modm:ext:fatfs</module>
     <module>modm:platform:flash</module>
     <module>modm:build:scons</module>
     <module>modm:math:utils</module>
     <!-- Required when using CFG_TUSB_DEBUG on e.g. modm:nucleo-f429zi -->
-    <!-- <module>modm:printf</module> -->
+    <!-- <module>modm:ext:printf</module> -->
   </modules>
   <collectors>
     <!-- For debug output via STLink on e.g. modm:nucleo-f429zi -->

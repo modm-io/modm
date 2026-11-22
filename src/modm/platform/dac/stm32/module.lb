@@ -81,7 +81,7 @@ def prepare(module, options):
         for instance in listify(driver["instance"]):
             module.add_submodule(Instance(int(instance)))
 
-    module.depends(":cmsis:device")
+    module.depends(":ext:cmsis:device")
     return True
 
 

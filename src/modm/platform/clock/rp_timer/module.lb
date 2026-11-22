@@ -18,7 +18,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("timer:rp20"):
         return False
 
-    module.depends(":architecture:clock", ":cmsis:device")
+    module.depends(":architecture:clock", ":ext:cmsis:device")
     return True
 
 def build(env):

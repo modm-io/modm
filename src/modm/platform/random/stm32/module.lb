@@ -15,7 +15,7 @@ def init(module):
     module.description = "Random Number Generator (RNG)"
 
 def prepare(module, options):
-    module.depends(":cmsis:device", ":platform:rcc")
+    module.depends(":ext:cmsis:device", ":platform:rcc")
     return options[":target"].has_driver("rng:stm32")
 
 def build(env):

@@ -132,7 +132,7 @@ loop 53
 ^C
 ```
 
-See the `modm:rtt` module for more options.
+See the `modm:ext:rtt` module for more options.
 
 
 ## Customization

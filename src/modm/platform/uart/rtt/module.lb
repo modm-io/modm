@@ -20,13 +20,13 @@ def prepare(module, options):
         return False
 
     module.add_alias(
-        Alias(name="buffer.tx", destination=":rtt:buffer.tx",
-              description="Moved to the `modm:rtt` module"))
+        Alias(name="buffer.tx", destination=":ext:rtt:buffer.tx",
+              description="Moved to the `modm:ext:rtt` module"))
     module.add_alias(
-        Alias(name="buffer.rx", destination=":rtt:buffer.rx",
-              description="Moved to the `modm:rtt` module"))
+        Alias(name="buffer.rx", destination=":ext:rtt:buffer.rx",
+              description="Moved to the `modm:ext:rtt` module"))
 
-    module.depends(":architecture:uart", ":architecture:fiber", ":rtt")
+    module.depends(":architecture:uart", ":architecture:fiber", ":ext:rtt")
     return True
 
 

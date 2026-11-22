@@ -19,4 +19,4 @@ if (char data; stream.get(data), data != modm::IOStream::eof)
 { /* process new data */ }
 ```
 
-To configure the number and size of RTT channels, see the `modm:rtt` module.
+To configure the number and size of RTT channels, see the `modm:ext:rtt` module.

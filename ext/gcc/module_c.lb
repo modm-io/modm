@@ -14,7 +14,7 @@
 
 
 def init(module):
-    module.name = ":stdc"
+    module.name = ":ext:stdc"
     module.description = """
 # C Standard Environment
 
@@ -46,6 +46,6 @@ def build(env):
 
         # Compiler options for targets
         env.collect(":build:linkflags", "--specs=nosys.specs")
-        if not env.get(":stdc++:exceptions", False):
+        if not env.get(":ext:stdc++:exceptions", False):
             # Newlib Nano does not support C++ exceptions at all
             env.collect(":build:linkflags", "--specs=nano.specs")

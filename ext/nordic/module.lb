@@ -81,12 +81,12 @@ def _peripheral_aliases(src_dir, define):
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.name = ":cmsis:device"
+    module.name = ":ext:cmsis:device"
 
 
 def prepare(module, options):
     module.add_query(EnvironmentQuery(name="peripherals", factory=common_peripherals))
-    module.depends(":cmsis:core")
+    module.depends(":ext:cmsis:core")
     return options[":target"].identifier.platform == "nrf"
 
 

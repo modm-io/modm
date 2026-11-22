@@ -29,7 +29,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:uart",
         ":architecture:fiber",
-        ":cmsis:device")
+        ":ext:cmsis:device")
 
     module.add_option(
         NumericOption(name="buffer.tx", description=descr_buffer_tx,

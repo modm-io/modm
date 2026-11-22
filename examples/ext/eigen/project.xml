@@ -8,6 +8,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:platform:heap</module>
-    <module>modm:eigen</module>
+    <module>modm:ext:eigen</module>
   </modules>
 </library>

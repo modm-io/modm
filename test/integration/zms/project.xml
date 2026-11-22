@@ -4,7 +4,7 @@
   <modules>
     <module>modm:platform:flash</module>
     <module>modm:platform:iwdg</module>
-    <module>modm:zms</module>
+    <module>modm:ext:zms</module>
     <module>modm:build:scons</module>
   </modules>
 </library>

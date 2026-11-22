@@ -26,7 +26,7 @@ def prepare(module, options):
             minimum=1,
             maximum="32M"))
 
-    module.depends(":architecture:interrupt", ":stdc++")
+    module.depends(":architecture:interrupt", ":ext:stdc++")
     return True
 
 # A weak __emutls_get_address() in this discarded section turns the use of

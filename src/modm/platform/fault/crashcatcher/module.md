@@ -1,6 +1,6 @@
 # ARM Cortex-M Fault Reporters
 
-This module manages data storage for core dumps provided by the `modm:crashcatcher`
+This module manages data storage for core dumps provided by the `modm:ext:crashcatcher`
 module to investigate HardFault events via offline post-mortem debugging.
 The data is stored in the volatile memory designated for the heap.
 

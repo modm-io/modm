@@ -12,7 +12,7 @@
 # -----------------------------------------------------------------------------
 
 def init(module):
-    module.name = ":fatfs"
+    module.name = ":ext:fatfs"
     module.description = """
 # FatFs: FAT Filesystem
 
@@ -57,7 +57,6 @@ def prepare(module, options):
     return True
 
 def build(env):
-    env.collect(":build:path.include", "modm/ext")
     env.outbasepath = "modm/ext/fatfs"
 
     env.copy("fatfs/full/source/diskio.h", "diskio.h")

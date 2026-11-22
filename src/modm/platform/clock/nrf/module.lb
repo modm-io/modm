@@ -19,7 +19,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("clock:nrf5*"):
         return False
 
-    module.depends(":cmsis:device", ":platform:clock", ":architecture:delay")
+    module.depends(":ext:cmsis:device", ":platform:clock", ":architecture:delay")
     return True
 
 def build(env):

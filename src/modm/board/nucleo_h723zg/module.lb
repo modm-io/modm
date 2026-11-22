@@ -23,7 +23,7 @@ def init(module):
 To use the USB port, you must configure TinyUSB to use the HS port in FS mode:
 
 ```xml
-<option name="modm:tinyusb:max-speed">full</option>
+<option name="modm:ext:tinyusb:max-speed">full</option>
 ```
 """
 

@@ -21,7 +21,7 @@ def prepare(module, options):
         return False
 
     module.depends(
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:rcc",
         ":math:calendar",
         ":architecture:fiber",

@@ -7,6 +7,6 @@
     <module>modm:build:scons</module>
     <module>modm:platform:dma</module>
     <module>modm:platform:spi:2</module>
-    <module>modm:vl53:vl53lmz</module>
+    <module>modm:ext:vl53:vl53lmz</module>
   </modules>
 </library>

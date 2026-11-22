@@ -6,7 +6,7 @@
     <module>modm:platform:can</module>
     <module>modm:platform:uart:2</module>
     <module>modm:platform:heap</module>
-    <module>modm:ros</module>
+    <module>modm:ext:ros</module>
   </modules>
   <collectors>
     <collect name="modm:build:openocd.source">interface/stlink.cfg</collect>

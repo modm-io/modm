@@ -18,7 +18,7 @@ def prepare(module, options):
     if not options[":target"].partname.startswith("samd2"):
         return False
 
-    module.depends(":cmsis:device", ":platform:gclk", ":platform:gpio")
+    module.depends(":ext:cmsis:device", ":platform:gclk", ":platform:gpio")
 
     return True
 

@@ -107,7 +107,7 @@ def prepare(module, options):
     else:
         return False
 
-    module.depends(":cmsis:device")
+    module.depends(":ext:cmsis:device")
 
     for instance in listify(device.get_driver("comp")["instance"]):
         module.add_submodule(Instance(int(instance)))

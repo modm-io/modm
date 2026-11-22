@@ -60,7 +60,7 @@ def prepare(module, options):
         ":architecture:register",
         ":architecture:spi",
         ":architecture:fiber",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:algorithm",
         ":platform:gpio")
 

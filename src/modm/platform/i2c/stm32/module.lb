@@ -56,7 +56,7 @@ def prepare(module, options):
         ":architecture:interrupt",
         ":math:algorithm",
         ":math:utils",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":container",
         ":platform:gpio")
 

@@ -53,7 +53,7 @@ def prepare(module, options):
         ":architecture:fiber",
         ":architecture:register",
         ":math:algorithm",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio",
         ":platform:gclk")
 

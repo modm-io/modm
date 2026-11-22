@@ -17,7 +17,7 @@ default_port = 0
 
 # -----------------------------------------------------------------------------
 def init(module):
-    module.name = ":tinyusb"
+    module.name = ":ext:tinyusb"
     module.description = FileReader("module.md")
 
 def prepare(module, options):
@@ -45,7 +45,7 @@ def prepare(module, options):
                               description="Endpoint Configuration",
                               enumeration=configs,
                               dependencies=lambda vs:
-                                    [":tinyusb:" + v.replace(".", ":") for v in vs]))
+                                    [":ext:tinyusb:" + v.replace(".", ":") for v in vs]))
 
 
     # Most devices only have FS=usb, some STM32 have FS/HS=usb_otg_fs/usb_otg_hs
@@ -63,16 +63,16 @@ def prepare(module, options):
     # Generate the host and device modules
     module.add_submodule(TinyUsbDeviceModule(ports))
     module.add_submodule(TinyUsbHostModule(ports))
-    module.depends(":cmsis:device", ":architecture:atomic", ":architecture:interrupt", ":platform:usb")
+    module.depends(":ext:cmsis:device", ":architecture:atomic", ":architecture:interrupt", ":platform:usb")
     return True
 
 
 def validate(env):
-    has_device = env.has_module(":tinyusb:device")
-    has_host = env.has_module(":tinyusb:host")
+    has_device = env.has_module(":ext:tinyusb:device")
+    has_host = env.has_module(":ext:tinyusb:host")
     if has_device and has_host:
-        device_port = env.get(":tinyusb:device:port")
-        host_port = env.get(":tinyusb:host:port")
+        device_port = env.get(":ext:tinyusb:device:port")
+        host_port = env.get(":ext:tinyusb:host:port")
         if device_port == host_port and host_port is not None:
             raise ValidateException("You cannot place Device and Host on the same USB port!")
 
@@ -129,8 +129,8 @@ def build(env):
             tusb_config["TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX"] = "0"
             env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
             # rp2040_usb.c includes both headers unconditionally
-            if not env.has_module(":tinyusb:device"): env.copy("tinyusb/src/device/dcd.h", "device/dcd.h")
-            if not env.has_module(":tinyusb:host"): env.copy("tinyusb/src/host/hcd.h", "host/hcd.h")
+            if not env.has_module(":ext:tinyusb:device"): env.copy("tinyusb/src/device/dcd.h", "device/dcd.h")
+            if not env.has_module(":ext:tinyusb:host"): env.copy("tinyusb/src/host/hcd.h", "host/hcd.h")
 
     elif target.platform == "nrf":
         tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_NRF5X"
@@ -138,11 +138,11 @@ def build(env):
         env.copy("tinyusb/src/portable/nordic/nrf5x/", "portable/nordic/nrf5x/")
 
     # TinyUSB has a OS abstraction layer for FreeRTOS, but it is causes problems with modm
-    # if env.has_module(":freertos"):
+    # if env.has_module(":ext:freertos"):
     #    tusb_config["CFG_TUSB_OS"] = "OPT_OS_FREERTOS"
     #    env.copy("tinyusb/src/osal/osal_freertos.h", "osal/osal_freertos.h")
 
-    if env.has_module(":freertos"):
+    if env.has_module(":ext:freertos"):
         env.log.warning("TinyUSB in modm does not currently use the FreeRTOS abstraction layer"
                         " and is not thread-safe with FreeRTOS threads.")
 
@@ -158,8 +158,8 @@ def build(env):
     # controller of an STM32 with just OTG_HS is TinyUSB port 0, not 1
     rhport = lambda port: 0 if default_port == 1 else port
     for mode in ["device", "host"]:
-        if env.has_module(f":tinyusb:{mode}"):
-            port = env.get(f":tinyusb:{mode}:port", default_port)
+        if env.has_module(f":ext:tinyusb:{mode}"):
+            port = env.get(f":ext:tinyusb:{mode}:port", default_port)
             ports[port] = mode[0]
             mode = f"OPT_MODE_{mode.upper()}"
             if port == 1 and (speed := env.get("max-speed")) is not None:
@@ -233,7 +233,7 @@ def build(env):
         "power_irqs": power_irqs,
         "ports": ports,
         "with_debug": env.has_module(":debug"),
-        "with_cdc": env.has_module(":tinyusb:device:cdc"),
+        "with_cdc": env.has_module(":ext:tinyusb:device:cdc"),
         "itfs": itfs,
         "itfs_enum": itf_enum,
         "endpoints": endpoints,
@@ -263,7 +263,7 @@ class TinyUsbDeviceModule(Module):
         self.ports = ports
 
     def init(self, module):
-        module.name = ":tinyusb:device"
+        module.name = ":ext:tinyusb:device"
         module.description = """
 # TinyUSB in Device Mode
 
@@ -287,7 +287,7 @@ Configuration options:
         return True
 
     # def validate(self, env):
-    #     if env.has_module(":tinyusb:device:ncm") and env.has_module(":tinyusb:device:ecm_rndis"):
+    #     if env.has_module(":ext:tinyusb:device:ncm") and env.has_module(":ext:tinyusb:device:ecm_rndis"):
     #         raise ValidateException("TinyUSB cannot enable both ECM_RNDIS and NCM network drivers!")
 
     def build(self, env):
@@ -302,7 +302,7 @@ class TinyUsbHostModule(Module):
         self.ports = ports
 
     def init(self, module):
-        module.name = ":tinyusb:host"
+        module.name = ":ext:tinyusb:host"
         module.description = """
 # TinyUSB in Host Mode
 
@@ -379,7 +379,7 @@ class TinyUsbClassModule(Module):
         self.mode = mode
 
     def init(self, module):
-        module.name = f":tinyusb:{self.mode}:{self.name}"
+        module.name = f":ext:tinyusb:{self.mode}:{self.name}"
         descr = f"# {self.mode.capitalize()} class {self.name.upper()}"
         conf = tu_config_descr.get(self.mode, {}).get(self.name, "")
         if conf: descr += "\n\nConfiguration options:\n" + conf
@@ -390,7 +390,7 @@ class TinyUsbClassModule(Module):
         if self.mode == "device":
             if self.name == "cdc":
                 module.depends(":architecture:uart")
-        module.depends(":tinyusb")
+        module.depends(":ext:tinyusb")
         return True
 
     def build(self, env):
@@ -408,8 +408,8 @@ class TinyUsbClassModule(Module):
         cfg_name = f"CFG_TU{self.mode[0].upper()}_{self.name.upper()}"
         if "DFU_RT" in cfg_name: cfg_name = cfg_name.replace("_RT", "_RUNTIME")
         # Classes in the descriptor config are counted, otherwise enable one instance
-        tusb_config[cfg_name] = max(1, env[":tinyusb:config"].count(f"{self.mode}.{self.name}"))
-        is_hs = env.get(":tinyusb:max-speed", "full") == "high"
+        tusb_config[cfg_name] = max(1, env[":ext:tinyusb:config"].count(f"{self.mode}.{self.name}"))
+        is_hs = env.get(":ext:tinyusb:max-speed", "full") == "high"
 
         if self.mode == "device":
             # These are the defaults that don't crash TinyUSB.

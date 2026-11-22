@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-/// @ingroup modm_cmsis_dap
+/// @ingroup modm_ext_cmsis_dap
 /// @{
 
 // Original functions by DAP.h
@@ -79,7 +79,7 @@ uint8_t DAP_Reset(void);
 namespace modm::dap
 {
 
-/// @ingroup modm_cmsis_dap
+/// @ingroup modm_ext_cmsis_dap
 /// @{
 
 template<typename Pin>

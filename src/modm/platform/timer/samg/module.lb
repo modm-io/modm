@@ -48,7 +48,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:register",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio")
 
     timers = device.get_all_drivers("tc:sam*")

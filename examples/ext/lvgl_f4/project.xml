@@ -6,6 +6,6 @@
   <modules>
     <module>modm:build:scons</module>
     <module>modm:processing:timer</module>
-    <module>modm:lvgl</module>
+    <module>modm:ext:lvgl</module>
   </modules>
 </library>

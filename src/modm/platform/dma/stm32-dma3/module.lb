@@ -28,7 +28,7 @@ def prepare(module, options):
         ":architecture:assert",
         ":architecture:interrupt",
         ":architecture:register",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:rcc")
     return True
 

@@ -106,7 +106,7 @@ def prepare(module, options):
         ":architecture:uart",
         ":architecture:fiber",
         ":math:algorithm",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio",
         ":platform:rcc",
         ":utils")
@@ -173,6 +173,6 @@ def build(env):
 
     env.copy("uart.hpp")
     env.copy("uart_buffer.hpp")
-    if env.has_module(":freertos"):
+    if env.has_module(":ext:freertos"):
         env.copy(repopath("ext/aws/uart_buffer_freertos.hpp"), "uart_buffer_freertos.hpp")
 

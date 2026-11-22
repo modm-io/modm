@@ -450,7 +450,7 @@ scons debug-coredump profile={debug|release} ui={tui|gdbgui} \
 Launches GDB for post-mortem debugging with the firmware identified by the
 (optional) `firmware={hash or filepath}` argument using the data from the
 `coredump={filepath}` argument. Note that CrashDebug must be in your path, see
-the `modm:crashcatcher` module for details.
+the `modm:ext:crashcatcher` module for details.
 
 Use the `scons coredump` method to generate a coredump with a debugger attached,
 otherwise see the `modm:platform:fault` module for details how to generate and
@@ -765,16 +765,16 @@ are supported, this is only meant for using the IDE as an editor.
 
 ## Protobuf Generator Tool
 
-The `modm:nanopb` module contains a Python generator to translate the messages
-defined in `*.proto` files by the `modm:nanopb:source` option into `*.pb.cpp`
+The `modm:ext:nanopb` module contains a Python generator to translate the messages
+defined in `*.proto` files by the `modm:ext:nanopb:source` option into `*.pb.cpp`
 and `*.pb.hpp` files.
 This module contains a SCons wrapper tool that automatically updates the
 generated files when it becomes necessary:
 
 ```py
 cpp_sources += env.NanopbProtofile(
-    sources=options[":nanopb:sources"],
-    path=options[":nanopb:path"],
+    sources=options[":ext:nanopb:sources"],
+    path=options[":ext:nanopb:path"],
 )
 ```
 

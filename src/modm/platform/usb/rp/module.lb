@@ -23,7 +23,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:interrupt",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio")
 
     return True
@@ -31,5 +31,5 @@ def prepare(module, options):
 def build(env):
     env.outbasepath = "modm/src/modm/platform/usb"
     env.copy('usb.hpp')
-    if env.has_module(":tinyusb:device:cdc"):
+    if env.has_module(":ext:tinyusb:device:cdc"):
         env.copy(repopath("ext/hathach/uart.hpp"), "uart.hpp")

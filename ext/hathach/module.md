@@ -18,15 +18,15 @@ and host classes on one port or both on separate ports at the same time.
 You can configure this via these module options:
 
 ```xml
-<option name="modm:tinyusb:device:port">fs</option>
-<option name="modm:tinyusb:host:port">hs</option>
+<option name="modm:ext:tinyusb:device:port">fs</option>
+<option name="modm:ext:tinyusb:host:port">hs</option>
 ```
 
 However, the high speed capable port can also run in full speed mode, in which
 case you must configure TinyUSB to *not* use the ULPI interface:
 
 ```xml
-<option name="modm:tinyusb:max-speed">full</option>
+<option name="modm:ext:tinyusb:max-speed">full</option>
 ```
 
 
@@ -70,7 +70,7 @@ USB_OTG_FS->GCCFG |= USB_OTG_GCCFG_VBDEN;
 
 ## Autogeneration of USB Descriptors
 
-You can select the device classes you want to use via the `modm:tinyusb:config`
+You can select the device classes you want to use via the `modm:ext:tinyusb:config`
 list option:
 
 - `device.cdc`: Serial connection (uses **two** endpoints!)
@@ -85,9 +85,9 @@ enough endpoints and USB RAM available:
 
 ```xml
 <!-- Using the CDC and MSC classes together -->
-<option name="modm:tinyusb:config">device.cdc,device.msc</option>
+<option name="modm:ext:tinyusb:config">device.cdc,device.msc</option>
 <!-- Using two CDC ports! -->
-<option name="modm:tinyusb:config">device.cdc,device.cdc</option>
+<option name="modm:ext:tinyusb:config">device.cdc,device.cdc</option>
 ```
 
 modm will generate the USB descriptors automatically for the set of device
@@ -121,30 +121,30 @@ descriptors:
 
 ## Manual USB Descriptors
 
-If you leave the `modm:tinyusb:config` option empty, no descriptors are
+If you leave the `modm:ext:tinyusb:config` option empty, no descriptors are
 generated, so you can implement them yourself. Note that you must also
 manually depend on the device classes you want to implement:
 
 ```xml
-<module>modm:tinyusb:device:audio</module>
-<module>modm:tinyusb:device:bth</module>
-<module>modm:tinyusb:device:cdc</module>
-<module>modm:tinyusb:device:dfu</module>
-<module>modm:tinyusb:device:dfu_rt</module>
-<module>modm:tinyusb:device:ecm_rndis</module>
-<module>modm:tinyusb:device:hid</module>
-<module>modm:tinyusb:device:midi</module>
-<module>modm:tinyusb:device:midi2</module>
-<module>modm:tinyusb:device:msc</module>
-<module>modm:tinyusb:device:mtp</module>
-<module>modm:tinyusb:device:ncm</module>
-<module>modm:tinyusb:device:printer</module>
-<module>modm:tinyusb:device:usbtmc</module>
-<module>modm:tinyusb:device:vendor</module>
-<module>modm:tinyusb:device:video</module>
+<module>modm:ext:tinyusb:device:audio</module>
+<module>modm:ext:tinyusb:device:bth</module>
+<module>modm:ext:tinyusb:device:cdc</module>
+<module>modm:ext:tinyusb:device:dfu</module>
+<module>modm:ext:tinyusb:device:dfu_rt</module>
+<module>modm:ext:tinyusb:device:ecm_rndis</module>
+<module>modm:ext:tinyusb:device:hid</module>
+<module>modm:ext:tinyusb:device:midi</module>
+<module>modm:ext:tinyusb:device:midi2</module>
+<module>modm:ext:tinyusb:device:msc</module>
+<module>modm:ext:tinyusb:device:mtp</module>
+<module>modm:ext:tinyusb:device:ncm</module>
+<module>modm:ext:tinyusb:device:printer</module>
+<module>modm:ext:tinyusb:device:usbtmc</module>
+<module>modm:ext:tinyusb:device:vendor</module>
+<module>modm:ext:tinyusb:device:video</module>
 ```
 
-Each class module that is not part of the `modm:tinyusb:config` option is
+Each class module that is not part of the `modm:ext:tinyusb:config` option is
 enabled with one instance (e.g. `CFG_TUD_AUDIO=1`), which you can override in
 the `<tusb_config_local.h>` file.
 Some of these classes require a lot of configuration that you must provide via
@@ -163,11 +163,11 @@ one instance (e.g. `CFG_TUH_MSC=1`), which you can override in the
 `<tusb_config_local.h>` file:
 
 ```xml
-<module>modm:tinyusb:host:cdc</module>
-<module>modm:tinyusb:host:hid</module>
-<module>modm:tinyusb:host:midi</module>
-<module>modm:tinyusb:host:midi2</module>
-<module>modm:tinyusb:host:msc</module>
+<module>modm:ext:tinyusb:host:cdc</module>
+<module>modm:ext:tinyusb:host:hid</module>
+<module>modm:ext:tinyusb:host:midi</module>
+<module>modm:ext:tinyusb:host:midi2</module>
+<module>modm:ext:tinyusb:host:msc</module>
 ```
 
 

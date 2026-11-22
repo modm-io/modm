@@ -7,8 +7,8 @@
 
   <options>
     <option name="modm:target">stm32g030f6p6</option>
-    <option name="modm:rtt:buffer.tx">256</option>
-    <option name="modm:rtt:buffer.rx">16</option>
+    <option name="modm:ext:rtt:buffer.tx">256</option>
+    <option name="modm:ext:rtt:buffer.rx">16</option>
     <option name="modm:platform:cortex-m:main_stack_size">1Ki</option>
   </options>
   <modules>

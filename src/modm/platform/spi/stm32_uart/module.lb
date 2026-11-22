@@ -56,7 +56,7 @@ def prepare(module, options):
     module.depends(
         ":architecture:spi",
         ":architecture:fiber",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":platform:gpio",
         ":platform:uart")
 

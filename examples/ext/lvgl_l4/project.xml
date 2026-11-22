@@ -14,6 +14,6 @@
     <module>modm:platform:spi:1</module>
     <module>modm:platform:spi:3</module>
     <module>modm:platform:dma</module>
-    <module>modm:lvgl</module>
+    <module>modm:ext:lvgl</module>
   </modules>
 </library>

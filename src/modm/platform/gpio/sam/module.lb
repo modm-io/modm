@@ -50,7 +50,7 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:gpio",
-        ":cmsis:device",
+        ":ext:cmsis:device",
         ":math:utils")
     return True
 
@@ -106,7 +106,7 @@ def build(env):
 
     # add peripherals without gpio signals
     # the generated types are used in the clock driver api to enable the peripheral clocks
-    for peripheral_clock in env.query(":cmsis:device:clock-map").keys():
+    for peripheral_clock in env.query(":ext:cmsis:device:clock-map").keys():
         name, instance = (peripheral_clock[0].capitalize(), peripheral_clock[1])
         if name not in peripherals:
             if instance:

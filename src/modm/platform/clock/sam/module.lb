@@ -20,7 +20,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("gclk:sam"):
         return False
 
-    module.depends(":cmsis:device", ":architecture:delay", ":math:utils", ":platform:clock")
+    module.depends(":ext:cmsis:device", ":architecture:delay", ":math:utils", ":platform:clock")
     return True
 
 def build(env):
@@ -35,7 +35,7 @@ def build(env):
     else:  # d1x/d2x/dax
         boot_frequency = "1'000'000"
 
-    clock_map = env.query(":cmsis:device:clock-map")
+    clock_map = env.query(":ext:cmsis:device:clock-map")
     if target.series == "d21":
         # Variant "l" devices have one comparator with instance number "1" and one without.
         # To be compatible with the gpio data, instance number "0" is used for the first.

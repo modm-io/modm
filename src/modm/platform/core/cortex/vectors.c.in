@@ -33,7 +33,7 @@ extern uint32_t __main_stack_top[]; // from linkerscript
 %% if with_rtt
 // Incomplete type, since SEGGER_RTT.h pulls in the device header, whose IRQ
 // alias macros collide with the handler declarations above.
-extern struct SEGGER_RTT_CB _SEGGER_RTT; // from modm:rtt
+extern struct SEGGER_RTT_CB _SEGGER_RTT; // from modm:ext:rtt
 %% endif
 %#
 // Define the vector table
