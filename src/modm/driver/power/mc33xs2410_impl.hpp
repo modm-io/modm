@@ -110,20 +110,25 @@ template <class SpiMaster, class Cs, size_t MaxDevices>
 void
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::setVoltageThreshold(Output output, float lowerVoltage, float upperVoltage, uint8_t device)
 {
-	writeRegister(device, Register(uint8_t(Register::OVW_OUT1) + 2 * uint8_t(output)),
-		voltageThresholdCode(upperVoltage));
-	writeRegister(device, Register(uint8_t(Register::UVW_OUT1) + 2 * uint8_t(output)),
-		voltageThresholdCode(lowerVoltage));
-
 	const uint8_t shift = 2 * uint8_t(output);
-	uint8_t wv = readRegister(device, Register::WV_CTRL);
+	uint16_t wv{};
+	// The value of the read arrives during the first write
+	const Command first[]{
+		Command::read(Register::WV_CTRL, &wv, device),
+		Command::write(Register(uint8_t(Register::OVW_OUT1) + shift), voltageThresholdCode(upperVoltage), device),
+	};
+	transfer(first);
 	// OutputOn (VOUTx_ON, from CMM) rather than Continuous (VOUTx, from OVM):
 	// VOUTx is refreshed even while the output is off, so it reads ~0 V there
 	// and would immediately trip UndervoltageWarning against any threshold.
 	// VOUTx_ON only updates while the output is actually on, and - like
 	// IOUTx - is blanked by the first measurement delay (M_SETUP).
 	wv = (wv & ~(0b11 << shift)) | (uint8_t(VoltageWarningSource::OutputOn) << shift);
-	writeRegister(device, Register::WV_CTRL, wv);
+	const Command second[]{
+		Command::write(Register(uint8_t(Register::UVW_OUT1) + shift), voltageThresholdCode(lowerVoltage), device),
+		Command::write(Register::WV_CTRL, uint8_t(wv), device),
+	};
+	transfer(second);
 }
 
 
@@ -131,15 +136,20 @@ template <class SpiMaster, class Cs, size_t MaxDevices>
 void
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::setCurrentThreshold(Output output, float lowerCurrent, float upperCurrent, uint8_t device)
 {
-	writeRegister(device, Register(uint8_t(Register::OCW_OUT1) + 2 * uint8_t(output)),
-		overcurrentWarningCode(upperCurrent));
-	writeRegister(device, Register(uint8_t(Register::UCW_OUT1) + 2 * uint8_t(output)),
-		undercurrentWarningCode(lowerCurrent));
-
 	const uint8_t shift = 2 * uint8_t(output);
-	uint8_t wc = readRegister(device, Register::WC_CTRL);
+	uint16_t wc{};
+	// The value of the read arrives during the first write
+	const Command first[]{
+		Command::read(Register::WC_CTRL, &wc, device),
+		Command::write(Register(uint8_t(Register::OCW_OUT1) + shift), overcurrentWarningCode(upperCurrent), device),
+	};
+	transfer(first);
 	wc = (wc & ~(0b11 << shift)) | (uint8_t(CurrentWarningSource::Continuous) << shift);
-	writeRegister(device, Register::WC_CTRL, wc);
+	const Command second[]{
+		Command::write(Register(uint8_t(Register::UCW_OUT1) + shift), undercurrentWarningCode(lowerCurrent), device),
+		Command::write(Register::WC_CTRL, uint8_t(wc), device),
+	};
+	transfer(second);
 }
 
 
@@ -163,22 +173,67 @@ template <class SpiMaster, class Cs, size_t MaxDevices>
 void
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::writeRegister(uint8_t device, Register reg, uint8_t data)
 {
-	setCommand(device, buildWriteFrame(reg, data));
-	transferChain();
+	const Command command = Command::write(reg, data, device);
+	transfer({&command, 1});
 }
 
 template <class SpiMaster, class Cs, size_t MaxDevices>
 uint16_t
 Mc33xs2410<SpiMaster, Cs, MaxDevices>::readRegister(uint8_t device, uint8_t address, bool controlBank)
 {
-	setCommand(device, buildReadFrame(address, controlBank));
-	transferChain();
+	uint16_t value{};
+	const Command command{buildReadFrame(address, controlBank), &value, device};
+	transfer({&command, 1});
+	return value;
+}
 
-	// The value arrives in the next frame. Repeating the read here would clear
-	// a read-to-clear register a second time and lose what latched in between.
-	setCommand(device, buildNopFrame());
-	transferChain();
-	return rx[device] & 0x3FFF;
+
+template <class SpiMaster, class Cs, size_t MaxDevices>
+bool
+Mc33xs2410<SpiMaster, Cs, MaxDevices>::transfer(std::span<const Command> commands)
+{
+	const auto find = [&](uint8_t device, size_t from)
+	{
+		while (from < commands.size() and commands[from].device != device) from++;
+		return from;
+	};
+	size_t next[MaxDevices];
+	uint16_t* results[MaxDevices] = {};
+	// A read only takes effect, also on read-to-clear bits, in the next frame
+	bool reading[MaxDevices] = {};
+	for (uint8_t ii = 0; ii < devices_; ii++) next[ii] = find(ii, 0);
+
+	bool valid{true};
+	while (true)
+	{
+		bool work{false};
+		for (uint8_t ii = 0; ii < devices_; ii++)
+		{
+			const bool queued = next[ii] < commands.size();
+			// A NOP, since repeating a read would clear its register again
+			tx[ii] = queued ? commands[next[ii]].frame : buildNopFrame();
+			work |= queued or reading[ii];
+		}
+		if (not work) return valid;
+
+		transferChain();
+
+		for (uint8_t ii = 0; ii < devices_; ii++)
+		{
+			if ((rx[ii] >> 14) == 0b11) valid = false;
+			// This frame answers the command of the previous one
+			if (results[ii]) *results[ii] = rx[ii] & 0x3FFF;
+			results[ii] = nullptr;
+			reading[ii] = false;
+			if (next[ii] < commands.size())
+			{
+				const Command& command = commands[next[ii]];
+				results[ii] = command.result;
+				reading[ii] = not (command.frame & 0x8000);
+				next[ii] = find(ii, next[ii] + 1);
+			}
+		}
+	}
 }
 
 

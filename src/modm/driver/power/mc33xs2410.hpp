@@ -14,6 +14,7 @@
 #define MODM_MC33XS2410_HPP
 
 #include <cstddef>
+#include <span>
 #include <modm/architecture/interface/delay.hpp>
 #include <modm/architecture/interface/register.hpp>
 #include <modm/architecture/interface/gpio.hpp>
@@ -394,6 +395,28 @@ struct mc33xs2410
 	buildNopFrame()
 	{ return buildReadFrame(uint8_t(DiagnosticRegister::IN_OUT_STA), false); }
 
+	/// One register access of one device for Mc33xs2410::transfer()
+	struct Command
+	{
+		uint16_t frame;
+		uint16_t* result;
+		uint8_t device;
+
+		/// Reads a register into `result`, data bits only. Without `result`
+		/// this only clears a read-to-clear register.
+		static constexpr Command
+		read(Register reg, uint16_t* result = nullptr, uint8_t device = 0)
+		{ return {buildReadFrame(uint8_t(reg), true), result, device}; }
+
+		static constexpr Command
+		read(DiagnosticRegister reg, uint16_t* result = nullptr, uint8_t device = 0)
+		{ return {buildReadFrame(uint8_t(reg), false), result, device}; }
+
+		static constexpr Command
+		write(Register reg, uint8_t data, uint8_t device = 0)
+		{ return {buildWriteFrame(reg, data), nullptr, device}; }
+	};
+
 	/// Scaling of the embedded 12-bit ADC measurements reported in the
 	/// diagnostic bank, which carries them as raw unitless codes.
 	/// @{
@@ -448,9 +471,10 @@ struct mc33xs2410
  * buffers, the actual chain length is passed to the constructor, so it may be
  * discovered at runtime. Every accessor below takes a `device` index (0-based,
  * defaults to 0) to select which chained device it addresses. A single SPI
- * transfer always shifts data through the *whole* chain, and because a
- * register's value is only reported in the SPI frame *following* the one that
- * requested it, `readRegister()` performs two whole-chain transfers per call.
+ * transfer always shifts data through the *whole* chain, and a register's
+ * value is only reported in the SPI frame *following* the one that requested
+ * it. Use `transfer()` to access several registers or devices at once, since
+ * the devices then share those frames.
  *
  * @tparam	SpiMaster	SpiMaster interface
  * @tparam	Cs			Chip-select pin, shared by all devices in the chain
@@ -624,16 +648,17 @@ public:
 	readDieTemperature(uint8_t device = 0)
 	{ return float(readRegister(device, DiagnosticRegister::TS_0_TEMP)) * TemperaturePerLsb + TemperatureOffset; }
 
-private:
-	/// Places one command in the chain and makes every other slot a NOP, so
-	/// that the *previous* command is not shifted into those devices again.
-	void
-	setCommand(uint8_t device, uint16_t frame)
-	{
-		for (uint8_t ii = 0; ii < devices_; ii++) tx[ii] = buildNopFrame();
-		tx[device] = frame;
-	}
+	/// Runs the commands in as few chain frames as possible: the longest queue
+	/// of any one device, plus one frame if its last command is a read.
+	/// Commands of one device run in order, commands of different devices may
+	/// share a frame, so use separate calls if the order between devices
+	/// matters. Results are valid after the call, so a write that depends on a
+	/// read needs a second call.
+	/// @return false if any device reported an invalid SPI frame (ST = 11b)
+	bool
+	transfer(std::span<const Command> commands);
 
+private:
 	void
 	writeRegister(uint8_t device, Register reg, uint8_t data);
 
