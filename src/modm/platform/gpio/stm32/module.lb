@@ -262,7 +262,7 @@ def build(env):
     env.template("../common/unused.hpp.in", "unused.hpp")
     env.template("../common/port_shim.hpp.in", "port_shim.hpp")
     env.template("runtime.hpp.in")
-    env.copy("../common/any.hpp", "any.hpp")
+    env.template("../common/any.hpp.in", "any.hpp")
     if len(env["enable_ports"]):
         env.template("enable.cpp.in")
 

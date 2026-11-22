@@ -30,4 +30,6 @@ def build(env):
     env.outbasepath = "modm/src/modm/platform/gpio"
 
     env.template("unused.hpp.in")
+    env.copy("runtime.hpp")
+    env.template("../common/any.hpp.in", "any.hpp")
     env.copy("../common/inverted.hpp", "inverted.hpp")

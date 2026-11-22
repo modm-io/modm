@@ -1,0 +1,196 @@
+/*
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "../device.hpp"
+#include "pin.hpp"
+#include "unused.hpp"
+#include <bit>
+#include <concepts>
+
+namespace modm::platform
+{
+
+/**
+ * Runtime GPIO pin: the port and the pin mask as a value.
+ *
+ * A value type that can be copied, stored in constexpr tables and selected at
+ * runtime. Construct it from a static GPIO class, also an inverted one, or from
+ * a port and a pin number.
+ *
+ * Only pins of this device, for `GpioUnused` see `modm::AnyGpio`.
+ *
+ * @ingroup modm_platform_gpio
+ */
+class GpioPin
+{
+public:
+	using InputType = ::modm::platform::InputType;
+
+protected:
+	uintptr_t addr;		///< (port << 2) | (inverted << 1), bit 0 is always clear
+	uint32_t setBits;	///< The physical pin mask
+
+	constexpr GpioPin(uintptr_t addr, uint32_t setBits) : addr(addr), setBits(setBits) {}
+
+	constexpr bool inverted() const { return addr & 2u; }
+
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+	Pio*
+	reg() const
+	{
+		switch(PortName(addr >> 2))
+		{
+%% for port in ports
+			case PortName::{{port}}: return PIO{{port}};
+%% endfor
+		}
+		__builtin_unreachable();
+	}
+%% else
+	auto& group() const { return PORT->Group[addr >> 2]; }
+	auto& pincfg() const { return group().PINCFG[std::countr_zero(setBits)].reg; }
+%% endif
+
+public:
+	constexpr GpioPin(PortName port, uint8_t pin, bool inverted = false)
+	:	addr((uintptr_t(port) << 2) | (inverted ? 2u : 0u)), setBits(1ul << (pin & 31)) {}
+
+	template< class Pin >
+	requires requires { Pin::port; Pin::pin; Pin::isInverted; }
+		and (not std::derived_from<Pin, GpioUnused>)
+	constexpr GpioPin(Pin)
+	:	GpioPin(Pin::port, Pin::pin, Pin::isInverted) {}
+
+	void
+	setOutput() const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		reg()->PIO_PER = setBits;
+		reg()->PIO_OER = setBits;
+%% else
+		group().DIRSET.reg = setBits;
+		pincfg() = 0;
+%% endif
+	}
+
+	/// The level is written first, so that the pin never glitches.
+	void
+	setOutput(bool value) const
+	{
+		set(value);
+		setOutput();
+	}
+
+	void
+	setInput() const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		reg()->PIO_PER = setBits;
+		reg()->PIO_ODR = setBits;
+%% else
+		group().DIRCLR.reg = setBits;
+		pincfg() = PORT_PINCFG_INEN;
+%% endif
+	}
+
+	void
+	setInput(InputType type) const
+	{
+		setInput();
+		configure(type);
+	}
+
+	void
+	configure(InputType type) const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		Pio *const pio = reg();
+		if (type != InputType::PullDown) pio->PIO_PPDDR = setBits;
+		if (type != InputType::PullUp) pio->PIO_PUDR = setBits;
+		if (type == InputType::PullDown) pio->PIO_PPDER = setBits;
+		if (type == InputType::PullUp) pio->PIO_PUER = setBits;
+%% else
+		// The output register selects the direction of the pull
+		if (type == InputType::PullUp) group().OUTSET.reg = setBits;
+		else group().OUTCLR.reg = setBits;
+		pincfg() = (pincfg() & ~PORT_PINCFG_PULLEN) | PORT_PINCFG_INEN
+				 | ((type != InputType::Floating) ? PORT_PINCFG_PULLEN : 0);
+%% endif
+	}
+
+	::modm::Gpio::Direction
+	getDirection() const
+	{
+		using Direction = ::modm::Gpio::Direction;
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		if (not (reg()->PIO_PSR & setBits)) return Direction::Special;
+		return (reg()->PIO_OSR & setBits) ? Direction::Out : Direction::In;
+%% else
+		if (pincfg() & PORT_PINCFG_PMUXEN) return Direction::Special;
+		return (group().DIR.reg & setBits) ? Direction::Out : Direction::In;
+%% endif
+	}
+
+	/// Back to a floating input, detached from any peripheral signal
+	void disconnect() const { setInput(InputType::Floating); }
+
+	void set() const { set(true); }
+	void reset() const { set(false); }
+
+	void
+	set(bool value) const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		if (value != inverted()) reg()->PIO_SODR = setBits;
+		else reg()->PIO_CODR = setBits;
+%% else
+		if (value != inverted()) group().OUTSET.reg = setBits;
+		else group().OUTCLR.reg = setBits;
+%% endif
+	}
+
+	void
+	toggle() const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		// PIO_ODSR ignores writes unless they are enabled in PIO_OWSR
+		Pio *const pio = reg();
+		if (pio->PIO_ODSR & setBits) pio->PIO_CODR = setBits;
+		else pio->PIO_SODR = setBits;
+%% else
+		group().OUTTGL.reg = setBits;
+%% endif
+	}
+
+	bool
+	isSet() const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		return bool(reg()->PIO_ODSR & setBits) != inverted();
+%% else
+		return bool(group().OUT.reg & setBits) != inverted();
+%% endif
+	}
+
+	bool
+	read() const
+	{
+%% if target["family"] in ["g5x", "e7x/s7x/v7x"]
+		return bool(reg()->PIO_PDSR & setBits) != inverted();
+%% else
+		return bool(group().IN.reg & setBits) != inverted();
+%% endif
+	}
+};
+
+} // namespace modm::platform

@@ -34,8 +34,7 @@ namespace modm::platform
  * pins[index].toggle();
  * @endcode
  *
- * Only pins of this device, for pins on GPIO expanders and for `GpioUnused`
- * see `modm::AnyGpio`.
+ * Only pins of this device, for `GpioUnused` see `modm::AnyGpio`.
  *
  * @ingroup modm_platform_gpio
  */
