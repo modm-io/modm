@@ -103,6 +103,30 @@ modm_ramcode void read_efc_uid(uint32_t *uid)
 extern "C" uint8_t
 tusb_get_device_serial(uint16_t *serial_str)
 {
+	const auto fn_nibble = [](uint8_t nibble)
+	{
+		return nibble + (nibble > 9 ? 'A' - 10 : '0');
+	};
+
+%% if target.platform in ["stm32"]
+	// The serial number the STM32 system bootloader and the ST USB device
+	// library report, so that a device that detached into the bootloader for
+	// DFU can be found again under the same serial number.
+	// That is UID0 + UID2 in 8 digits, then the upper half of UID1 in 4.
+	const uint32_t *uid = (const uint32_t *) UID_BASE;
+%% if target.family in ["l0", "l1"]
+	// The third UID word is at offset 0x14 on these families. The STM32L152
+	// bootloader skips it and is not unique, so this serial differs from it.
+	const uint32_t sum = uid[0] + uid[5];
+%% else
+	const uint32_t sum = uid[0] + uid[2];
+%% endif
+	for (int i = 0; i < 8; i++)
+		serial_str[i] = fn_nibble(sum >> (28 - 4 * i) & 0xf);
+	for (int i = 0; i < 4; i++)
+		serial_str[8 + i] = fn_nibble(uid[1] >> (28 - 4 * i) & 0xf);
+	return 12;
+%% else
 	uint8_t raw_id[16];
 
 %% if "samg55" in target.string
@@ -111,10 +135,7 @@ tusb_get_device_serial(uint16_t *serial_str)
 
 	uint32_t *id_addresses[4] =
 	{
-	%% if target.platform in ["stm32"]
-		((uint32_t *) UID_BASE), ((uint32_t *) UID_BASE) + 1,
-		((uint32_t *) UID_BASE) + 2, ((uint32_t *) UID_BASE) + 3
-	%% elif target.platform in ["nrf"]
+	%% if target.platform in ["nrf"]
 		%% if target.family == "53"
 		((uint32_t *) NRF_FICR->INFO.DEVICEID), ((uint32_t *) NRF_FICR->INFO.DEVICEID) + 1,
 		((uint32_t *) NRF_FICR->INFO.DEVICEID) + 2, ((uint32_t *) NRF_FICR->INFO.DEVICEID) + 3,
@@ -142,11 +163,6 @@ tusb_get_device_serial(uint16_t *serial_str)
 			raw_id[4 * i + (3 - k)] = (*(id_addresses[i]) >> k * 8) & 0xff;
 %% endif
 
-	const auto fn_nibble = [](uint8_t nibble)
-	{
-		return nibble + (nibble > 9 ? 'A' - 10 : '0');
-	};
-
 	for (unsigned int i = 0; i < sizeof(raw_id); i++)
 	{
 		serial_str[i * 2 + 1] = fn_nibble(raw_id[i] & 0xf);
@@ -154,6 +170,7 @@ tusb_get_device_serial(uint16_t *serial_str)
 	}
 
 	return sizeof(raw_id) * 2;
+%% endif
 }
 
 extern "C" void
