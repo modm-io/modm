@@ -239,8 +239,6 @@ def common_compiler_flags(compiler, target):
         "-gdwarf-3",
     ]
 
-    if target.identifier["platform"] not in ["hosted"]:
-        flags["ccflags"].append("-fshort-wchar")
     if compiler.startswith("gcc"):
         flags["ccflags"] += [
             "-Wduplicated-cond",

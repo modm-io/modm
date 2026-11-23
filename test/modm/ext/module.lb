@@ -22,4 +22,6 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm-test/src/modm-test/ext"
-    env.copy('.')
+    # Only Cortex-M uses newlib, the other targets have no or a native wchar_t
+    is_cortex_m = env[":target"].get_driver("core")["type"].startswith("cortex-m")
+    env.copy('.', ignore=env.ignore_files("wchar_test.*") if not is_cortex_m else None)

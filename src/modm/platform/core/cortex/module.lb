@@ -469,8 +469,7 @@ def build(env):
     if env.has_module(":architecture:unaligned"):
         env.template("unaligned_impl.hpp.in")
 
-    env.collect(":build:linkflags", "-Wl,--no-wchar-size-warning",
-                "-Wl,--no-warn-rwx-segment", "-L{project_source_dir}",
+    env.collect(":build:linkflags", "-Wl,--no-warn-rwx-segment", "-L{project_source_dir}",
                 "-Wl,-z,execstack")
     # Linkerscript
     linkerscript = env["linkerscript.override"]
