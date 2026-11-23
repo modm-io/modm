@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <bits/functexcept.h>
 
+%% if is_avr
 #if __GNUC__ < 14
 #error "The AVR C++ standard library requires avr-gcc 14 or newer!"
 #endif
@@ -23,61 +24,106 @@
 %% else
 #define __modm_stdcpp_failure(failure) __builtin_abort();
 %% endif
+#define __modm_stdcpp_stub
+%% else
+#include <regex>
+#include <modm/architecture/interface/assert.hpp>
+
+// One shared message: the strings of unused stubs are not garbage collected.
+#define __modm_stdcpp_failure(failure) modm_assert(false, "c++", "C++ exception raised!");
+// libstdc++ defines these next to other symbols, for example std::error_code
+// in system_error.o. Weak stubs do not collide if such an object is linked.
+#define __modm_stdcpp_stub __attribute__((weak))
+%% endif
 
 namespace std _GLIBCXX_VISIBILITY(default)
 {
 _GLIBCXX_BEGIN_NAMESPACE_VERSION
 
-	void
+	__modm_stdcpp_stub void
 	__throw_logic_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("logic_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_domain_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("domain_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_invalid_argument(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("invalid_argument"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_length_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("length_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_out_of_range(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("out_of_range"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_out_of_range_fmt(const char* __s __attribute__((unused)), ...)
 	{ __modm_stdcpp_failure("out_of_range"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_bad_array_new_length()
 	{ __modm_stdcpp_failure("bad_array_new_length"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_runtime_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("runtime_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_range_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("range_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_overflow_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("overflow_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_underflow_error(const char* __s __attribute__((unused)))
 	{ __modm_stdcpp_failure("underflow_error"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_bad_function_call()
 	{ __modm_stdcpp_failure("bad_function_call"); }
 
-	void
+	__modm_stdcpp_stub void
 	__throw_system_error(int errc __attribute__((unused)))
 	{ __modm_stdcpp_failure("system_error"); }
+%% if not is_avr
+
+	__modm_stdcpp_stub void
+	__throw_bad_alloc()
+	{ __modm_stdcpp_failure("bad_alloc"); }
+
+	__modm_stdcpp_stub void
+	__throw_bad_cast()
+	{ __modm_stdcpp_failure("bad_cast"); }
+
+	__modm_stdcpp_stub void
+	__throw_bad_exception()
+	{ __modm_stdcpp_failure("bad_exception"); }
+
+	__modm_stdcpp_stub void
+	__throw_bad_typeid()
+	{ __modm_stdcpp_failure("bad_typeid"); }
+
+	__modm_stdcpp_stub void
+	__throw_ios_failure(const char* __s __attribute__((unused)))
+	{ __modm_stdcpp_failure("ios_failure"); }
+
+	__modm_stdcpp_stub void
+	__throw_ios_failure(const char* __s __attribute__((unused)), int errc __attribute__((unused)))
+	{ __modm_stdcpp_failure("ios_failure"); }
+
+	__modm_stdcpp_stub void
+	__throw_future_error(int errc __attribute__((unused)))
+	{ __modm_stdcpp_failure("future_error"); }
+
+	__modm_stdcpp_stub void
+	__throw_regex_error(regex_constants::error_type errc __attribute__((unused)))
+	{ __modm_stdcpp_failure("regex_error"); }
+%% endif
 _GLIBCXX_END_NAMESPACE_VERSION
 } // namespace

@@ -1,0 +1,13 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- <extends>modm:nucleo-f072rb</extends> -->
+  <options>
+    <!-- LTO resolves archive members before it removes dead throw paths -->
+    <option name="modm:build:lto">yes</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:ext:printf</module>
+    <module>modm:platform:heap</module>
+  </modules>
+</library>

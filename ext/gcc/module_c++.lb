@@ -120,6 +120,11 @@ def build(env):
         env.collect(":build:path.include", "modm/ext/gcc/libstdc++/include")
         env.copy("libstdc++/gcc15/include", "libstdc++/include")
         env.copy("libstdc++/gcc15/src", "libstdc++/src")
+
+    if is_avr or not with_exceptions:
+        # Without these stubs, the throw paths of libstdc++ link its real
+        # exception code, which pulls in iostreams, locales and newlib printf.
+        env.substitutions = {"is_avr": is_avr}
         env.template("assert.cpp.in", "assert.cpp")
 
     env.outbasepath = "modm/ext/gcc"
