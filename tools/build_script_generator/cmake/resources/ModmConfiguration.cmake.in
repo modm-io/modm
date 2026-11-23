@@ -33,6 +33,16 @@ if(NOT MODM_BMP_PORT)
     CACHE STRING "Set BMP debug port." FORCE)
 endif()
 
+if(NOT MODM_DFU_DELAY)
+  set(MODM_DFU_DELAY
+    5
+    CACHE STRING "Set DFU delay in seconds to re-enumerate." FORCE)
+endif()
+
+set(MODM_DFU_SERIAL
+  ""
+  CACHE STRING "Set serial number of the DFU device.")
+
 if(NOT MODM_ITM_FCPU)
   set(MODM_ITM_FCPU
     0
@@ -212,6 +222,19 @@ function(modm_targets_create project_name)
         ${PROJECT_BINARY_DIR}/${project_name}.elf
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${PROJECT_BINARY_DIR}/${project_name}.elf)
+
+%% if core.startswith("cortex-m")
+  if(MODM_DFU_SERIAL)
+    set(dfu_serial -S ${MODM_DFU_SERIAL})
+  endif()
+  add_custom_target(program-dfu DEPENDS program-dfu.done)
+  add_custom_command(OUTPUT program-dfu.done
+    USES_TERMINAL
+    COMMAND dfu-util -v -E${MODM_DFU_DELAY} ${dfu_serial} -R -i 0 -a 0 -s {{ flash_address }}:leave
+        -D ${PROJECT_BINARY_DIR}/${project_name}.bin
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS ${PROJECT_BINARY_DIR}/${project_name}.elf)
+%% endif
 
   add_custom_target(debug DEPENDS debug.done)
   add_custom_command(OUTPUT debug.done

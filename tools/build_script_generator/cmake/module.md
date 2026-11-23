@@ -53,6 +53,21 @@ Writes the executable onto your target via JLink.
 (\* *only ARM Cortex-M targets*)
 
 
+#### program-dfu
+
+- option `MODM_DFU_DELAY=5` in seconds.
+- option `MODM_DFU_SERIAL` as string, empty by default.
+
+Writes the executable onto your target via Device Firmware Update (DFU) over
+USB with `dfu-util`. Some DFU devices require additional delay to re-enumerate,
+which you can specify with `MODM_DFU_DELAY`.
+
+With several DFU devices connected, select one with `MODM_DFU_SERIAL`. A device
+that runs its firmware is detached into its bootloader first, which may report
+another serial number: give both as `{firmware},{bootloader}`.
+(\* *only ARM Cortex-M targets*)
+
+
 #### debug
 
 - option `MODM_DBG_UI=tui` in {`tui`, `gdbgui`}.

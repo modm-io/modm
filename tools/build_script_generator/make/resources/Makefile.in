@@ -120,7 +120,7 @@ delay?=5
 CONFIG_FLASH_ADDRESS?=0x08000000
 .PHONY: program-dfu
 program-dfu: bin
-	@dfu-util -v -E$(delay) -R -i 0 -a 0 -s $(CONFIG_FLASH_ADDRESS):leave -D $(BIN_FILE)
+	@dfu-util -v -E$(delay) $(if $(serial),-S $(serial)) -R -i 0 -a 0 -s $(CONFIG_FLASH_ADDRESS):leave -D $(BIN_FILE)
 %#
 %% if platform in ["sam"]
 .PHONY: program-bossac
