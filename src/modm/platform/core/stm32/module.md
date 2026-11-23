@@ -14,6 +14,35 @@ forbidden until the supply configuration is written. The H7 boards do this in
 `modm_initialize_platform()`, which is called directly afterwards.
 
 
+## System Bootloader Serial Number
+
+Most STM32 system bootloaders report a USB serial number of 12 hexadecimal
+digits derived from the 96-bit unique device ID (UID):
+
+```
+UID_BASE + 0x0  UID0 ─┐
+                      ├─ add (wraps) ─► 8 hex digits ─┐
+UID_BASE + 0x8  UID2 ─┘                               ├─► 12 digit serial
+UID_BASE + 0x4  UID1 ──── >> 16 ────► 4 hex digits ───┘
+```
+
+On STM32L0 and STM32L1 the third UID word is at offset `0x14` instead of `0x8`.
+
+The bootloaders of some devices do not report a unique serial number:
+
+| Device         | Serial number  | Reason                                       |
+|:---------------|:---------------|:---------------------------------------------|
+| STM32F722/F723 | `STM32FxSTM32` | Default string, the UID is not read          |
+| STM32F746      | `00000008FFFF` | Reads the STM32F4 UID address `0x1FFF7A10`   |
+| STM32H743      | `100364500000` | Reads `DBGMCU` instead of the UID            |
+| STM32H745      | `200364500000` | Reads `DBGMCU` instead of the UID            |
+| STM32H7A3      | `FFFFFFFEFFFF` | Reads the erased address `0x1FF1E800`        |
+| STM32L152      | not unique     | Skips the third UID word at offset `0x14`    |
+
+The serial numbers of STM32H743 and STM32H745 depend on the silicon revision and
+end in `0070` instead of `0000` with a debugger attached.
+
+
 ## Linkerscript
 
 For each target a specific linkerscript is generated out of a template, which
