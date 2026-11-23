@@ -17,6 +17,8 @@ def init(module):
 
 def prepare(module, options):
     module.depends("modm:ext:stdc++")
+    if options[":target"].get_driver("core")["type"].startswith("cortex-m"):
+        module.depends("modm:ext:printf")
     return True
 
 

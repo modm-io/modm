@@ -21,4 +21,7 @@ public:
 
 	void
 	testWideString();
+
+	void
+	testSwprintf();
 };

@@ -32,3 +32,5 @@ def build(env):
         "is_hosted": is_hosted,
     }
     env.template("printf_config.h.in")
+    if env[":target"].get_driver("core")["type"].startswith("cortex-m"):
+        env.copy("newlib_printf.c")
