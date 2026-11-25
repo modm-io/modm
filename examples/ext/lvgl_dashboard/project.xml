@@ -1,0 +1,11 @@
+<library>
+  <!-- Set the revision of your board: b-01 to b-03 have an OTM8009A display, b-08 and c-01 an NT35510 -->
+  <extends>modm:disco-f469ni:b-01</extends>
+  <options>
+    <option name="modm:platform:cortex-m:main_stack_size">8Ki</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:ext:lvgl</module>
+  </modules>
+</library>
