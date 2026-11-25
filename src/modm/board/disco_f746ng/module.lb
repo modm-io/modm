@@ -30,6 +30,17 @@ accesses, so the MPU maps the SDRAM as normal memory. It is not cacheable, so
 that the CPU and DMAs always see the same data.
 
 
+## Display
+
+The 4.3" 480x272 LCD is driven by the LTDC with an RGB565 framebuffer. Call
+`Board::initializeDisplay()` and show a framebuffer with
+`Board::setDisplayBuffer(buffer)`, which switches during the next vertical
+blanking period. The capacitive touch panel uses an FT5336 controller, which you
+initialize with `Board::initializeTouchscreen()` and read with `Board::ft6::Touch`.
+It reports the axes swapped: the display coordinates are `x = touch.y` and
+`y = touch.x`.
+
+
 ## TinyUSB
 
 This board has two USB ports: one with Full Speed support and another with true
@@ -61,10 +72,13 @@ def prepare(module, options):
 
     module.depends(
         ":architecture:clock",
+        ":architecture:fiber",
         ":debug",
+        ":driver:ft6x06",
         ":platform:clock",
         ":platform:core",
         ":platform:gpio",
+        ":platform:i2c:3",
         ":platform:uart:1",
         ":platform:usb:fs",
         ":platform:usb:hs")
