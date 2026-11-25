@@ -1,0 +1,11 @@
+<library>
+  <extends>modm:disco-f723ie</extends>
+  <options>
+    <option name="modm:platform:cortex-m:main_stack_size">8Ki</option>
+  </options>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:platform:heap</module>
+    <module>modm:ext:lvgl</module>
+  </modules>
+</library>
