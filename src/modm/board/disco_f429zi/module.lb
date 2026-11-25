@@ -23,6 +23,13 @@ def init(module):
 To use the logging, you need to close SB11 and SB15 and upgrade the STLINK/V2-B
 firmware! See Section 6.3 "Embedded ST-LINK/V2-B" of UM1670.
 
+## External Memory
+
+The 8MB SDRAM on the FMC is configured before `main()` and added to the heap.
+You can allocate from it with `new (modm::MemoryExternal) T` or place objects
+into it with the `.data_sdram`, `.bss_sdram` or `.noinit_sdram` sections.
+
+
 ## TinyUSB
 
 To use the USB port, you must configure TinyUSB to use the HS port in FS mode:
@@ -60,3 +67,67 @@ def build(env):
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
     env.collect(":build:openocd.source", "board/stm32f429discovery.cfg")
+
+    env.collect(":platform:cortex-m:linkerscript.memory", linkerscript_memory)
+    env.collect(":platform:cortex-m:linkerscript.sections", linkerscript_sections)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.zero", linkerscript_extern_zero)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.copy", linkerscript_extern_copy)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_extern_heap)
+
+
+# =============================================================================
+linkerscript_memory = """\
+SDRAM (rwx) : ORIGIN = 0xD0000000, LENGTH = 8M
+"""
+
+linkerscript_sections = """\
+.data_sdram :
+{
+    __data_sdram_load = LOADADDR(.data_sdram);
+    __data_sdram_start = .;
+    *(.data_sdram .data_sdram.*)
+    . = ALIGN(4);
+    __data_sdram_end = .;
+} >SDRAM AT >FLASH
+
+.bss_sdram (NOLOAD) :
+{
+    __bss_sdram_start = .;
+    *(.bss_sdram .bss_sdram.*)
+    . = ALIGN(4);
+    __bss_sdram_end = .;
+} >SDRAM
+
+.noinit_sdram (NOLOAD) :
+{
+    __noinit_sdram_start = .;
+    *(.noinit_sdram .noinit_sdram.*)
+    . = ALIGN(4);
+    __noinit_sdram_end = .;
+} >SDRAM
+
+.heap_sdram (NOLOAD) :
+{
+    __heap_sdram_start = .;
+    *(.heap_sdram .heap_sdram.*)
+    . = ORIGIN(SDRAM) + LENGTH(SDRAM);
+    __heap_sdram_end = .;
+} >SDRAM
+"""
+
+linkerscript_extern_zero = """\
+LONG(__bss_sdram_start)
+LONG(__bss_sdram_end)
+"""
+
+linkerscript_extern_copy = """\
+LONG(__data_sdram_load)
+LONG(__data_sdram_start)
+LONG(__data_sdram_end)
+"""
+
+linkerscript_extern_heap = """\
+LONG(0x801f)
+LONG(__heap_sdram_start)
+LONG(__heap_sdram_end)
+"""
