@@ -56,7 +56,7 @@ using namespace Board;
 using namespace std::chrono_literals;
 using namespace modm::platform;
 
-#if __has_include(<modm/driver/touch/ft6x06.hpp>)
+#if defined(STM32F469xx)
 namespace dev
 {
 	using Scl = Board::ft6::Scl;
@@ -281,7 +281,7 @@ run(const char *name)
 	Master::template initialize<Board::SystemClock, dev::Baudrate>();
 
 	uint8_t address = dev::Address;
-#if __has_include(<modm/driver/touch/ft6x06.hpp>)
+#if defined(STM32F469xx)
 	{
 		modm::I2cDevice<Master> other{dev::Address2};
 		if (other.ping()) address = dev::Address2;
