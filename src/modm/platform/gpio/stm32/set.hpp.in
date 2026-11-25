@@ -41,6 +41,15 @@ protected:
 			if (masks[id] & (1 << ii)) r |= (uint32_t(value) << (ii * 2));
 		return r;
 	}
+%% if target["family"] not in ["f1"]
+	/// The 4-bit fields of the pins in the lower (half=0) or upper (half=1) AFR register
+	static constexpr uint32_t afr(uint8_t id, uint8_t half, uint8_t value = 0b1111) {
+		uint32_t r{0};
+		for (int ii=0; ii<8; ii++)
+			if (masks[id] & (1 << (ii + half * 8))) r |= (uint32_t(value) << (ii * 4));
+		return r;
+	}
+%% endif
 %% if target["family"] in ["f1"]
 	static constexpr uint64_t mask4(uint8_t id, uint8_t value = 0b1111) {
 		uint64_t r{0};
@@ -107,6 +116,21 @@ public:
 %% endif
 	}
 
+%% if target["family"] not in ["f1"]
+	/// Connects all pins to the same alternate function, with one access per register and port.
+	/// Use this instead of connecting many pins one by one, e.g. for a memory bus.
+	static void setAlternateFunction(uint8_t af)
+	{
+	%% for port, id in ports.items()
+		if constexpr (mask({{id}})) {
+			if constexpr (afr({{id}}, 0)) GPIO{{port}}->AFR[0] = (GPIO{{port}}->AFR[0] & ~afr({{id}}, 0)) | ((af & 0xf) * afr({{id}}, 0, 1));
+			if constexpr (afr({{id}}, 1)) GPIO{{port}}->AFR[1] = (GPIO{{port}}->AFR[1] & ~afr({{id}}, 1)) | ((af & 0xf) * afr({{id}}, 1, 1));
+			GPIO{{port}}->MODER = (GPIO{{port}}->MODER & ~mask2({{id}})) | mask2({{id}}, i(Mode::AlternateFunction));
+		}
+	%% endfor
+	}
+
+%% endif
 	static void setInput()
 	{
 %% if target["family"] in ["f1"]
