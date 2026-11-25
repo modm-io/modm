@@ -18,6 +18,18 @@ def init(module):
 
 [Discovery kit for STM32F746](https://www.st.com/en/evaluation-tools/32f746gdiscovery.html)
 
+## External Memory
+
+The SDRAM on the FMC is configured before `main()` and added to the heap. Only
+16 of its 32 data bits are connected, so 8MB of its 16MB are accessible. You can
+allocate from it with `new (modm::MemoryExternal) T` or place objects into it
+with the `.data_sdram`, `.bss_sdram` or `.noinit_sdram` sections.
+
+The Cortex-M7 treats 0xC0000000 as device memory, which does not allow unaligned
+accesses, so the MPU maps the SDRAM as normal memory. It is not cacheable, so
+that the CPU and DMAs always see the same data.
+
+
 ## TinyUSB
 
 This board has two USB ports: one with Full Speed support and another with true
@@ -67,3 +79,67 @@ def build(env):
     env.template("../board.cpp.in", "board.cpp")
     env.copy('.')
     env.collect(":build:openocd.source", "board/stm32f7discovery.cfg")
+
+    env.collect(":platform:cortex-m:linkerscript.memory", linkerscript_memory)
+    env.collect(":platform:cortex-m:linkerscript.sections", linkerscript_sections)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.zero", linkerscript_extern_zero)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.copy", linkerscript_extern_copy)
+    env.collect(":platform:cortex-m:linkerscript.table_extern.heap", linkerscript_extern_heap)
+
+
+# =============================================================================
+linkerscript_memory = """\
+SDRAM (rwx) : ORIGIN = 0xC0000000, LENGTH = 8M
+"""
+
+linkerscript_sections = """\
+.data_sdram :
+{
+    __data_sdram_load = LOADADDR(.data_sdram);
+    __data_sdram_start = .;
+    *(.data_sdram .data_sdram.*)
+    . = ALIGN(4);
+    __data_sdram_end = .;
+} >SDRAM AT >FLASH
+
+.bss_sdram (NOLOAD) :
+{
+    __bss_sdram_start = .;
+    *(.bss_sdram .bss_sdram.*)
+    . = ALIGN(4);
+    __bss_sdram_end = .;
+} >SDRAM
+
+.noinit_sdram (NOLOAD) :
+{
+    __noinit_sdram_start = .;
+    *(.noinit_sdram .noinit_sdram.*)
+    . = ALIGN(4);
+    __noinit_sdram_end = .;
+} >SDRAM
+
+.heap_sdram (NOLOAD) :
+{
+    __heap_sdram_start = .;
+    *(.heap_sdram .heap_sdram.*)
+    . = ORIGIN(SDRAM) + LENGTH(SDRAM);
+    __heap_sdram_end = .;
+} >SDRAM
+"""
+
+linkerscript_extern_zero = """\
+LONG(__bss_sdram_start)
+LONG(__bss_sdram_end)
+"""
+
+linkerscript_extern_copy = """\
+LONG(__data_sdram_load)
+LONG(__data_sdram_start)
+LONG(__data_sdram_end)
+"""
+
+linkerscript_extern_heap = """\
+LONG(0x801f)
+LONG(__heap_sdram_start)
+LONG(__heap_sdram_end)
+"""
