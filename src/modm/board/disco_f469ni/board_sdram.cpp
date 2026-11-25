@@ -10,56 +10,8 @@
 // ----------------------------------------------------------------------------
 
 #include "board.hpp"
-#include <modm/math/utils/bit_constants.hpp>
 
 // ----------------------------------- SDRAM -----------------------------------
-static void
-sdram_configure_gpio(GPIO_TypeDef * const port, const uint16_t mask)
-{
-	// For all GPIOs:
-	// - Pull-Up
-	// - Fast Speed
-	// - Alternate Function 12
-	// => MODER = 0b10
-	// => OTYPER = 0b0
-	// => OSPEEDR = 0b11
-	// => PUPDR = 0b01
-	// => AFR = 0b1100
-
-	// compute the 0b11 and 0b1111 spreads
-	uint32_t portMask2 = 0;
-	uint32_t portMask4[2] = {0,0};
-	for (int ii = 0; ii < 16; ii++) {
-		if (mask & (1 << ii)) {
-			portMask2 |= (0b11 << (ii * 2));
-			if (ii < 8) {
-				portMask4[0] |= (0b1111 << (ii * 4));
-			} else {
-				portMask4[1] |= (0b1111 << ((ii - 8) * 4));
-			}
-		}
-	}
-	// mask to get the actual bit masks
-	const uint32_t port01 = 0x55555555 & portMask2;
-	const uint32_t port10 = 0xAAAAAAAA & portMask2;
-	const uint32_t port1100L = 0xCCCCCCCC & portMask4[0];
-	const uint32_t port1100H = 0xCCCCCCCC & portMask4[1];
-
-	port->AFR[0]  = port1100L;
-	port->AFR[1]  = port1100H;
-	port->OSPEEDR = port10 | port01;
-	port->PUPDR   = port01;
-	port->MODER   = port10;
-	port->OTYPER &= ~mask;
-
-	// We lock the corresponding GPIO pins, so that users do not shoot
-	// themselves in their feet, if they accidentally use SDRAM GPIOs.
-	port->LCKR = 0x10000 | mask;
-	port->LCKR = 0x00000 | mask;
-	port->LCKR = 0x10000 | mask;
-	(void) port->LCKR;
-}
-
 static bool
 sdram_send_command(uint8_t mode, uint8_t auto_refresh = 1, uint16_t mode_register = 0)
 {
@@ -81,21 +33,24 @@ board_initialize_sdram()
 	using namespace modm;
 	// Strongly inspired by the F469I-DISCO BSP from ST
 
-	// Configure all pins
-	// C0
-	sdram_configure_gpio(GPIOC, Bit0);
-	// D0, D1, D8, D9, D10, D14, D15
-	sdram_configure_gpio(GPIOD, Bit0 | Bit1 | Bit8 | Bit9 | Bit10 | Bit14 | Bit15);
-	// E0, E1, E7, E8, E9, E10, E11, E12, E13, E14, E15
-	sdram_configure_gpio(GPIOE, Bit0 | Bit1 | Bit7 | Bit8 | Bit9 | Bit10 | Bit11 | Bit12 | Bit13 | Bit14 | Bit15);
-	// F0, F1, F2, F3, F4, F5, F11, F12, F13, F14, F15
-	sdram_configure_gpio(GPIOF, Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5 | Bit11 | Bit12 | Bit13 | Bit14 | Bit15);
-	// G0, G1, G4, G5, G8, G15
-	sdram_configure_gpio(GPIOG, Bit0 | Bit1 | Bit4 | Bit5 | Bit8 | Bit15);
-	// H2, H3, H8, H9, H10, H11, H12, H13, H14, H15
-	sdram_configure_gpio(GPIOH, Bit2 | Bit3 | Bit8 | Bit9 | Bit10 | Bit11 | Bit12 | Bit13 | Bit14 | Bit15);
-	// I0, I1, I2, I3, I4, I5, I6, I7, I9, I10
-	sdram_configure_gpio(GPIOI, Bit0 | Bit1 | Bit2 | Bit3 | Bit4 | Bit5 | Bit6 | Bit7 | Bit9 | Bit10);
+	// Configure all pins as fast push-pull outputs with pull-up on alternate function 12
+	using Pins = GpioSet<
+		// D0-D15
+		GpioD14, GpioD15, GpioD0, GpioD1, GpioE7, GpioE8, GpioE9, GpioE10,
+		GpioE11, GpioE12, GpioE13, GpioE14, GpioE15, GpioD8, GpioD9, GpioD10,
+		// D16-D31
+		GpioH8, GpioH9, GpioH10, GpioH11, GpioH12, GpioH13, GpioH14, GpioH15,
+		GpioI0, GpioI1, GpioI2, GpioI3, GpioI6, GpioI7, GpioI9, GpioI10,
+		// A0-A11, BA0, BA1
+		GpioF0, GpioF1, GpioF2, GpioF3, GpioF4, GpioF5, GpioF12, GpioF13, GpioF14,
+		GpioF15, GpioG0, GpioG1, GpioG4, GpioG5,
+		// SDNE0, SDCKE0, SDCLK, SDNWE, SDNRAS, SDNCAS, NBL0-NBL3
+		GpioH3, GpioH2, GpioG8, GpioC0, GpioF11, GpioG15, GpioE0, GpioE1, GpioI4, GpioI5>;
+	Pins::configure(modm::platform::Gpio::OutputType::PushPull, modm::platform::Gpio::OutputSpeed::VeryHigh);
+	Pins::configure(modm::platform::Gpio::InputType::PullUp);
+	Pins::setAlternateFunction(12);
+	// Lock the pins, so that they cannot be reconfigured by accident
+	Pins::lock();
 
 	// Configure the SDRAM
 	// Enable FMC clock
