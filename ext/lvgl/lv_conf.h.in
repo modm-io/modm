@@ -18,5 +18,18 @@
 #define LV_USE_STDLIB_MALLOC    LV_STDLIB_CLIB
 #define LV_USE_STDLIB_STRING    LV_STDLIB_CLIB
 #define LV_USE_STDLIB_SPRINTF   LV_STDLIB_CLIB
+%% if dma2d
+
+/*=========================
+   DMA2D DRAW UNIT
+ *=========================*/
+
+#ifndef LV_USE_DRAW_DMA2D
+#define LV_USE_DRAW_DMA2D       1
+#endif
+// The family header defines the family macros the DMA2D draw unit checks
+#define {{ dma2d.define }} 1
+#define LV_DRAW_DMA2D_HAL_INCLUDE <{{ dma2d.family_header }}>
+%% endif
 
 #endif /*LV_CONF_H*/
