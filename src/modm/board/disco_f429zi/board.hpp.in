@@ -287,7 +287,11 @@ using Uart = BufferedUart<UsartHal1, UartTxBuffer<2048>>;
 
 /// @ingroup modm_board_disco_f429zi
 /// @{
+%% if with_rtt
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+%% else
 using LoggerDevice = modm::IODeviceWrapper< stlink::Uart, modm::IOBuffer::BlockIfFull >;
+%% endif
 
 inline void
 initialize()
@@ -295,8 +299,10 @@ initialize()
 	SystemClock::enable();
 	SysTickTimer::initialize<SystemClock>();
 
+%% if not with_rtt
 	stlink::Uart::connect<stlink::Tx::Tx, stlink::Rx::Rx>();
 	stlink::Uart::initialize<SystemClock, 115200_Bd>();
+%% endif
 
 	LedGreen::setOutput(modm::Gpio::Low);
 	LedRed::setOutput(modm::Gpio::Low);
