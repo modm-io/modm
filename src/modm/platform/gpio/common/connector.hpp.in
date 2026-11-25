@@ -94,10 +94,65 @@ struct GpioConnector
 %% endif
 	}
 
+%% if target.platform in ["stm32"] and target.family not in ["f1"]
+	/// The AFR fields (value=false) or alternate functions (value=true) of all signals on a port
+	template< class Signal >
+	static constexpr uint64_t afr(Gpio::Port port, bool value)
+	{
+		if constexpr (std::is_same_v<typename Signal::Data, detail::DataUnused>) return 0;
+		else {
+			constexpr int8_t af = detail::SignalConnection<Signal, peripheral>::af;
+			if (af < 0 or Signal::Data::port != port) return 0;
+			return uint64_t(value ? af : 0xf) << (Signal::Data::pin * 4);
+		}
+	}
+
+	/// The MODER fields of all signals with an alternate function on a port
+	template< class Signal >
+	static constexpr uint32_t moder(Gpio::Port port)
+	{
+		if constexpr (std::is_same_v<typename Signal::Data, detail::DataUnused>) return 0;
+		else {
+			constexpr int8_t af = detail::SignalConnection<Signal, peripheral>::af;
+			if (af < 0 or Signal::Data::port != port) return 0;
+			return 0b11ul << (Signal::Data::pin * 2);
+		}
+	}
+
+	template< class Signal >
+	static void connectAnalog()
+	{
+		if constexpr (not std::is_same_v<typename Signal::Data, detail::DataUnused>) {
+			if constexpr (detail::SignalConnection<Signal, peripheral>::af == -2) {
+				GpioStatic<typename Signal::Data>::disconnect();
+				GpioStatic<typename Signal::Data>::setAnalogInput();
+			}
+		}
+	}
+
+	/// Connects all signals with one read-modify-write of AFR and MODER per port
+	static inline void connect()
+	{
+		(connectAnalog<Signals>(), ...);
+	%% for port in ports
+		if constexpr (constexpr uint64_t mask = (afr<Signals>(Gpio::Port::{{port}}, false) | ... | 0); mask)
+		{
+			constexpr uint64_t value = (afr<Signals>(Gpio::Port::{{port}}, true) | ... | 0);
+			constexpr uint32_t mode = (moder<Signals>(Gpio::Port::{{port}}) | ... | 0);
+			if constexpr (uint32_t(mask))
+				GPIO{{port}}->AFR[0] = (GPIO{{port}}->AFR[0] & ~uint32_t(mask)) | uint32_t(value);
+			if constexpr (uint32_t(mask >> 32))
+				GPIO{{port}}->AFR[1] = (GPIO{{port}}->AFR[1] & ~uint32_t(mask >> 32)) | uint32_t(value >> 32);
+			GPIO{{port}}->MODER = (GPIO{{port}}->MODER & ~mode) | (mode & 0xAAAA'AAAA);
+		}
+	%% endfor
+	}
+%% else
 	static inline void connect()
 	{
 		(connectSignal<Signals>(), ...);
 	}
+%% endif
 
 	static inline void disconnect()
 	{
