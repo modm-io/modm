@@ -32,9 +32,14 @@ Heap:     17.0 KiB /  20.0 KiB (84.9% available)
 (.heap1)
 ```
 
+Writable sections outside of these memories are in external memory, for example
+an SDRAM that the board adds to the linker script and fills up with heap. They
+are added to the heap total.
+
 (\* *only ARM Cortex-M targets*)
 """
 
+import math
 import textwrap
 from collections import defaultdict
 from pathlib import Path
@@ -49,7 +54,7 @@ Program: {rom_fmt:>9s} / {rom_total:>9s} ({rom_p:2.1f}% used)
 Data:    {ram_fmt:>9s} / {ram_total:>9s} ({ram_p:2.1f}% used) = {static} B static ({static_p:2.1f}%) + {stack} B stack ({stack_p:2.1f}%)
 ({ram_s})
 
-Heap:  {heap_fmt:>11s} / {ram_total:>9s} ({heap_p:2.1f}% available)
+Heap:  {heap_fmt:>11s} / {heap_total:>9s} ({heap_p:2.1f}% available)
 ({heap_s})
 """
 
@@ -94,6 +99,7 @@ def format(source, device_memories):
                 "vaddr": section["sh_addr"],
                 "paddr": section["sh_addr"],
                 "size": section["sh_size"],
+                "writable": bool(section["sh_flags"] & 1),  # SHF_WRITE
             }
             if s["vaddr"] == 0 or s["size"] == 0: continue;
             for segment in elffile.iter_segments():
@@ -104,7 +110,17 @@ def format(source, device_memories):
 
     sections = defaultdict(list)
     totals = defaultdict(int)
+    def is_in_memory(s, name):
+        start = s[{"rom": "paddr", "ram": "vaddr"}[name]]
+        return any(((m["start"] <= start) and
+                    ((start + s["size"]) <= (m["start"] + m["size"])))
+                    for m in memories[name])
+
     for s in memory_sections:
+        # Writable sections outside of the device memories are in external
+        # memory, which the linker script adds and fills up with heap
+        if s["writable"] and not is_in_memory(s, "ram") and not is_in_memory(s, "rom"):
+            totals["external"] += s["size"]
         if s["name"].startswith(".stack"):
             totals["stack"] += s["size"]
             sections["stack"].append(s["name"])
@@ -112,18 +128,11 @@ def format(source, device_memories):
             totals["heap"] += s["size"]
             sections["heap"].append(s["name"])
         else:
-
-            def is_in_memory(name):
-                start = s[{"rom": "paddr", "ram": "vaddr"}[name]]
-                return any(((m["start"] <= start) and
-                            ((start + s["size"]) <= (m["start"] + m["size"])))
-                            for m in memories[name])
-
-            if is_in_memory("rom"):
+            if is_in_memory(s, "rom"):
                 totals["rom"] += s["size"]
                 if not ".build_id" in s["name"]:
                     sections["rom"].append(s["name"])
-            if is_in_memory("ram"):
+            if is_in_memory(s, "ram"):
                 totals["static"] += s["size"]
                 sections["static"].append(s["name"])
 
@@ -144,7 +153,8 @@ def format(source, device_memories):
         "ram_p": (totals["static"] + totals["stack"]) / float(ram) * 100.0,
         "static_p": totals["static"] / float(ram) * 100.0,
         "stack_p": totals["stack"] / float(ram) * 100.0,
-        "heap_p": totals["heap"] / float(ram) * 100.0
+        # Round down, so that a heap with anything used is never 100.0% available
+        "heap_p": math.floor(totals["heap"] / float(ram + totals["external"]) * 1000.0) / 10.0
     }
     subs.update(totals)
 
@@ -152,6 +162,7 @@ def format(source, device_memories):
                                   rom_fmt=human_readable_format(subs["rom"]),
                                   heap_fmt=human_readable_format(subs["heap"]),
                                   ram_total=human_readable_format(ram),
+                                  heap_total=human_readable_format(ram + totals["external"]),
                                   rom_total=human_readable_format(flash),
                                   **subs)
     return output
