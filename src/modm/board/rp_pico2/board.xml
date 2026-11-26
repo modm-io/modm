@@ -1,0 +1,16 @@
+<library>
+  <repositories>
+    <repository>
+      <path>../../../../repo.lb</path>
+    </repository>
+  </repositories>
+
+  <options>
+    <option name="modm:target">rp2350a</option>
+    <option name="modm:platform:core:boot2">w25q080</option>
+    <option name="modm:platform:core:flash_size">4Mi</option>
+  </options>
+  <modules>
+    <module>modm:board:rp-pico2</module>
+  </modules>
+</library>

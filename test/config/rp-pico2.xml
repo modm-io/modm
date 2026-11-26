@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library>
+  <extends>modm:rp-pico2</extends>
+  <options>
+    <option name="modm:build:build.path">../../build/generated-unittest/rp-pico2/</option>
+    <option name="modm:build:unittest.source">../../build/generated-unittest/rp-pico2/modm-test</option>
+    <option name="modm:board:rp-pico2:logger">RTT</option>
+    <option name="modm:ext:rtt:buffer.tx">16384</option>
+    <option name="modm:ext:tinyusb:config">device.cdc</option>
+  </options>
+  <modules>
+    <module>modm:platform:heap</module>
+    <module>modm-test:test:**</module>
+  </modules>
+</library>

@@ -243,3 +243,6 @@ run-samv71-xplained-ultra:
 
 compile-rp-pico:
 	$(call compile-test,rp-pico,size uf2)
+
+compile-rp-pico2:
+	$(call compile-test,rp-pico2,size uf2)

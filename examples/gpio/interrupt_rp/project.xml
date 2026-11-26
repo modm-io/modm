@@ -1,5 +1,6 @@
 <library>
   <extends>modm:rp-pico</extends>
+  <!-- <extends>modm:rp-pico2</extends> -->
   <modules>
     <module>modm:platform:extint</module>
     <module>modm:build:scons</module>

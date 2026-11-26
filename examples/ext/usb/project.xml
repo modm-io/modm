@@ -20,6 +20,7 @@
   <!-- <extends>modm:nucleo-h743zi</extends> -->
   <!-- <extends>modm:nucleo-h7a3zi-q</extends> -->
   <!-- <extends>modm:rp-pico</extends> -->
+  <!-- <extends>modm:rp-pico2</extends> -->
   <!-- <extends>modm:samd21-mini</extends> -->
   <!-- <extends>modm:weact-g0b1cb</extends> -->
   <!-- <extends>modm:weact-u585ci</extends> -->

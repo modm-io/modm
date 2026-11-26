@@ -1,0 +1,124 @@
+/*
+ *
+ * Copyright (c) 2022, Andrey Kunitsyn
+ * Copyright (c) 2022, Nikolay Semenov
+ * Copyright (c) 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include <modm/architecture/interface/clock.hpp>
+#include <modm/platform.hpp>
+%% if with_logger
+#include <modm/debug/logger.hpp>
+#include <modm/io.hpp>
+#define MODM_BOARD_HAS_LOGGER
+%% endif
+
+using namespace modm::platform;
+
+namespace Board
+{
+using namespace modm::literals;
+
+/// RP2350 running at 150MHz generated from the external 12MHz crystal
+/// @ingroup modm_board_rp_pico2
+struct SystemClock
+{
+	static constexpr uint32_t Frequency = 150_MHz;
+	static constexpr uint32_t XOSCFrequency = 12_MHz;
+	static constexpr uint32_t PllSysFrequency = Frequency;
+	static constexpr uint32_t PllUsbFrequency = 48_MHz;
+	static constexpr uint32_t SysPLLMul = 125;
+	static constexpr uint32_t UsbPLLMul = 100;
+	static constexpr uint32_t RefFrequency = XOSCFrequency;
+	static constexpr uint32_t UsbFrequency = PllUsbFrequency;
+	static constexpr uint32_t AdcFrequency = PllUsbFrequency;
+	static constexpr uint32_t SysFrequency = Frequency;
+	static constexpr uint32_t PeriFrequency = SysFrequency;
+
+	static bool inline enable()
+	{
+		ClockControl::disableResus();
+		ClockControl::enableExternalCrystal(XOSCFrequency);
+		ClockControl::disableAux<ClockControl::Clock::Sys>();
+		ClockControl::disableAux<ClockControl::Clock::Ref>();
+		// PLL SYS: 12MHz / 1 = 12MHz * 125 = 1500MHZ / 5 / 2 = 150MHz
+		ClockControl::initPll<ClockControl::Pll::Sys, 1, SysPLLMul, 5, 2>();
+		// PLL USB: 12MHz / 1 = 12MHz * 100 = 1200MHz / 5 / 5 =  48MHz
+		ClockControl::initPll<ClockControl::Pll::Usb, 1, UsbPLLMul, 5, 5>();
+
+		// CLK_REF = XOSC (12MHz) / 1 = 12MHz
+		ClockControl::configureClock<ClockControl::Clock::Ref, ClockControl::ClockSrc::Xosc,
+									 XOSCFrequency, RefFrequency>();
+		// CLK SYS = PLL SYS (150MHz) / 1 = 150MHz
+		ClockControl::configureClock<ClockControl::Clock::Sys, ClockControl::ClockSrc::PllSys,
+									 PllSysFrequency, SysFrequency>();
+		// CLK USB = PLL USB (48MHz) / 1 = 48MHz
+		ClockControl::configureClock<ClockControl::Clock::Usb, ClockControl::ClockSrc::PllUsb,
+									 PllUsbFrequency, UsbFrequency>();
+		// CLK ADC = PLL USB (48MHZ) / 1 = 48MHz
+		ClockControl::configureClock<ClockControl::Clock::Adc, ClockControl::ClockSrc::PllUsb,
+									 PllUsbFrequency, AdcFrequency>();
+		// CLK PERI = clk_sys (150MHz) / 1 = 150MHz
+		ClockControl::configureClock<ClockControl::Clock::Peri, ClockControl::ClockSrc::Sys,
+									 SysFrequency, PeriFrequency>();
+
+		ClockControl::updateCoreFrequency<Frequency>();
+		return true;
+	}
+};
+
+namespace usb
+{
+/// @ingroup modm_board_rp_pico2
+using Device = Usb;
+}
+
+/// @ingroup modm_board_rp_pico2
+/// @{
+// User LED
+using LedGreen = GpioOutput25;
+using Leds = SoftwareGpioPort<LedGreen>;
+
+using Button = GpioUnused;
+
+%% if with_logger == "UART"
+using LoggerDevice = modm::IODeviceWrapper< Uart0, modm::IOBuffer::BlockIfFull >;
+%% elif with_logger == "RTT"
+using LoggerDevice = modm::IODeviceWrapper< Rtt<0>, modm::IOBuffer::DiscardIfFull >;
+%% endif
+
+inline void
+initialize()
+{
+	SystemClock::enable();
+	TimerClock::initialize<SystemClock>();
+
+	LedGreen::setOutput();
+
+%% if with_logger == "UART"
+	// initialize Uart0 for MODM_LOG_*
+	Uart0::connect<GpioOutput0::Tx>();
+	Uart0::initialize<Board::SystemClock, 115200_Bd>();
+%% endif
+
+}
+
+inline void
+initializeUsb(uint8_t priority=3)
+{
+	usb::Device::initialize<SystemClock>(priority);
+	usb::Device::connect<>();
+}
+
+/// @}
+
+}  // namespace Board

@@ -1,7 +1,11 @@
 <library>
   <extends>modm:rp-pico</extends>
+  <!-- <extends>modm:rp-pico2</extends> -->
   <options>
+    <!-- Required for modm:rp-pico -->
     <option name="modm:board:rp-pico:with_logger">yes</option>
+    <!-- Required for modm:rp-pico2 -->
+    <!-- <option name="modm:board:rp-pico2:logger">UART</option> -->
   </options>
   <modules>
     <module>modm:io</module>
