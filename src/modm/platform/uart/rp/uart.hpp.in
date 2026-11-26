@@ -160,7 +160,7 @@ public:
 %% if options["buffer.rx"] > fifo_size
 		/* If RX buffering with more than {{ fifo_size }} bytes is requested a software queue
 		 * must be used for receiving. This involves the Rx Interrupt only. */
-		uart{{ id }}_hw->imsc = UART_UARTIMSC_RXIM_BITS;
+		uart{{ id }}_hw->imsc = UART_UARTIMSC_RXIM_BITS | UART_UARTIMSC_RTIM_BITS;
 %% endif
 
 %% if options["buffer.tx"] > fifo_size or options["buffer.rx"] > fifo_size

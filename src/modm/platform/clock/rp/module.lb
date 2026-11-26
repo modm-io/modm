@@ -20,7 +20,7 @@ def prepare(module, options):
     if not options[":target"].has_driver("clocks:rp*"):
         return False
 
-    module.depends(":ext:cmsis:device", ":utils")
+    module.depends(":architecture:delay", ":ext:cmsis:device", ":utils")
     return True
 
 def _space_numbers(match):

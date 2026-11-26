@@ -76,6 +76,7 @@ modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configurat
 		hw().enable = 1;
 
 		auto nextOperation = static_cast<modm::I2c::Operation>(starting.next);
+		bool transferred = false;
 
 		do
 		{
@@ -87,6 +88,7 @@ modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configurat
 					// what next?
 					nextOperation = static_cast<modm::I2c::Operation>(writing.next);
 					doWrite<SimpleWait>(writing.buffer,writing.length,nextOperation!=I2c::Operation::Stop);
+					transferred |= writing.length > 0;
 				} break;
 
 				case I2c::Operation::Read:
@@ -94,6 +96,7 @@ modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configurat
 					auto reading = transaction->reading();
 					nextOperation = static_cast<modm::I2c::Operation>(reading.next);
 					doRead<SimpleWait>(reading.buffer,reading.length,nextOperation!=I2c::Operation::Stop);
+					transferred |= reading.length > 0;
 					break;
 				}
 
@@ -104,6 +107,14 @@ modm::platform::I2cMaster{{ id }}::start(I2cTransaction *transaction, Configurat
 
 				default:
 				case I2c::Operation::Stop:
+					if (not transferred)
+					{
+						// The controller cannot send only the address (I2cDevice::ping),
+						// so read one byte to see whether the address is acknowledged.
+						uint8_t dummy;
+						doRead<SimpleWait>(&dummy, 1, false);
+						if (errorState != Error::NoError) break;
+					}
 					transaction->detaching(modm::I2c::DetachCause::NormalStop);
 					return true;
 			}

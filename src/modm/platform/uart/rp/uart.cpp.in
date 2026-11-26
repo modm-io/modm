@@ -168,7 +168,7 @@ modm::platform::Uart{{ id }}::discardTransmitBuffer()
 	atomic::Lock lock;
 	std::size_t count(0);
 	// disable interrupt since buffer will be cleared
-	uart{{ id }}_hw->imsc &= UART_UARTIMSC_TXIM_BITS;
+	uart{{ id }}_hw->imsc &= ~UART_UARTIMSC_TXIM_BITS;
 	while(not txBuffer.isEmpty())
 	{
 		++count;
@@ -196,7 +196,7 @@ modm::platform::Uart{{ id }}::read(uint8_t& data)
 		if (rxBuffer.isNotFull())
 		{
 			atomic::Lock lock;
-			uart{{ id }}_hw->imsc |= UART_UARTIMSC_RXIM_BITS;
+			uart{{ id }}_hw->imsc |= UART_UARTIMSC_RXIM_BITS | UART_UARTIMSC_RTIM_BITS;
 		}
 		return true;
 	}
@@ -263,13 +263,14 @@ MODM_ISR(UART{{ id }}_IRQ)
 	}
 %% endif
 %% if options["buffer.rx"] > fifo_size
-	if (IValue & UART_UARTMIS_RXMIS_BITS)
+	// The receive timeout interrupt fetches the bytes below the FIFO level
+	if (IValue & (UART_UARTMIS_RXMIS_BITS | UART_UARTMIS_RTMIS_BITS))
 	{
-		while(!rx_fifo_empty()) {
+		while(!rx_fifo_empty() and rxBuffer.isNotFull()) {
 			rxBuffer.push(uart{{ id }}_hw->dr);
 		}
 		if (rxBuffer.isFull()) {
-			uart{{ id }}_hw->imsc &= ~UART_UARTIMSC_RXIM_BITS;
+			uart{{ id }}_hw->imsc &= ~(UART_UARTIMSC_RXIM_BITS | UART_UARTIMSC_RTIM_BITS);
 		}
 	}
 %% endif
