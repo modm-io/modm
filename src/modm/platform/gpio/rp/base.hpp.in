@@ -125,24 +125,31 @@ struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 	static void sio_{{reg}}(PortMask mask) { sio_hw->gpio{{sio_names[port]}}_{{reg}} = mask{% if sio_shift[port] %} << {{sio_shift[port]}}{% endif %}; }
 %% endif
 %% endfor
+%% if pad_index[port]
+	// The pads are ordered differently from the IO and SIO bits
+	static constexpr uint8_t pad(uint8_t pin)
+	{ constexpr uint8_t pads[] = { {{ pad_index[port] | join(", ") }} }; return pads[pin]; }
+%% else
+	static constexpr uint8_t pad(uint8_t pin) { return pin; }
+%% endif
 	static uint8_t funcsel(uint8_t pin)
 	{ return (io{{port | lower}}_hw->io[pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) >> IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB; }
 	static void set_funcsel(uint8_t pin, uint32_t fn)
 	{
-		hw_write_masked(&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+		hw_write_masked(&pads{{(pads_names[port] or port) | lower}}_hw->io[pad(pin)],
 				   PADS_BANK0_GPIO0_IE_BITS,
 				   PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS
 		);
 		io{{port | lower}}_hw->io[pin].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
 %% if target.family == "23"
 		// Remove the pad isolation latch only after the function is selected
-		hw_clear_bits(&pads{{(pads_names[port] or port) | lower}}_hw->io[pin], PADS_BANK0_GPIO0_ISO_BITS);
+		hw_clear_bits(&pads{{(pads_names[port] or port) | lower}}_hw->io[pad(pin)], PADS_BANK0_GPIO0_ISO_BITS);
 %% endif
 	}
 	static void set_pue_pde(uint8_t pin, bool up, bool down)
 	{
 		hw_write_masked(
-			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+			&pads{{(pads_names[port] or port) | lower}}_hw->io[pad(pin)],
 			((up?1:0) << PADS_BANK0_GPIO0_PUE_LSB) | ((down?1:0) << PADS_BANK0_GPIO0_PDE_LSB),
 			PADS_BANK0_GPIO0_PUE_BITS | PADS_BANK0_GPIO0_PDE_BITS
 		);
@@ -150,7 +157,7 @@ struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 	static void set_drive(uint8_t pin, uint8_t strength)
 	{
 		hw_write_masked(
-			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+			&pads{{(pads_names[port] or port) | lower}}_hw->io[pad(pin)],
 			uint32_t(strength) << PADS_BANK0_GPIO0_DRIVE_LSB,
 			PADS_BANK0_GPIO0_DRIVE_BITS
 		);
@@ -158,7 +165,7 @@ struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 	static void set_slewrate(uint8_t pin, uint8_t rate)
 	{
 		hw_write_masked(
-			&pads{{(pads_names[port] or port) | lower}}_hw->io[pin],
+			&pads{{(pads_names[port] or port) | lower}}_hw->io[pad(pin)],
 			uint32_t(rate) << PADS_BANK0_GPIO0_SLEWFAST_LSB,
 			PADS_BANK0_GPIO0_SLEWFAST_BITS
 		);

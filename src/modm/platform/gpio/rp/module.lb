@@ -76,6 +76,11 @@ def build(env):
         # The RP2350B maps the bank0 pins 32-47 to the SIO GPIO_HI registers
         "port_mask_bits": 64 if any(int(g["pin"]) >= 32 for g in driver["gpio"]) else 32,
     }
+    # The QSPI pads are ordered SCLK, SD0-3, SS, unlike the IO and SIO bits
+    subs["pad_index"] = {}
+    for port in subs["ranges"]:
+        gpios = sorted((g for g in driver["gpio"] if g["port"].capitalize() == port["name"]), key=lambda g: int(g["pin"]))
+        subs["pad_index"][port["name"]] = [int(g.get("pad", g["pin"])) for g in gpios] if any("pad" in g for g in gpios) else None
     subs["ports"] = OrderedDict([(k, i) for i, k in enumerate([p["name"].capitalize() for p in subs["ranges"]])])
 
     peripherals = []
