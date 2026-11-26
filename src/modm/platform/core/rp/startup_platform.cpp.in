@@ -15,9 +15,29 @@
 #include "multicore.hpp"
 %% endif
 
+%% if with_xip_setup
+extern "C" const uint8_t boot2[256];
+
+%% endif
 extern "C" void
 __modm_initialize_platform(void)
 {
+%% if family == "23"
+	// The bootrom functions (flash, reboot) use the redundancy coprocessor
+	SCB->CPACR |= 3ul << (7 * 2);
+	__DSB();
+	__ISB();
+%% endif
+%% if with_xip_setup
+	{
+		// The bootrom leaves the flash in slow serial reads. The XIP setup
+		// reconfigures the QMI, so it must run from RAM, here from the stack.
+		uint32_t xip_setup[64];
+		for (uint32_t ii = 0; ii < 64; ii++) xip_setup[ii] = reinterpret_cast<const uint32_t*>(boot2)[ii];
+		asm volatile ("" ::: "memory");
+		reinterpret_cast<void(*)()>(uintptr_t(xip_setup) | 1)();
+	}
+%% endif
 %% if with_multicore
 	modm::platform::multicore::SystemSpinLock::init();
 %% endif
@@ -39,7 +59,11 @@ __modm_initialize_platform(void)
 	// clk_ref. Other peripherals stay in reset until we've configured clocks.
 	modm::platform::Resets::unresetWait(RESETS_RESET_BITS & ~(
 			RESETS_RESET_ADC_BITS |
+%% if family == "20"
 			RESETS_RESET_RTC_BITS |
+%% else
+			RESETS_RESET_HSTX_BITS |
+%% endif
 			RESETS_RESET_SPI0_BITS |
 			RESETS_RESET_SPI1_BITS |
 			RESETS_RESET_UART0_BITS |

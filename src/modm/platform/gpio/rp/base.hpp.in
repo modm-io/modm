@@ -93,6 +93,9 @@ struct Gpio
 %% endfor
 	};
 
+	/// Bit mask of the pins of one port in the SIO registers
+	using PortMask = uint{{port_mask_bits}}_t;
+
 	template <Port>
 	struct PortRegs;
 	/// @endcond
@@ -104,14 +107,24 @@ template <>
 struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 {
 	using status_ctrl_hw_t = io_{{port | lower}}_status_ctrl_hw_t;
-	static uint32_t sio_in() { return sio_hw->gpio{{sio_names[port]}}_in; }
-	static uint32_t sio_out() { return sio_hw->gpio{{sio_names[port]}}_out; }
-	static uint32_t sio_oe() { return sio_hw->gpio{{sio_names[port]}}_oe; }
-	static void sio_set(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_set = mask; }
-	static void sio_clr(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_clr = mask; }
-	static void sio_togl(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_togl = mask; }
-	static void sio_oe_set(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_oe_set = mask; }
-	static void sio_oe_clr(uint32_t mask) { sio_hw->gpio{{sio_names[port]}}_oe_clr = mask; }
+%% for reg in ["in", "out", "oe"]
+%% if port == "Bank0" and port_mask_bits == 64
+	static PortMask sio_{{reg}}() { return (PortMask(sio_hw->gpio_hi_{{reg}}) << 32) | sio_hw->gpio_{{reg}}; }
+%% else
+	static PortMask sio_{{reg}}() { return sio_hw->gpio{{sio_names[port]}}_{{reg}}{% if sio_shift[port] %} >> {{sio_shift[port]}}{% endif %}; }
+%% endif
+%% endfor
+%% for reg in ["set", "clr", "togl", "oe_set", "oe_clr"]
+%% if port == "Bank0" and port_mask_bits == 64
+	static void sio_{{reg}}(PortMask mask)
+	{
+		if (uint32_t(mask)) sio_hw->gpio_{{reg}} = mask;
+		if (mask >> 32) sio_hw->gpio_hi_{{reg}} = mask >> 32;
+	}
+%% else
+	static void sio_{{reg}}(PortMask mask) { sio_hw->gpio{{sio_names[port]}}_{{reg}} = mask{% if sio_shift[port] %} << {{sio_shift[port]}}{% endif %}; }
+%% endif
+%% endfor
 	static uint8_t funcsel(uint8_t pin)
 	{ return (io{{port | lower}}_hw->io[pin].ctrl & IO_BANK0_GPIO0_CTRL_FUNCSEL_BITS) >> IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB; }
 	static void set_funcsel(uint8_t pin, uint32_t fn)
@@ -121,6 +134,10 @@ struct Gpio::PortRegs<Gpio::Port::{{ port | capitalize }}>
 				   PADS_BANK0_GPIO0_IE_BITS | PADS_BANK0_GPIO0_OD_BITS
 		);
 		io{{port | lower}}_hw->io[pin].ctrl = fn << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB;
+%% if target.family == "23"
+		// Remove the pad isolation latch only after the function is selected
+		hw_clear_bits(&pads{{(pads_names[port] or port) | lower}}_hw->io[pin], PADS_BANK0_GPIO0_ISO_BITS);
+%% endif
 	}
 	static void set_pue_pde(uint8_t pin, bool up, bool down)
 	{

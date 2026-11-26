@@ -22,6 +22,13 @@ modm_initialize_core1(void)
 static void
 core1_wrapper(void (*entry)(void))
 {
+%% if family == "23"
+	// The coprocessor access is core-local, core 0 enables it in the startup code:
+	// the FPU and the redundancy coprocessor, which the bootrom functions use
+	SCB->CPACR |= (3UL << 10*2) | (3UL << 11*2) | (3UL << 7*2);
+	__DSB();
+	__ISB();
+%% endif
 	modm_initialize_core1();
 	(*entry)();
 }
@@ -48,8 +55,8 @@ runCore1(void (*entry)(), uint32_t *stack_bottom, uint32_t stack_size)
 	// Allow for the fact that the caller may have already enabled the FIFO IRQ for their
 	// own purposes (expecting FIFO content after core 1 is launched). We must disable
 	// the IRQ during the handshake, then restore afterwards.
-	const bool enabled = NVIC_GetEnableIRQ(SIO_IRQ_PROC0_IRQn);
-	NVIC_DisableIRQ(SIO_IRQ_PROC0_IRQn);
+	const bool enabled = NVIC_GetEnableIRQ(Core::FifoIrq);
+	NVIC_DisableIRQ(Core::FifoIrq);
 
 	// Boot code start core 1 at waiting following protocol on Mailbox
 	// Values to be sent in order over the FIFO from core 0 to core 1
@@ -77,8 +84,8 @@ runCore1(void (*entry)(), uint32_t *stack_bottom, uint32_t stack_size)
 	}
 	while (seq < std::size(cmd_sequence));
 
-	if (enabled) NVIC_EnableIRQ(SIO_IRQ_PROC0_IRQn);
-	else NVIC_DisableIRQ(SIO_IRQ_PROC0_IRQn);
+	if (enabled) NVIC_EnableIRQ(Core::FifoIrq);
+	else NVIC_DisableIRQ(Core::FifoIrq);
 }
 
 extern "C" uint32_t __stack1_start;

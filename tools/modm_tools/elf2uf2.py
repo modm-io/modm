@@ -50,6 +50,8 @@ warned = False
 
 uf2_config = {
     "rp2040":    ( 0xe48bff56, False ), "samd21":      ( 0x68ed2b88, False ),
+    # RP2350_ARM_S, the RP2354 is an RP2350 with stacked flash
+    "rp2350":    ( 0xe48bff59, True ),  "rp2354":      ( 0xe48bff59, True ),
     # same5x shares its id with samd51
     "samd51":    ( 0x55114460, True ),  "same5":       ( 0x55114460, True ),
     "saml21":    ( 0x1851780a, False ), "stm32f0":     ( 0x647824b6, False ),

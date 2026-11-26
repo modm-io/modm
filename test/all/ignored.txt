@@ -109,5 +109,3 @@ samd21e16c-uu
 # Undocumented and inconsistent header and device file
 stm32g411
 stm32g414
-# Not implemented
-rp2350

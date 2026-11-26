@@ -23,6 +23,7 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/core"
-    env.substitutions = {"num_cores": int(env[":target"].identifier.cores)}
+    env.substitutions = {"num_cores": int(env[":target"].identifier.cores),
+                         "family": env[":target"].identifier.family}
     env.template('multicore.hpp.in')
-    env.copy('multicore.cpp')
+    env.template('multicore.cpp.in')

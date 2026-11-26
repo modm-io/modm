@@ -66,7 +66,7 @@ struct Mailbox
 };
 
 /**
- * The RP2040 provides 32 hardware spin locks, which can be used to manage mutually-exclusive access to shared software
+ * The RP2040 provides 32 hardware spin locks (the RP2350 uses SRAM because of erratum E2), which can be used to manage mutually-exclusive access to shared software
  * and hardware resources.
  *
  * Instance 0 allocated for modm usage.
@@ -78,6 +78,7 @@ template <uint8_t instance>
 class SpinLockUnsafe
 {
 	static_assert(instance < 32);
+%% if family == "20"
 	using LockType = volatile uint32_t;
 
 private:
@@ -103,6 +104,26 @@ public:
 		__atomic_thread_fence(__ATOMIC_RELEASE);
 		*l = 0;
 	}
+%% else
+	// RP2350-E2: writes to other SIO registers can release the SIO spinlocks,
+	// so the locks are implemented with exclusive accesses to SRAM instead,
+	// like the pico-sdk does with PICO_USE_SW_SPIN_LOCKS.
+	alignas(4) static inline volatile uint32_t locked{0};
+
+public:
+	static void init()
+	{
+		unlock();
+	}
+	static inline void lock()
+	{
+		while (__LDAEX(&locked) or __STREXW(1, &locked)) ;
+	}
+	static inline void unlock()
+	{
+		__STL(0, &locked);
+	}
+%% endif
 };
 
 /// This class will disable interrupts prior to acquiring the spinlock.
@@ -214,6 +235,9 @@ public:
 /// @ingroup modm_platform_multicore
 struct Core
 {
+	/// The core-local interrupt of the inter-core FIFO
+	static constexpr IRQn_Type FifoIrq = {{ "SIO_IRQ_PROC0_IRQn" if family == "20" else "SIO_IRQ_FIFO_IRQn" }};
+
 	static inline uint32_t cpuId()
 	{
 		return sio_hw->cpuid;

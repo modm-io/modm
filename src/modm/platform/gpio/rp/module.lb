@@ -64,9 +64,17 @@ def build(env):
         },
         "intreg_pin_mask_shift": {
             "Bank0": "(pin % 8)",
-            "Qspi": "pin"
+            # The RP2350 has the two USB PHY pins in front of the QSPI pins
+            "Qspi": "(pin + 2)" if device.identifier.family == "23" else "pin"
         },
-        "port_width": 32
+        "port_width": 32,
+        # The RP2350 maps the QSPI pins to bits 26-31 of the SIO GPIO_HI registers
+        "sio_shift": {
+            "Bank0": 0,
+            "Qspi": 26 if device.identifier.family == "23" else 0,
+        },
+        # The RP2350B maps the bank0 pins 32-47 to the SIO GPIO_HI registers
+        "port_mask_bits": 64 if any(int(g["pin"]) >= 32 for g in driver["gpio"]) else 32,
     }
     subs["ports"] = OrderedDict([(k, i) for i, k in enumerate([p["name"].capitalize() for p in subs["ranges"]])])
 

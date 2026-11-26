@@ -17,7 +17,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if not device.has_driver("usb:rp20*"):
+    if not device.has_driver("usb:rp*"):
         return False
 
 

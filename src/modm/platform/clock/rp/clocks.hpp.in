@@ -45,7 +45,8 @@ public:
 		Usb,
 	};
 
-	static constexpr uint32_t BootFrequency = 125'000'000;  // after bootloader
+	// Upper bound of the boot clock, so that delays are too long, not too short
+	static constexpr uint32_t BootFrequency = {{ "125'000'000" if target.family == "20" else "150'000'000" }};
 
 protected:
 	/// @cond
@@ -158,8 +159,9 @@ public:
 	configureClock()
 	{
 		using Config = SrcConfig<clk, src>;
-		constexpr uint32_t div = (uint64_t(SrcFreq) << 8) / TargetFreq;
-		static_assert(((uint64_t(SrcFreq) << 8) / div) == TargetFreq, "invalid freq");
+		// The divider is fixed point with 8 (RP2040) or 16 (RP2350) fractional bits
+		constexpr uint32_t div = (uint64_t(SrcFreq) << CLOCKS_CLK_SYS_DIV_INT_LSB) / TargetFreq;
+		static_assert(((uint64_t(SrcFreq) << CLOCKS_CLK_SYS_DIV_INT_LSB) / div) == TargetFreq, "invalid freq");
 
 		if constexpr (isGlitchless(clk))
 		{

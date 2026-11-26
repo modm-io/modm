@@ -39,8 +39,13 @@ extern "C" void panic(const char *fmt, ...)
 
 extern "C" uint8_t rp2040_chip_version(void)
 {
+%% if family == "23"
+	// The RP2350 USB controller behaves like the RP2040-B2 (endpoint abort works)
+	return 2;
+%% else
 	const uint32_t chip_id = *((const uint32_t*)(SYSINFO_BASE + SYSINFO_CHIP_ID_OFFSET));
 	return (chip_id & SYSINFO_CHIP_ID_REVISION_BITS) >> SYSINFO_CHIP_ID_REVISION_LSB;
+%% endif
 }
 
 extern "C" void critical_section_enter_blocking(critical_section_t *cs)

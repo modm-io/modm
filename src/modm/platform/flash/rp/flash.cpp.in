@@ -13,13 +13,21 @@
 #include <modm/architecture/interface/atomic_lock.hpp>
 
 #include <hardware/regs/io_qspi.h>
-#include <hardware/regs/ssi.h>
 #include <hardware/structs/ioqspi.h>
 #include <hardware/structs/pads_qspi.h>
+%% if family == "20"
+#include <hardware/regs/ssi.h>
 #include <hardware/structs/ssi.h>
+%% else
+#include <hardware/structs/qmi.h>
+%% endif
 
 #include <modm/platform/core/rom.hpp>
 
+%% if with_xip_setup
+extern "C" const uint8_t boot2[256];
+
+%% endif
 namespace modm::platform
 {
 
@@ -45,6 +53,10 @@ static bool boot2_copyout_valid = false;
 struct flash_hardware_save_state_t
 {
 	uint32_t qspi_pads[NUM_QSPI_GPIOS];
+%% if family == "23"
+	// The bootrom resets the QMI to 03h reads on CS1 during flash_exit_xip()
+	uint32_t qmi_cs1_timing, qmi_cs1_rcmd, qmi_cs1_rfmt;
+%% endif
 };
 
 
@@ -54,7 +66,15 @@ flash_init_boot2_copyout(void)
 	if (boot2_copyout_valid) return;
 	// todo we may want the option of boot2 just being a free function in
 	//      user RAM, e.g. if it is larger than 256 bytes
+%% if family == "20"
 	const volatile uint32_t *copy_from = reinterpret_cast<uint32_t *>(XIP_BASE);
+%% elif with_xip_setup
+	// The faster XIP setup of the modm:platform:core:boot2 option
+	const volatile uint32_t *copy_from = reinterpret_cast<const uint32_t *>(boot2);
+%% else
+	// The RP2350 bootrom leaves its XIP setup function in the boot RAM
+	const volatile uint32_t *copy_from = reinterpret_cast<uint32_t *>(BOOTRAM_BASE);
+%% endif
 	for (size_t i = 0; i < BOOT2_SIZE_WORDS; ++i) boot2_copyout[i] = copy_from[i];
 	asm inline("" ::: "memory");
 	boot2_copyout_valid = true;
@@ -68,21 +88,37 @@ modm_ramcode static void
 flash_save_hardware_state(flash_hardware_save_state_t *state)
 {
 	for (size_t i = 0; i < NUM_QSPI_GPIOS; ++i) { state->qspi_pads[i] = pads_qspi_hw->io[i]; }
+%% if family == "23"
+	state->qmi_cs1_timing = qmi_hw->m[1].timing;
+	state->qmi_cs1_rcmd = qmi_hw->m[1].rcmd;
+	state->qmi_cs1_rfmt = qmi_hw->m[1].rfmt;
+%% endif
 }
 
 modm_ramcode static void
 flash_restore_hardware_state(flash_hardware_save_state_t *state)
 {
 	for (size_t i = 0; i < NUM_QSPI_GPIOS; ++i) { pads_qspi_hw->io[i] = state->qspi_pads[i]; }
+%% if family == "23"
+	// ponytail: assumes no PSRAM on CS1 (FLASH_DEVINFO), see pico-sdk flash_rp2350_restore_qmi_cs1()
+	qmi_hw->m[1].timing = state->qmi_cs1_timing;
+	qmi_hw->m[1].rcmd = state->qmi_cs1_rcmd;
+	qmi_hw->m[1].rfmt = state->qmi_cs1_rfmt;
+%% endif
 }
 
 modm_ramcode static void
 flash_cs_force(bool high)
 {
+%% if family == "20"
 	uint32_t field_val = high ? IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_HIGH
 							  : IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_VALUE_LOW;
 	hw_write_masked(&ioqspi_hw->io[1].ctrl, field_val << IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_LSB,
 					IO_QSPI_GPIO_QSPI_SS_CTRL_OUTOVER_BITS);
+%% else
+	if (high) hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+	else hw_set_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_ASSERT_CS0N_BITS);
+%% endif
 }
 
 modm_ramcode void
@@ -188,6 +224,7 @@ Flash::doCmd(const void *txData, void *rxData, size_t count)
 	const uint8_t *txbuf = static_cast<const uint8_t *>(txData);
 	uint8_t *rxbuf = static_cast<uint8_t *>(rxData);
 
+%% if family == "20"
 	// Synopsys SSI version
 	// We may be interrupted -- don't want FIFO to overflow if we're distracted.
 	const size_t max_in_flight = 16 - 2;
@@ -207,6 +244,27 @@ Flash::doCmd(const void *txData, void *rxData, size_t count)
 			--rx_remaining;
 		}
 	}
+%% else
+	// QMI version: no need to bound the FIFO, the QMI stalls on a full DIRECT_RX
+	hw_set_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_EN_BITS);
+	while (tx_remaining || rx_remaining)
+	{
+		uint32_t flags = qmi_hw->direct_csr;
+		bool can_put = !(flags & QMI_DIRECT_CSR_TXFULL_BITS);
+		bool can_get = !(flags & QMI_DIRECT_CSR_RXEMPTY_BITS);
+		if (can_put && tx_remaining)
+		{
+			qmi_hw->direct_tx = *txbuf++;
+			--tx_remaining;
+		}
+		if (can_get && rx_remaining)
+		{
+			*rxbuf++ = (uint8_t)qmi_hw->direct_rx;
+			--rx_remaining;
+		}
+	}
+	hw_clear_bits(&qmi_hw->direct_csr, QMI_DIRECT_CSR_EN_BITS);
+%% endif
 	flash_cs_force(true);
 
 	flash_flush_cache_func();

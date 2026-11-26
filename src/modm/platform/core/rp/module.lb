@@ -23,26 +23,43 @@ def prepare(module, options):
         return False
 
     module.depends(":platform:cortex-m")
-    module.add_option(
-        EnumerationOption(
-            name="boot2",
-            description="Second-stage bootloader variant",
-            enumeration=["generic_03h", "at25sf128a", "is25lp080", "w25q080", "w25x10cl"],
-            default="generic_03h"))
-    module.add_option(
-        NumericOption(
-            name="boot2_size",
-            description="Specify the size of external QSPI FLASH chip",
-            minimum=0,
-            maximum="16Mi",
-            default="2Mi"))
+    if options[":target"].identifier.family == "20":
+        module.add_option(
+            EnumerationOption(
+                name="boot2",
+                description="Second-stage bootloader variant",
+                enumeration=["generic_03h", "at25sf128a", "is25lp080", "w25q080", "w25x10cl"],
+                default="generic_03h"))
+        module.add_option(
+            NumericOption(
+                name="boot2_size",
+                description="Specify the size of external QSPI FLASH chip",
+                minimum=0,
+                maximum="16Mi",
+                default="2Mi"))
+    else:
+        module.add_option(
+            EnumerationOption(
+                name="boot2",
+                description="Faster XIP setup, which the startup code runs from RAM",
+                enumeration=["none", "generic_03h", "w25q080"],
+                default="none"))
+        module.add_option(
+            NumericOption(
+                name="flash_size",
+                description="Size of the QSPI flash on chip select 0 (the RP2354 has 2MiB in the package)",
+                minimum="4Ki",
+                maximum="16Mi",
+                default="2Mi" if options[":target"].identifier.flash == "4" else "4Mi"))
     return True
 
 
 def build(env):
     target = env[":target"].identifier
 
-    env.substitutions = {"with_multicore": env.has_module(":platform:multicore")}
+    env.substitutions = {"with_multicore": env.has_module(":platform:multicore"),
+                         "family": target.family,
+                         "with_xip_setup": target.family == "23" and env["boot2"] != "none"}
     env.outbasepath = "modm/src/modm/platform/core"
     # startup helper code
     env.template("startup_platform.cpp.in")
@@ -50,7 +67,8 @@ def build(env):
     # delay code that must be tuned for each family
     # (cycles per loop, setup cost in loops, max CPU freq)
     tuning = {
-        "20": (3, 4, 133000000)
+        "20": (3, 4, 133000000),
+        "23": (3, 2, 150000000),
     }[target.family]
 
     # us_shift is an optimization to limit error via fractional math
@@ -69,15 +87,20 @@ def build(env):
     env.template("../cortex/delay_ns.hpp.in", "delay_ns.hpp")
     env.template("../cortex/delay_impl.hpp.in", "delay_impl.hpp")
     env.copy("resets.hpp")
-    if target.family == "20":
-        env.copy("rom.hpp")
+    env.template("rom.hpp.in", "rom.hpp")
 
-    env.copy(repopath("ext/rp/pico-sdk/src/boot2_rp2040_{}.cpp".format(env["boot2"])),"boot2.cpp")
+    if target.family == "20":
+        env.copy(repopath("ext/rp/pico-sdk/src/boot2_rp2040_{}.cpp".format(env["boot2"])),"boot2.cpp")
+    else:
+        env.copy("image_def.S")
+        if env["boot2"] != "none":
+            env.copy(repopath("ext/rp/pico-sdk/src/boot2_rp2350_{}.cpp".format(env["boot2"])),"boot2.cpp")
 
 
 def post_build(env):
     env.substitutions = env.query("::cortex-m:linkerscript")
     env.substitutions.update(env.query("::cortex-m:vector_table"))
     env.substitutions["with_multicore"] = env.has_module(":platform:multicore")
+    env.substitutions["with_boot2"] = env[":target"].identifier.family == "20"
     env.outbasepath = "modm/link"
     env.template("flash.ld.in", "linkerscript.ld")

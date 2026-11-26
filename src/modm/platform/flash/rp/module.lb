@@ -16,7 +16,7 @@ def init(module):
 
 def prepare(module, options):
     device = options[":target"]
-    if device.identifier.platform != "rp" or device.identifier.family != "20":
+    if device.identifier.platform != "rp":
         return False
 
     module.depends(":architecture:atomic", ":ext:cmsis:device", ":platform:core",
@@ -28,4 +28,6 @@ def build(env):
 
     env.outbasepath = "modm/src/modm/platform/flash"
     env.copy("flash.hpp")
-    env.copy("flash.cpp")
+    env.substitutions = {"family": target.family,
+                         "with_xip_setup": target.family == "23" and env.get(":platform:core:boot2", "none") != "none"}
+    env.template("flash.cpp.in")

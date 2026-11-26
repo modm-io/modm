@@ -1,6 +1,7 @@
-# System Clock via RP2040 TIMER
+# System Clock via RP2040/RP2350 TIMER
 
-The RP2040 TIMER is a 64-bit counter incremented by the 1µs watchdog tick and
+The RP2040 TIMER and the RP2350 TIMER0 are 64-bit counters incremented by a
+1µs tick (the watchdog tick on the RP2040, the TICKS block on the RP2350) and
 shared by both cores. It is used to implement the `modm::Clock::now()` and
 `modm::PreciseClock::now()` interfaces defined in the `modm:architecture:clock`
 module without any interrupt.

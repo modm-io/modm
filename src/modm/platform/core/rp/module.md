@@ -1,12 +1,18 @@
-# RP2040 core module
+# RP2040/RP2350 core module
 
 This module specializes the generic `modm:platform:cortex-m` module with
-RP2040-specific startup code and linkerscripts.
+RP2040 and RP2350 specific startup code and linkerscripts.
 
-!!! note "Second-stage Bootloader"
+!!! note "RP2040 Second-stage Bootloader"
 	The external Flash memory requires additional setup, which is provided by
 	the second-stage bootloader called boot2. You can select a pre-defined
 	configuration via the `modm:platform:core:boot2` option.
+
+!!! note "RP2350 Image Definition"
+	The RP2350 bootrom sets up the flash itself, but only boots an image that
+	contains an IMAGE_DEF block in its first 4kiB. The linkerscript places a
+	minimal block (Secure ARM executable) right after the vector table. The
+	flash size is set with the `modm:platform:core:flash_size` option.
 
 
 ## Startup
@@ -17,7 +23,7 @@ initial state.
 
 ## Linkerscript
 
-The RP2040 currently only has one linkerscript template for internal SRAM and
+The RP2040 and RP2350 currently only have one linkerscript template for internal SRAM and
 external Flash. You can place static objects in sections via the
 `modm_section` attribute:
 
@@ -39,7 +45,9 @@ uint8_t display_buffer[480][320];
 ### Dual-Core Static RAM (SRAM)
 
 The RP2040 memory map consists out of the main RAM (SRAM0-3 with striped bank
-access) and the dedicated memories for each core (SRAM4-5).
+access) and the dedicated memories for each core (SRAM4-5). The RP2350 has
+twice the main RAM (SRAM0-7) and the core memories (SRAM8-9) start at
+0x2008'0000 instead of 0x2004'0000.
 Note that the stack size for both cores is the same and can be changed with the
 `modm:platform:cortex-m:main_stack_size` option, however, the main stack for
 CPU1 is only added if modm is build with the `modm:platform:multicore` module

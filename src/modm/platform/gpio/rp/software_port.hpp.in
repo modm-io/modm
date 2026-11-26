@@ -65,7 +65,7 @@ public:
 		PortType r{0};
 %% for port, id in ports.items()
 		if constexpr (mask({{id}})) {
-			const uint32_t p = (Gpio::PortRegs<Gpio::Port::{{port}}>::sio_out() & mask({{id}})) ^ inverted({{id}});
+			const Gpio::PortMask p = (Gpio::PortRegs<Gpio::Port::{{port}}>::sio_out() & mask({{id}})) ^ inverted({{id}});
 	%% for pos in range(32)
 			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) r |= ((p >> pos) & 1) << {{pos}};
 	%% endfor
@@ -77,9 +77,9 @@ public:
 	static void write(PortType data)
 	{
 %% for port, id in ports.items()
-		if constexpr (mask({{id}})) { uint32_t ps{0}; uint32_t pr{0};
+		if constexpr (mask({{id}})) { Gpio::PortMask ps{0}; Gpio::PortMask pr{0};
 	%% for pos in range(32)
-			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) { if (data & (1ul << {{pos}})) { ps |= (1ul << pos); } else { pr |= (1ul << pos); }}
+			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) { if (data & (1ul << {{pos}})) { ps |= (Gpio::PortMask(1) << pos); } else { pr |= (Gpio::PortMask(1) << pos); }}
 	%% endfor
 			ps ^= inverted({{id}});
 			pr ^= inverted({{id}});
@@ -94,7 +94,7 @@ public:
 		PortType r{0};
 %% for port, id in ports.items()
 		if constexpr (mask({{id}})) {
-			const uint32_t p = (Gpio::PortRegs<Gpio::Port::{{port}}>::sio_in() & mask({{id}})) ^ inverted({{id}});
+			const Gpio::PortMask p = (Gpio::PortRegs<Gpio::Port::{{port}}>::sio_in() & mask({{id}})) ^ inverted({{id}});
 	%% for pos in range(32)
 			if constexpr ({{pos}} < width) if constexpr (constexpr auto pos = shift_mask({{id}}, {{pos}}); pos >= 0) r |= ((p >> pos) & 1) << {{pos}};
 	%% endfor

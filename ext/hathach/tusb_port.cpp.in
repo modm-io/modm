@@ -126,6 +126,14 @@ tusb_get_device_serial(uint16_t *serial_str)
 	for (int i = 0; i < 4; i++)
 		serial_str[8 + i] = fn_nibble(uid[1] >> (28 - 4 * i) & 0xf);
 	return 12;
+%% elif target.platform in ["rp"] and target.family == "23"
+	// The serial number the RP2350 bootrom (BOOTSEL) and picotool report:
+	// the 64-bit chip ID in OTP rows CHIPID3..CHIPID0 as 16 hex digits.
+	const volatile uint16_t *chipid = (const volatile uint16_t *) 0x40130000;  // OTP_DATA_BASE
+	for (int row = 0; row < 4; row++)
+		for (int i = 0; i < 4; i++)
+			serial_str[4 * (3 - row) + i] = fn_nibble(chipid[row] >> (12 - 4 * i) & 0xf);
+	return 16;
 %% else
 	uint8_t raw_id[16];
 

@@ -31,18 +31,22 @@ def build(env):
 
     env.outbasepath = "modm/ext/cmsis_device"
 
+    chip = "rp2040" if device.identifier.family == "20" else "rp2350"
     defines = []
-    headers = [
-        device.identifier.string.upper() + ".h"
-    ]
+    headers = [chip.upper() + ".h"]
+    # The pico-sdk headers select the package by these defines
+    env.collect(":build:cppdefines", "PICO_{}=1".format(chip.upper()))
+    if chip == "rp2350":
+        env.collect(":build:cppdefines", "PICO_RP2350A={}".format(int(device.identifier.package == "a")))
 
-    env.copy("pico-sdk/rp2040", "")
+    env.copy("pico-sdk/" + chip, "")
     env.copy("address_mapped.h", "hardware/address_mapped.h")
 
     if env.has_module(":ext:tinyusb"):
         env.substitutions = {
             "with_debug": env.has_module(":debug"),
             "with_multicore": env.has_module(":platform:multicore"),
+            "family": device.identifier.family,
         }
         env.copy("pico.h")
         env.template("pico.cpp.in", "pico.cpp")

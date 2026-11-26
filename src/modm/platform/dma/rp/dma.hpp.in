@@ -49,6 +49,16 @@ struct DmaBase
 		Pio1_Rx1  = DREQ_PIO1_RX1,
 		Pio1_Rx2  = DREQ_PIO1_RX2,
 		Pio1_Rx3  = DREQ_PIO1_RX3,
+%% if family == "23"
+		Pio2_Tx0  = DREQ_PIO2_TX0,
+		Pio2_Tx1  = DREQ_PIO2_TX1,
+		Pio2_Tx2  = DREQ_PIO2_TX2,
+		Pio2_Tx3  = DREQ_PIO2_TX3,
+		Pio2_Rx0  = DREQ_PIO2_RX0,
+		Pio2_Rx1  = DREQ_PIO2_RX1,
+		Pio2_Rx2  = DREQ_PIO2_RX2,
+		Pio2_Rx3  = DREQ_PIO2_RX3,
+%% endif
 		Spi0_Tx   = DREQ_SPI0_TX,
 		Spi0_Rx   = DREQ_SPI0_RX,
 		Spi1_Tx   = DREQ_SPI1_TX,
@@ -65,14 +75,28 @@ struct DmaBase
 		Pwm_Wrap5 = DREQ_PWM_WRAP5,
 		Pwm_Wrap6 = DREQ_PWM_WRAP6,
 		Pwm_Wrap7 = DREQ_PWM_WRAP7,
+%% if family == "23"
+		Pwm_Wrap8 = DREQ_PWM_WRAP8,
+		Pwm_Wrap9 = DREQ_PWM_WRAP9,
+		Pwm_Wrap10 = DREQ_PWM_WRAP10,
+		Pwm_Wrap11 = DREQ_PWM_WRAP11,
+%% endif
 		I2c0_Tx   = DREQ_I2C0_TX,
 		I2c0_Rx   = DREQ_I2C0_RX,
 		I2c1_Tx   = DREQ_I2C1_TX,
 		I2c1_Rx   = DREQ_I2C1_RX,
 		Adc       = DREQ_ADC,
 		Xip_Stream = DREQ_XIP_STREAM,
+%% if family == "20"
 		Xip_SsiTx = DREQ_XIP_SSITX,
 		Xip_SsiRx = DREQ_XIP_SSIRX,
+%% else
+		Xip_QmiTx = DREQ_XIP_QMITX,
+		Xip_QmiRx = DREQ_XIP_QMIRX,
+		Hstx      = DREQ_HSTX,
+		Coresight = DREQ_CORESIGHT,
+		Sha256    = DREQ_SHA256,
+%% endif
 		Dma_Timer0 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER0,
 		Dma_Timer1 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER1,
 		Dma_Timer2 = DMA_CH0_CTRL_TRIG_TREQ_SEL_VALUE_TIMER2,

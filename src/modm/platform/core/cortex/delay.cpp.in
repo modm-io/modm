@@ -13,6 +13,10 @@
 #include "hardware_init.hpp"
 #include "delay_impl.hpp"
 
+%% if target.platform == "rp"
+// The RP2350 executes from the XIP cache, a miss takes several microseconds
+modm_fastcode
+%% endif
 void
 modm::delay_us(uint32_t us)
 {

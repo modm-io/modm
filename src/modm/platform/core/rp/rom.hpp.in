@@ -23,10 +23,16 @@ struct ROM
 {
 
 
+%% if family == "20"
 	static constexpr uint16_t FuncTableOffset = 0x0014;
 	static constexpr uint16_t TableLookupOffset = 0x0018;
-
 	using TableLookupFn = void *(*)(const uint16_t *table, uint32_t code);
+%% else
+	static constexpr uint16_t TableLookupOffset = 0x0016;
+	static constexpr uint32_t RT_FLAG_FUNC_ARM_SEC = 0x0004;
+	using TableLookupFn = void *(*)(uint32_t code, uint32_t mask);
+%% endif
+
 	static modm_always_inline void *
 	getRomPtr(uint16_t romAddress)
 	{
@@ -35,6 +41,7 @@ struct ROM
 		return reinterpret_cast<void *>(*reinterpret_cast<const uint16_t *>(romAddress));
 #pragma GCC diagnostic pop
 	}
+
 	template<uint8_t c1, uint8_t c2, typename Signature>
 	struct Func
 	{
@@ -44,8 +51,12 @@ struct ROM
 		get()
 		{
 			auto lookup = reinterpret_cast<TableLookupFn>(getRomPtr(TableLookupOffset));
+%% if family == "20"
 			auto table = static_cast<const uint16_t *>(getRomPtr(FuncTableOffset));
 			return reinterpret_cast<Signature>(lookup(table, Code));
+%% else
+			return reinterpret_cast<Signature>(lookup(Code, RT_FLAG_FUNC_ARM_SEC));
+%% endif
 		}
 	};
 
@@ -100,6 +111,7 @@ struct ROM
 	 */
 	using flash_enter_cmd_xip = Func<'C', 'X', void (*)(void)>;
 
+%% if family == "20"
 	// RP2040 specific
 
 	/**
@@ -168,6 +180,7 @@ struct ROM
 	 * - 2 To disable the USB PICOBOOT Interface (see Section 2.8.5)
 	 */
 	using reset_to_usb_boot = Func<'U', 'B', void (*)(uint32_t, uint32_t)>;
+%% endif
 
 };
 

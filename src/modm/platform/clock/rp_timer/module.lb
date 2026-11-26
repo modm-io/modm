@@ -15,7 +15,7 @@ def init(module):
     module.description = FileReader("module.md")
 
 def prepare(module, options):
-    if not options[":target"].has_driver("timer:rp20"):
+    if not options[":target"].has_driver("timer:rp*"):
         return False
 
     module.depends(":architecture:clock", ":ext:cmsis:device")
@@ -23,5 +23,6 @@ def prepare(module, options):
 
 def build(env):
     env.outbasepath = "modm/src/modm/platform/clock"
-    env.copy("timer_clock.hpp")
-    env.copy("timer_clock.cpp")
+    env.substitutions = {"family": env[":target"].identifier.family}
+    env.template("timer_clock.hpp.in")
+    env.template("timer_clock.cpp.in")

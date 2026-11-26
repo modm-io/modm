@@ -10,6 +10,7 @@ SECTIONS
 {
 {{ linker.section_rom_start(cont_flash_name) }}
 
+%% if with_boot2
 	.boot2 :
 	{
 		__boot2_start__ = .;
@@ -19,13 +20,25 @@ SECTIONS
 	ASSERT(__boot2_end__ - __boot2_start__ == 256,
 		   "ERROR: Pico second stage bootloader must be 256 bytes in size!")
 
+%% endif
 	.text :
 	{
 		__vector_table_rom_start = .;
 		__vector_table_ram_load = .;
 		KEEP(*(.vector_rom))
 		__vector_table_rom_end = .;
+%% if not with_boot2
+		/* The bootrom searches the first 4kiB of flash for the IMAGE_DEF block */
+		__image_def_start = .;
+		KEEP(*(.image_def))
+		__image_def_end = .;
+		. = ALIGN(4);
+		KEEP(*(.boot2))
+%% endif
 	} > FLASH
+%% if not with_boot2
+	ASSERT(__image_def_end <= ORIGIN(FLASH) + 4096, "ERROR: The IMAGE_DEF block must be in the first 4kiB of flash!")
+%% endif
 
 {{ linker.section_rom(cont_flash_name) }}
 

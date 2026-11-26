@@ -17,11 +17,12 @@ def init(module):
 
 def prepare(module, options):
     module.depends(":ext:cmsis:device", ":platform:clockgen")
-    return options[":target"].has_driver("dma:rp20*")
+    return options[":target"].has_driver("dma:rp*")
 
 
 def build(env):
-    env.substitutions = {"dma": env[":target"].get_driver("dma")}
+    env.substitutions = {"dma": env[":target"].get_driver("dma"),
+                         "family": env[":target"].identifier.family}
     env.outbasepath = "modm/src/modm/platform/dma"
     env.template("dma.hpp.in")
 

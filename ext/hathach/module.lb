@@ -124,7 +124,8 @@ def build(env):
             env.copy("tinyusb/src/portable/microchip/samd/", "portable/microchip/samd/")
 
     elif target.platform == "rp":
-        if target.family == "20":
+        # TinyUSB drives the RP2350 with the RP2040 port, the errata depend on PICO_RP2040
+        if target.family in ["20", "23"]:
             tusb_config["CFG_TUSB_MCU"] = "OPT_MCU_RP2040"
             tusb_config["TUD_OPT_RP2040_USB_DEVICE_UFRAME_FIX"] = "0"
             env.copy("tinyusb/src/portable/raspberrypi/rp2040/", "portable/raspberrypi/rp2040/")
@@ -221,7 +222,7 @@ def build(env):
     elif target.platform == "sam" and target.family in ["d5x/e5x"]:
         irqs = [("USB_OTHER", 0, "d"), ("USB_SOF_HSOF", 0, "d"),
                 ("USB_TRCPT0", 0, "d"), ("USB_TRCPT1", 0, "d")]
-    elif target.platform == "rp" and target.family in ["20"]:
+    elif target.platform == "rp":
         irqs = [("USBCTRL_IRQ", 0, "d")]
     else:
         irqs = [("USB", 0, "d")]

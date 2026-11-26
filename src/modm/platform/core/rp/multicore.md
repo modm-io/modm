@@ -1,4 +1,4 @@
-# RP2040 multi-core module
+# RP2040/RP2350 multi-core module
 
 This module adds the ability to run code on CPU1 and provides mailbox, spinlock
 and mutex implementations, and additionally a stack of size
@@ -39,3 +39,11 @@ extern "C" void modm_initialize_core1()
     SCB->VTOR = custom_vector_table;
 }
 ```
+
+
+## RP2350 Spinlocks
+
+The RP2350 SIO spinlocks are affected by erratum RP2350-E2, where writes to
+other SIO registers can release them. Therefore the spinlocks are implemented
+with exclusive load/store instructions on SRAM instead, like the pico-sdk does
+with `PICO_USE_SW_SPIN_LOCKS`.

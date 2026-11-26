@@ -16,7 +16,7 @@
 #include <modm/platform/gpio/base.hpp>
 #include <modm/utils/inplace_function.hpp>
 
-#include <RP2040.h>
+#include <modm/platform/device.hpp>
 
 #if defined __DOXYGEN__ || !defined MODM_EXTINT_HANDLER_STORAGE
 /// @ingroup modm_platform_extint
