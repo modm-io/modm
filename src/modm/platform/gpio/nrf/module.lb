@@ -151,5 +151,7 @@ def build(env):
     env.template("port.hpp.in")
     env.template("software_port.hpp.in")
     env.template("../common/port_shim.hpp.in", "port_shim.hpp")
+    env.template("runtime.hpp.in")
+    env.template("../common/any.hpp.in", "any.hpp")
     env.template("../common/connector.hpp.in", "connector.hpp",
                  filters={"formatPeripheral": "", "printSignalMap": ""})

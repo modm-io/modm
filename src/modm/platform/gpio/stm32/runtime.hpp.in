@@ -1,0 +1,229 @@
+/*
+ * Copyright (c) 2021, Christopher Durand
+ * Copyright (c) 2021, 2026, Niklas Hauser
+ *
+ * This file is part of the modm project.
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+// ----------------------------------------------------------------------------
+
+#pragma once
+
+#include "../device.hpp"
+#include "base.hpp"
+#include "data.hpp"
+#include <bit>
+#include <concepts>
+
+namespace modm::platform
+{
+
+/**
+ * Runtime GPIO pin: the port address and the pin's BSRR bits in 8 bytes.
+ *
+ * A value type that can be copied, stored in constexpr tables and selected at
+ * runtime, almost as fast as the static GPIO classes. Construct it from a
+ * static GPIO class, also an inverted one, or from a port and a pin number:
+ *
+ * @code
+ * GpioPin led = GpioInverted<GpioA5>{};
+ * static constexpr GpioPin pins[]{GpioA0{}, GpioPin{Gpio::Port::B, 3}};
+ * pins[index].toggle();
+ * @endcode
+ *
+ * Only pins of this device, for `GpioUnused` see `modm::AnyGpio`.
+ *
+ * @ingroup modm_platform_gpio
+ */
+class GpioPin : public Gpio
+{
+protected:
+	uintptr_t addr;		///< GPIO port base address, bit 0 is always clear
+	/// The BSRR value that sets the pin to logic high: the pin mask in the
+	/// lower half, or in the upper half if the pin is inverted.
+	uint32_t setBits;
+
+	static constexpr uintptr_t
+	base(Port port)
+	{
+		switch(port)
+		{
+%% for port in ports
+			case Port::{{port}}: return GPIO{{port}}_BASE;
+%% endfor
+		}
+		return 0;
+	}
+
+	constexpr GpioPin(uintptr_t addr, uint32_t setBits) : addr(addr), setBits(setBits) {}
+
+	GPIO_TypeDef*
+	reg() const { return reinterpret_cast<GPIO_TypeDef*>(addr); }
+
+	/// The BSRR value that sets the pin to logic low
+	constexpr uint32_t
+	resetBits() const { return std::rotr(setBits, 16); }
+
+	/// The physical pin mask
+	constexpr uint32_t
+	mask() const { return (setBits | (setBits >> 16)) & 0xffff; }
+
+	/// Logic level from the value of IDR or ODR: the upper half is inverted, so
+	/// that setBits selects the level with the polarity of the pin.
+	bool
+	level(uint16_t value) const
+	{ return (uint32_t(value) | (uint32_t(~value) << 16)) & setBits; }
+
+%% if target.family in ["f1"]
+	volatile uint32_t*
+	cr() const { return (mask() & 0xff) ? &reg()->CRL : &reg()->CRH; }
+
+	uint32_t
+	crShift() const { return (std::countr_zero(mask()) & 7) * 4; }
+
+	void
+	writeCr(uint32_t value) const
+	{ *cr() = (*cr() & ~(0xful << crShift())) | (value << crShift()); }
+%% else
+	// For a single bit mask m = 1 << n: m * m = 1 << 2n, the mask of a 2-bit field
+	uint32_t
+	mask2() const { return mask() * mask(); }
+%% endif
+
+public:
+	constexpr GpioPin(Port port, uint8_t pin, bool inverted = false)
+	:	addr(base(port)), setBits((1ul << (pin & 0xf)) << (inverted ? 16 : 0)) {}
+
+	template< class Pin >
+	requires requires { Pin::port; Pin::pin; Pin::isInverted; typename Pin::Data; }
+		and (not std::same_as<typename Pin::Data, detail::DataUnused>)
+	constexpr GpioPin(Pin)
+	:	GpioPin(Pin::port, Pin::pin, Pin::isInverted) {}
+
+	void
+	setOutput() const
+	{
+%% if target.family in ["f1"]
+		configure(OutputType::PushPull);
+%% else
+		reg()->MODER = (reg()->MODER & ~(3 * mask2())) | (i(Mode::Output) * mask2());
+%% endif
+	}
+
+	/// The level is written first, so that the pin never glitches.
+	void
+	setOutput(bool value) const
+	{
+		set(value);
+		setOutput();
+	}
+
+	void
+	setOutput(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) const
+	{
+		configure(type, speed);
+%% if target.family not in ["f1"]
+		setOutput();
+%% endif
+	}
+
+	void
+	configure(OutputType type, OutputSpeed speed = OutputSpeed::MHz50) const
+	{
+%% if target.family in ["f1"]
+		writeCr(i(type) | i(speed));
+%% else
+		reg()->OSPEEDR = (reg()->OSPEEDR & ~(3 * mask2())) | (i(speed) * mask2());
+		reg()->OTYPER = (reg()->OTYPER & ~mask()) | (i(type) ? mask() : 0);
+%% endif
+	}
+
+	void
+	setInput() const
+	{
+%% if target.family in ["f1"]
+		configure(InputType::Floating);
+%% else
+		reg()->MODER &= ~(3 * mask2());
+		reg()->OTYPER &= ~mask();
+		reg()->OSPEEDR &= ~(3 * mask2());
+%% endif
+	}
+
+	void
+	setInput(InputType type) const
+	{
+		configure(type);
+%% if target.family not in ["f1"]
+		setInput();
+%% endif
+	}
+
+	void
+	configure(InputType type) const
+	{
+%% if target.family in ["f1"]
+		writeCr(i(type) & 0xc);
+		reg()->BSRR = mask() << ((type == InputType::PullUp) ? 0 : 16);
+%% else
+		reg()->PUPDR = (reg()->PUPDR & ~(3 * mask2())) | (i(type) * mask2());
+%% endif
+	}
+
+	::modm::Gpio::Direction
+	getDirection() const
+	{
+		using Direction = ::modm::Gpio::Direction;
+%% if target.family in ["f1"]
+		const uint32_t mode = (*cr() >> crShift()) & 0xf;
+		if (mode & 0b0011) return (mode & 0b1000) ? Direction::Special : Direction::Out;
+		return (mode == 0b0100 or mode == 0b1000) ? Direction::In : Direction::Special;
+%% else
+		const uint32_t mode = (reg()->MODER >> (2 * std::countr_zero(mask()))) & 0b11;
+		if (mode == i(Mode::Input)) return Direction::In;
+		if (mode == i(Mode::Output)) return Direction::Out;
+		return Direction::Special;
+%% endif
+	}
+
+	/// Back to a floating input, detached from any peripheral signal
+	void
+	disconnect() const
+	{
+		setInput(InputType::Floating);
+%% if target.family not in ["f1", "l1"]
+		const uint8_t pin = std::countr_zero(mask());
+		reg()->AFR[pin / 8] &= ~(0xful << ((pin % 8) * 4));
+	%% if target["family"] in ["l4"] and target["name"] in ["71", "75", "76", "85", "86"]
+		reg()->ASCR &= ~mask();
+	%% endif
+%% endif
+	}
+
+	modm_always_inline void
+	set() const { reg()->BSRR = setBits; }
+
+	modm_always_inline void
+	reset() const { reg()->BSRR = resetBits(); }
+
+	modm_always_inline void
+	set(bool value) const { reg()->BSRR = value ? setBits : resetBits(); }
+
+	modm_always_inline void
+	toggle() const
+	{
+		const uint32_t odr = reg()->ODR;
+		reg()->BSRR = ((odr & mask()) << 16) | (~odr & mask());
+	}
+
+	modm_always_inline bool
+	isSet() const { return level(reg()->ODR); }
+
+	modm_always_inline bool
+	read() const { return level(reg()->IDR); }
+};
+
+} // namespace modm::platform

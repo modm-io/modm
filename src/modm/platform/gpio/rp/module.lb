@@ -130,6 +130,8 @@ def build(env):
     env.template("../common/unused.hpp.in", "unused.hpp")
     env.template("../common/pins.hpp.in", "pins.hpp")
     env.template("../common/port_shim.hpp.in", "port_shim.hpp")
+    env.template("runtime.hpp.in")
+    env.template("../common/any.hpp.in", "any.hpp")
 
     # FIXME: Move to modm:platform:core!
     env.outbasepath = "modm/src/modm/platform/core"

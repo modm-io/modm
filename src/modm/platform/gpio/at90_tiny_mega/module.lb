@@ -154,6 +154,8 @@ def build(env):
     env.template("set.hpp.in")
     env.template("../common/unused.hpp.in", "unused.hpp")
     env.template("../common/port_shim.hpp.in", "port_shim.hpp")
+    env.template("runtime.hpp.in")
+    env.template("../common/any.hpp.in", "any.hpp")
     env.template("../common/connector.hpp.in", "connector.hpp",
                  filters={"formatPeripheral": "", "printSignalMap": ""})
     env.copy("../common/open_drain.hpp", "open_drain.hpp")

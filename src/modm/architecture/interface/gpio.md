@@ -58,3 +58,47 @@ Led::reset();
 
 See the `modm:platform:gpio` module for platform-specific GPIO behaviors,
 especially signal connections to peripherals.
+
+
+## Runtime GPIOs
+
+The static GPIO classes are as fast as possible, but every pin is a separate
+type. When a pin is only known at runtime, for example because the wiring
+depends on the hardware revision, or the same code is used with several pins,
+use one of the runtime pins. They are small values that can be copied and
+stored in arrays and `constexpr` tables:
+
+- `modm::platform::GpioPin`: a pin of this device, also an inverted one, almost
+  as fast as the static classes.
+- `modm::AnyGpio`: a pin of this device or unused. Device pins take the inlined
+  fast path plus one test and branch, and unused pins do nothing like
+  `GpioUnused`, also when default constructed.
+
+```cpp
+GpioPin led = GpioInverted<GpioA5>{};
+static constexpr modm::AnyGpio pins[]{GpioA0{}, GpioPin{Gpio::Port::B, 3}, GpioUnused{}};
+pins[index].toggle();
+```
+
+Copy an `AnyGpio` into a local variable in hot loops: the compiler can then move
+the test out of the loop and the pin is as fast as `GpioPin`.
+
+`modm::AnyGpioAdapter<Source>` is a static GPIO class that forwards to the
+`AnyGpio` returned by `Source::get()`, for classes that take their pins as
+template arguments, like `BitBangI2cMaster`:
+
+```cpp
+struct SclSource
+{
+    static modm::AnyGpio get() { return table[hardware_revision()]; }
+};
+using Scl = modm::AnyGpioAdapter<SclSource>;
+```
+
+Runtime pins exist on all platforms. `modm::AnyGpio` has the same `InputType`,
+`OutputType` and `OutputSpeed` everywhere, with values that alias those of the
+platform. A configuration the platform does not have, like `InputType::PullDown`
+on AVR or `OutputType::OpenDrain` on RP2040, returns `false` and leaves the pin
+unchanged. `OutputSpeed` is a hint, which platforms without a matching setting
+ignore or round down. `GpioPin` keeps the types of its platform. Hosted targets
+have no device pins, so `modm::AnyGpio` can only be unused there.
