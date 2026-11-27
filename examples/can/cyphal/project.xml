@@ -1,0 +1,19 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <!-- <extends>modm:nucleo-h723zg</extends> -->
+  <!-- <extends>modm:nucleo-f429zi</extends> -->
+  <!-- <extends>modm:nucleo-f103rb</extends> -->
+  <!-- CI: expect "heartbeats 3 records 3 errors 0" -->
+  <!-- CI: limit 10 -->
+  <options>
+    <option name="modm:architecture:can:message.buffer">64</option>
+  </options>
+  <modules>
+    <module>modm:platform:can</module>
+    <module>modm:platform:can:*</module>
+    <module>modm:ext:libcanard</module>
+    <module>modm:ext:nunavut</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

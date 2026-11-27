@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+#
+# Copyright (c) 2026, Niklas Hauser
+#
+# This file is part of the modm project.
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+# -----------------------------------------------------------------------------
+
+
+def init(module):
+    module.name = ":ext:dronecan"
+    module.description = FileReader("dronecan.md")
+
+def prepare(module, options):
+    module.add_set_option(
+        EnumerationOption(name="namespaces",
+                          enumeration=["uavcan", "dronecan", "ardupilot", "com", "cuav", "mppt"],
+                          description="Root namespaces of the DroneCAN DSDL to generate."),
+        default="uavcan")
+    module.add_set_option(
+        PathOption(name="sources", absolute=True, empty_ok=True,
+                   description="Root namespace folders of your own DSDL types."),
+        default="")
+    module.add_option(
+        StringOption(name="types", default="",
+                     description="Comma separated full names of the types to generate, "
+                                 "e.g. `uavcan.protocol.NodeStatus`, with their dependencies. "
+                                 "Empty generates all types."))
+    module.add_option(
+        PathOption(name="path", default="generated/dronecan", absolute=True,
+                   description="Path to the generated code"))
+    module.add_collector(
+        StringCollector(name="type",
+                        description="Full names of types that other modules need, which are "
+                                    "added to the `types` option if it is not empty."))
+    module.depends(":ext:libcanard")
+    # too large for AVR
+    return not options[":target"].has_driver("core:avr*")
+
+def build(env):
+    env.outbasepath = "modm/ext/dronecan"
+    # The serialization functions of the DroneCAN fork of libcanard, which the
+    # generated code calls. Its header is renamed to not conflict with libcanard.
+    env.copy("cyphal/dronecan/libcanard/LICENSE", "LICENSE")
+    env.copy("cyphal/dronecan/libcanard/canard.h", "canard.h", patch="dronecan_canard.h.patch")
+    env.copy("cyphal/dronecan/libcanard/canard_internals.h", "canard_internals.h")
+    env.copy("cyphal/dronecan/libcanard/canard.c", "canard.c")
+    for namespace in env["namespaces"]:
+        env.copy("cyphal/dronecan/dsdl/" + namespace, "dsdl/" + namespace)
+    env.copy("cyphal/dronecan/dsdl/LICENSE", "dsdl/LICENSE")
+    # typed C++ helpers for the generated code on a modm::canard::Node
+    env.copy("dronecan.hpp")

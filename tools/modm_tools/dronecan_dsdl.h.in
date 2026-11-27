@@ -1,0 +1,278 @@
+{#
+ # Copyright (c) 2026, Niklas Hauser
+ #
+ # This file is part of the modm project.
+ #
+ # This Source Code Form is subject to the terms of the Mozilla Public
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ #}
+{#
+ # Header of a DroneCAN type for modm_tools/dronecan_dsdl.py: of a message or
+ # the request or response of a service (`part`), or of a whole service with
+ # both (`service`).
+ #
+ # Every macro renders the code of one value without indentation, the caller
+ # indents it with the `body` filter. `tao` is the C expression that is true if
+ # the value is in tail position, where arrays of bytes have no length prefix.
+ #}
+{%- macro encode_value(t, expr, tao) -%}
+{% if t.category == t.CATEGORY_PRIMITIVE %}
+{% if t.kind == t.KIND_FLOAT and t.bitlen == 16 %}
+{
+	float value = {{ expr }};
+{% if t.cast_mode == t.CAST_MODE_SATURATED %}
+	if (value > 65504.f) { value = 65504.f; } else if (value < -65504.f) { value = -65504.f; }
+{% endif %}
+	const uint16_t half = canardConvertNativeFloatToFloat16(value);
+	canardEncodeScalar(buffer, *bit_ofs, 16, &half);
+}
+{% else %}
+{
+	{{ c_type(t) }} value = {{ expr }};
+{% if saturate(t) %}
+{% set low, high = t.value_range %}
+{% if t.kind == t.KIND_SIGNED_INT %}
+	if (value > {{ high }}) { value = {{ high }}; } else if (value < {{ low }}) { value = {{ low }}; }
+{% else %}
+	if (value > {{ high }}u) { value = {{ high }}u; }
+{% endif %}
+{% endif %}
+	canardEncodeScalar(buffer, *bit_ofs, {{ t.bitlen }}, &value);
+}
+{% endif %}
+*bit_ofs += {{ t.bitlen }};
+{% elif t.category == t.CATEGORY_VOID %}
+*bit_ofs += {{ t.bitlen }};
+{% elif t.category == t.CATEGORY_COMPOUND %}
+_{{ c_name(t.full_name) }}_encode_bits(&{{ expr }}, buffer, bit_ofs, {{ tao }});
+{% elif t.mode == t.MODE_STATIC %}
+for (uint32_t i = 0; i < {{ t.max_size }}; i++) {
+{{ encode_value(t.value_type, expr ~ "[i]", "(%s && i == %d)" % (tao, t.max_size - 1)) | body(1) }}
+}
+{% else %}
+{% set tail_array = t.value_type.get_min_bitlen() >= 8 %}
+{
+{% if t.max_size in (255, 65535) %}
+	const {{ length_type(t) }} len = {{ expr }}.len;
+{% else %}
+	const {{ length_type(t) }} len = {{ expr }}.len > {{ t.max_size }} ? {{ t.max_size }} : {{ expr }}.len;
+{% endif %}
+{% if tail_array %}
+	if (!{{ tao }}) {
+		canardEncodeScalar(buffer, *bit_ofs, {{ t.max_size.bit_length() }}, &len);
+		*bit_ofs += {{ t.max_size.bit_length() }};
+	}
+{% else %}
+	canardEncodeScalar(buffer, *bit_ofs, {{ t.max_size.bit_length() }}, &len);
+	*bit_ofs += {{ t.max_size.bit_length() }};
+{% endif %}
+	for (uint32_t i = 0; i < len; i++) {
+{{ encode_value(t.value_type, expr ~ ".data[i]", "false" if tail_array else "(%s && i == len - 1u)" % tao) | body(2) }}
+	}
+}
+{% endif %}
+{%- endmacro %}
+
+
+{%- macro decode_value(t, expr, tao) -%}
+{% if t.category == t.CATEGORY_PRIMITIVE %}
+{% if t.kind == t.KIND_FLOAT and t.bitlen == 16 %}
+{
+	uint16_t half = 0;
+	canardDecodeScalar(transfer, *bit_ofs, 16, false, &half);
+	{{ expr }} = canardConvertFloat16ToNativeFloat(half);
+}
+{% else %}
+canardDecodeScalar(transfer, *bit_ofs, {{ t.bitlen }}, {{ "true" if t.kind == t.KIND_SIGNED_INT else "false" }}, &{{ expr }});
+{% endif %}
+*bit_ofs += {{ t.bitlen }};
+{% elif t.category == t.CATEGORY_VOID %}
+*bit_ofs += {{ t.bitlen }};
+{% elif t.category == t.CATEGORY_COMPOUND %}
+if (_{{ c_name(t.full_name) }}_decode_bits(transfer, bit_ofs, &{{ expr }}, {{ tao }})) { return true; }
+{% elif t.mode == t.MODE_STATIC %}
+for (uint32_t i = 0; i < {{ t.max_size }}; i++) {
+{{ decode_value(t.value_type, expr ~ "[i]", "(%s && i == %d)" % (tao, t.max_size - 1)) | body(1) }}
+}
+{% else %}
+{% if t.value_type.get_min_bitlen() >= 8 %}
+if ({{ tao }}) {
+	{{ expr }}.len = 0;
+	while ((*bit_ofs + 8) <= transfer->payload_len * 8u && {{ expr }}.len < {{ t.max_size }}) {
+{{ decode_value(t.value_type, expr ~ ".data[" ~ expr ~ ".len]", "false") | body(2) }}
+		{{ expr }}.len++;
+	}
+} else {
+{% else %}
+{
+{% endif %}
+	{{ expr }}.len = 0;
+	canardDecodeScalar(transfer, *bit_ofs, {{ t.max_size.bit_length() }}, false, &{{ expr }}.len);
+	*bit_ofs += {{ t.max_size.bit_length() }};
+{% if t.max_size not in (255, 65535) %}
+	if ({{ expr }}.len > {{ t.max_size }}) { return true; }
+{% endif %}
+	for (uint32_t i = 0; i < {{ expr }}.len; i++) {
+{{ decode_value(t.value_type, expr ~ ".data[i]", "(%s && i == %s.len - 1u)" % (tao, expr)) | body(2) }}
+	}
+}
+{% endif %}
+{%- endmacro %}
+
+
+{%- macro serialize(mode, part) -%}
+{% if part.union %}
+{% set bits = [part.fields | length - 1, 1] | max %}
+{% set bits = bits.bit_length() %}
+{% if mode == "encode" %}
+canardEncodeScalar(buffer, *bit_ofs, {{ bits }}, &msg->union_tag);
+*bit_ofs += {{ bits }};
+{% else %}
+msg->union_tag = 0;
+canardDecodeScalar(transfer, *bit_ofs, {{ bits }}, false, &msg->union_tag);
+*bit_ofs += {{ bits }};
+{% endif %}
+switch (msg->union_tag) {
+{% for field in part.fields %}
+	case {{ loop.index0 }}: {
+{{ (encode_value if mode == "encode" else decode_value)(field.type, "msg->" ~ field.name, "tao") | body(2) }}
+		break;
+	}
+{% endfor %}
+	default: {{ "break" if mode == "encode" else "return true" }};
+}
+{% else %}
+{% for field in part.fields %}
+{{ (encode_value if mode == "encode" else decode_value)(field.type, "msg->" ~ field.name if field.name else "", "tao" if loop.last else "false") | body(0) }}
+{% endfor %}
+{% endif %}
+{%- endmacro -%}
+{% if service %}
+{% set macro = c_name(service.full_name) | upper %}
+// Generated by modm from {{ source }}, do not edit.
+#pragma once
+#include <{{ service.full_name }}_req.h>
+#include <{{ service.full_name }}_res.h>
+
+{% if service.default_dtid is not none %}
+#define {{ macro }}_ID {{ service.default_dtid }}
+{% endif %}
+#define {{ macro }}_SIGNATURE (0x{{ "%016X" % service.get_data_type_signature() }}ULL)
+{% else %}
+// Generated by modm from {{ source }}, do not edit.
+#pragma once
+#include <stdbool.h>
+#include <stdint.h>
+#include <string.h>
+#include <dronecan/canard.h>
+
+{% for dependency in part.dependencies %}
+#include <{{ dependency }}>
+{% endfor %}
+
+{% if part.dtype.default_dtid is not none %}
+#define {{ part.macro }}_ID {{ part.dtype.default_dtid }}
+{% endif %}
+#define {{ part.macro }}_SIGNATURE (0x{{ "%016X" % part.dtype.get_data_type_signature() }}ULL)
+#define {{ part.macro }}_MAX_SIZE {{ part.max_size }}
+{% for constant in part.constants %}
+#define {{ part.macro }}_{{ constant.name | upper }} ({{ constant_value(constant) }})
+{% endfor %}
+{% if part.union %}
+{% for field in part.fields %}
+#define {{ part.macro }}_{{ field.name | upper }} {{ loop.index0 }}
+{% endfor %}
+{% endif %}
+
+struct {{ part.name }}
+{
+{% if part.union %}
+	uint8_t union_tag;
+	union
+	{
+{% for field in part.fields %}
+{% set type, suffix = field_type(field.type) %}
+		{{ type }} {{ field.name }}{{ suffix }};
+{% endfor %}
+	};
+{% else %}
+{% for field in part.fields if field.name %}
+{% set type, suffix = field_type(field.type) %}
+	{{ type }} {{ field.name }}{{ suffix }};
+{% else %}
+	uint8_t empty_;
+{% endfor %}
+{% endif %}
+};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+static inline void
+_{{ part.name }}_encode_bits(const struct {{ part.name }}* msg, uint8_t* buffer, uint32_t* bit_ofs, bool tao)
+{
+	(void) msg; (void) buffer; (void) bit_ofs; (void) tao;
+{% if part.fields %}
+{{ serialize("encode", part) | body(1) }}
+{% endif %}
+}
+
+static inline bool
+_{{ part.name }}_decode_bits(const CanardRxTransfer* transfer, uint32_t* bit_ofs, struct {{ part.name }}* msg, bool tao)
+{
+	(void) transfer; (void) msg; (void) bit_ofs; (void) tao;
+{% if part.fields %}
+{{ serialize("decode", part) | body(1) }}
+{% endif %}
+	return false;
+}
+
+/// Serializes the message into the buffer of {{ part.macro }}_MAX_SIZE bytes.
+/// @return the payload length in bytes
+static inline uint32_t
+{{ part.name }}_encode(const struct {{ part.name }}* msg, uint8_t* buffer)
+{
+	uint32_t bit_ofs = 0;
+	memset(buffer, 0, {{ part.macro }}_MAX_SIZE);
+	_{{ part.name }}_encode_bits(msg, buffer, &bit_ofs, true);
+	return (bit_ofs + 7) / 8;
+}
+
+/// Deserializes the payload of a transfer into the message.
+/// @return true if the payload is invalid
+static inline bool
+{{ part.name }}_decode(const CanardRxTransfer* transfer, struct {{ part.name }}* msg)
+{
+	uint32_t bit_ofs = 0;
+	memset(msg, 0, sizeof(*msg));
+	if (_{{ part.name }}_decode_bits(transfer, &bit_ofs, msg, true)) { return true; }
+	return bit_ofs > transfer->payload_len * 8u;
+}
+
+#ifdef __cplusplus
+}
+
+{% if part.other %}
+struct {{ c_name(part.dtype.full_name) ~ part.other }};
+{% endif %}
+namespace modm::dronecan { template< class T > struct Type; }
+template<>
+struct modm::dronecan::Type<{{ part.name }}>
+{
+{% if part.other %}
+	using {{ part.other }} = {{ c_name(part.dtype.full_name) ~ part.other }};
+{% endif %}
+{% if part.dtype.default_dtid is not none %}
+	static constexpr uint16_t id = {{ part.macro }}_ID;
+{% endif %}
+	static constexpr uint64_t signature = {{ part.macro }}_SIGNATURE;
+	static constexpr size_t max_size = {{ part.macro }}_MAX_SIZE;
+	static uint32_t encode(const {{ part.name }}& msg, uint8_t* buffer)
+	{ return {{ part.name }}_encode(&msg, buffer); }
+	static bool decode(const CanardRxTransfer& transfer, {{ part.name }}& msg)
+	{ return {{ part.name }}_decode(&transfer, &msg); }
+};
+#endif
+{% endif %}

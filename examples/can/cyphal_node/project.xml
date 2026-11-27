@@ -1,0 +1,16 @@
+<library>
+  <extends>modm:nucleo-g474re</extends>
+  <options>
+    <option name="modm:platform:can:1:buffer.tx">0</option>
+    <option name="modm:platform:can:1:tx_hw_queue_mode">Priority</option>
+  </options>
+  <modules>
+    <module>modm:platform:can:1</module>
+    <module>modm:platform:flash</module>
+    <module>modm:platform:id</module>
+    <module>modm:communication:cyphal</module>
+    <module>modm:ext:zms</module>
+    <module>modm:processing:timer</module>
+    <module>modm:build:scons</module>
+  </modules>
+</library>

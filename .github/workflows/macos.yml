@@ -33,7 +33,7 @@ jobs:
           echo "/usr/local/bin" >> $GITHUB_PATH
           # The following steps run the python3 in /usr/local/bin, which is a different install
           # than the brew pip3: the build tools (modm_tools, nanopb) need their packages there.
-          /usr/local/bin/python3 -m pip install --upgrade --break-system-packages modm lbuild scons protobuf grpcio-tools
+          /usr/local/bin/python3 -m pip install --upgrade --break-system-packages modm lbuild scons protobuf grpcio-tools nunavut dronecan
 
       - name: Dump environment
         run: |
