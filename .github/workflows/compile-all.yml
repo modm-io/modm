@@ -2,15 +2,17 @@ name: Compile HAL for all devices
 
 on:
   pull_request:
-    types: [labeled]
+    types: [labeled, synchronize, reopened]
 
+# Every added label starts its own run, so give unrelated labels their own group,
+# otherwise they cancel the ci:hal run. Pushes to a labeled PR restart the ci:hal run.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}-${{ github.event.action == 'labeled' && github.event.label.name || 'ci:hal' }}
   cancel-in-progress: true
 
 jobs:
   avr-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-avr:2026-09-28
@@ -36,7 +38,7 @@ jobs:
           path: test/all/log
 
   sam-d0x-d1x-d2x-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -62,7 +64,7 @@ jobs:
           path: test/all/log
 
   sam-x5x-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -88,7 +90,7 @@ jobs:
           path: test/all/log
 
   sam-x7x-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -114,7 +116,7 @@ jobs:
           path: test/all/log
 
   nrf-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -140,7 +142,7 @@ jobs:
           path: test/all/log
 
   stm32c0-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -166,7 +168,7 @@ jobs:
           path: test/all/log
 
   stm32f0-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -192,7 +194,7 @@ jobs:
           path: test/all/log
 
   stm32f1-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -218,7 +220,7 @@ jobs:
           path: test/all/log
 
   stm32f2-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -244,7 +246,7 @@ jobs:
           path: test/all/log
 
   stm32f3-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -270,7 +272,7 @@ jobs:
           path: test/all/log
 
   stm32f4-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -296,7 +298,7 @@ jobs:
           path: test/all/log
 
   stm32f4-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -322,7 +324,7 @@ jobs:
           path: test/all/log
 
   stm32f4-compile-all-3:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -348,7 +350,7 @@ jobs:
           path: test/all/log
 
   stm32f7-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -374,7 +376,7 @@ jobs:
           path: test/all/log
 
   stm32f7-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -400,7 +402,7 @@ jobs:
           path: test/all/log
 
   stm32l0-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -426,7 +428,7 @@ jobs:
           path: test/all/log
 
   stm32l0-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -453,7 +455,7 @@ jobs:
 
 
   stm32l1-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -479,7 +481,7 @@ jobs:
           path: test/all/log
 
   stm32l4-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -505,7 +507,7 @@ jobs:
           path: test/all/log
 
   stm32l4-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -531,7 +533,7 @@ jobs:
           path: test/all/log
 
   stm32l4-compile-all-3:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -557,7 +559,7 @@ jobs:
           path: test/all/log
 
   stm32l5-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -583,7 +585,7 @@ jobs:
           path: test/all/log
 
   stm32u0-compile-all:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -609,7 +611,7 @@ jobs:
           path: test/all/log
 
   stm32u5-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -635,7 +637,7 @@ jobs:
           path: test/all/log
 
   stm32u5-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -661,7 +663,7 @@ jobs:
           path: test/all/log
 
   stm32g0-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -687,7 +689,7 @@ jobs:
           path: test/all/log
 
   stm32g0-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -713,7 +715,7 @@ jobs:
           path: test/all/log
 
   stm32g4-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -739,7 +741,7 @@ jobs:
           path: test/all/log
 
   stm32g4-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -765,7 +767,7 @@ jobs:
           path: test/all/log
 
   stm32h5-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -791,7 +793,7 @@ jobs:
           path: test/all/log
 
   stm32h5-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -817,7 +819,7 @@ jobs:
           path: test/all/log
 
   stm32h7-compile-all-1:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
@@ -843,7 +845,7 @@ jobs:
           path: test/all/log
 
   stm32h7-compile-all-2:
-    if: github.event.label.name == 'ci:hal'
+    if: github.event.action == 'labeled' && github.event.label.name == 'ci:hal' || github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'ci:hal')
     runs-on: ubuntu-24.04
     container:
       image: ghcr.io/modm-ext/modm-build-cortex-m:2026-09-28
