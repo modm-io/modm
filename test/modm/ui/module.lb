@@ -20,6 +20,7 @@ def prepare(module, options):
     module.depends(
         "modm:ui:button",
         "modm:ui:color",
+        "modm:ui:display",
         "modm:math",
         "modm:ui:time")
     return True

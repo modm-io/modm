@@ -18,6 +18,7 @@
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+#include <modm/driver/touch/ft6x06.hpp>
 
 /// @ingroup modm_board_disco_f746ng
 #define MODM_BOARD_HAS_LOGGER
@@ -181,6 +182,34 @@ using D14 = GpioB9;
 using D15 = GpioB8;
 /// @}
 
+/// The 4.3" 480x272 RGB LCD with capacitive touch panel
+namespace lcd
+{
+/// @ingroup modm_board_disco_f746ng
+/// @{
+using Display = GpioOutputI12;		// LCD_DISP
+using Backlight = GpioOutputK3;		// LCD_BL_CTRL
+using TouchInt = GpioInputI13;		// LCD_INT
+constexpr uint16_t Width{480};
+constexpr uint16_t Height{272};
+/// @}
+}
+
+/// The FT5336 touch controller, which is register compatible with the FT6x06
+namespace ft6
+{
+/// @ingroup modm_board_disco_f746ng
+/// @{
+using Scl = GpioH7;
+using Sda = GpioH8;
+using I2cMaster = I2cMaster3;
+using Touch = modm::Ft6x06< I2cMaster >;
+constexpr uint8_t TouchAddress = 0x38;
+/// @}
+}
+
+/// @}
+
 namespace usb_fs
 {
 /// @ingroup modm_board_disco_f746ng
@@ -247,6 +276,25 @@ initialize()
 	// Disable Backlight
 	GpioK3::setOutput(modm::Gpio::Low);
 }
+
+inline void
+initializeTouchscreen()
+{
+	lcd::TouchInt::setInput();
+	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
+	ft6::I2cMaster::initialize<SystemClock, 360_kHz>();
+}
+
+/// Configures the LTDC for a 480x272 RGB565 framebuffer and turns on the display
+void
+initializeDisplay();
+
+/// Shows the RGB565 framebuffer of 480x272 pixels from the next vertical blanking on
+void
+setDisplayBuffer(void *buffer);
+
+void *
+getDisplayBuffer();
 
 inline void
 initializeUsb(uint8_t priority=3)

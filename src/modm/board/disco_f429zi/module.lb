@@ -45,6 +45,19 @@ You can allocate from it with `new (modm::MemoryExternal) T` or place objects
 into it with the `.data_sdram`, `.bss_sdram` or `.noinit_sdram` sections.
 
 
+## Display
+
+The 2.4" QVGA TFT LCD with an ILI9341 controller is driven by the LTDC with a
+240x320 RGB565 framebuffer. Call `Board::initializeDisplay()` to configure the
+ILI9341 over SPI5 and the LTDC, then show a framebuffer with
+`Board::setDisplayBuffer(buffer)`, which switches during the next vertical
+blanking period.
+
+The resistive touch screen uses the STMPE811 controller on I2C3. Call
+`Board::initializeTouchscreen()` and read the raw positions with
+`Board::lcd::Touch`, which you need to calibrate to the display coordinates.
+
+
 ## TinyUSB
 
 To use the USB port, you must configure TinyUSB to use the HS port in FS mode:
@@ -64,10 +77,13 @@ def prepare(module, options):
     module.depends(
         ":debug",
         ":architecture:clock",
+        ":architecture:fiber",
         ":driver:l3gd20",
+        ":driver:stmpe811",
         ":platform:clock",
         ":platform:core",
         ":platform:gpio",
+        ":platform:i2c:3",
         ":platform:spi:5",
         ":platform:uart:1",
         ":platform:usb:hs")

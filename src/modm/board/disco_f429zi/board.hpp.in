@@ -17,6 +17,7 @@
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+#include <modm/driver/touch/stmpe811.hpp>
 
 using namespace modm::platform;
 
@@ -222,6 +223,10 @@ using TouchInt = GpioInputA15;	// TP_INT1 [Touch Panel]: GPXTI15
 using TouchScl = GpioA8;		// I2C3_SCL [ACP/RF_SCL]: I2C3_SCL
 using TouchSda = GpioC9;		// I2C3_SDA [ACP/RF_SDA]: I2C3_SDA
 using TouchRst = GpioOutputA7;	// ACP_RST: GPIO_Output
+using TouchI2cMaster = I2cMaster3;
+/// STMPE811 resistive touch controller, its raw 12-bit values need calibration
+using Touch = modm::Stmpe811< TouchI2cMaster >;
+constexpr uint8_t TouchAddress = 0x41;
 
 using Hsync = GpioOutputC6;		// HSYNC: LTDC_HSYNC
 using Vsync = GpioOutputA4;		// VSYNC: LTDC_VSYNC
@@ -321,6 +326,26 @@ initializeL3g()
 	l3g::SpiMaster::initialize<SystemClock, 10.5_MHz>();
 	l3g::SpiMaster::setDataMode(l3g::SpiMaster::DataMode::Mode3);
 }
+
+/// Resets the touch controller and configures I2C3 for it
+inline void
+initializeTouchscreen()
+{
+	lcd::TouchInt::setInput();
+	lcd::TouchI2cMaster::connect<lcd::TouchScl::Scl, lcd::TouchSda::Sda>();
+	lcd::TouchI2cMaster::initialize<SystemClock, 100_kHz>();
+}
+
+/// Configures the ILI9341 over SPI5 and the LTDC for a 240x320 RGB565 framebuffer
+void
+initializeDisplay();
+
+/// Shows the RGB565 framebuffer of 240x320 pixels from the next vertical blanking on
+void
+setDisplayBuffer(void *buffer);
+
+void *
+getDisplayBuffer();
 
 inline void
 initializeUsb(uint8_t priority=3)

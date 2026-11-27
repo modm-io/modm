@@ -35,6 +35,11 @@ integration with modm which are:
 - Tick is implemented via the `modm:platform:clock` module.
 - `LV_LOG_PRINTF = 0`: logging is redirected to `MODM_LOG_*` if the
                        `modm:debug` module is included and `LV_USE_LOG = 1`.
+- `LV_USE_DRAW_DMA2D = 1` on STM32 devices with a DMA2D peripheral, so that
+  fills and image blends are accelerated by hardware. LVGL waits for each
+  transfer by polling, so no interrupt handler is required. Define
+  `LV_USE_DRAW_DMA2D 0` in your `<lv_conf_local.h>` to disable it, for example
+  if your application uses the DMA2D itself.
 
 To add your own configuration you can create a `<lv_conf_local.h>` file which
 will automatically be included at the *beginning* of our `lv_conf.h`.
@@ -76,6 +81,8 @@ def prepare(module, options):
     module.depends(":architecture:clock")
     if options[":target"].identifier.platform != "hosted":
         module.depends(":platform:heap")
+    if options[":target"].has_driver("dma2d:stm32*"):
+        module.depends(":ext:cmsis:device")
 
     return True
 
@@ -87,6 +94,9 @@ def build(env):
     env.copy("lvgl/lv_version.h")
     env.copy("lvgl/lvgl_private.h")
     env.copy("lvgl/include")
+    env.substitutions = {"dma2d": None}
+    if env[":target"].has_driver("dma2d:stm32*"):
+        env.substitutions["dma2d"] = env.query(":ext:cmsis:device:headers")
     env.template("lv_conf.h.in")
     # The Helium assembly is for Cortex-M55 only and not preprocessed on Windows
     env.copy("lvgl/src", ignore=env.ignore_files("*.S"), patch="lvgl_src.patch")

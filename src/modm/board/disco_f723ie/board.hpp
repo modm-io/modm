@@ -17,6 +17,10 @@
 #include <modm/platform.hpp>
 #include <modm/architecture/interface/clock.hpp>
 #include <modm/debug/logger.hpp>
+#include <modm/driver/display/st7789.hpp>
+#include <modm/driver/touch/ft6x06.hpp>
+#include <optional>
+#include <span>
 
 /// @ingroup modm_board_disco_f723ie
 #define MODM_BOARD_HAS_LOGGER
@@ -172,6 +176,120 @@ using LedGreen = GpioOutputB1;	// User Green LED
 using LedD13 = D13;				// User Blue LED (Arduino D13)
 
 using Leds = SoftwareGpioPort< LedD13, LedGreen, LedRed >;
+/// @}
+
+/// The 240x240 TFT LCD with an ST7789H2 controller on the FMC (NE2, 16-bit 8080 bus)
+namespace lcd
+{
+/// @ingroup modm_board_disco_f723ie
+/// @{
+using Reset = GpioOutputH7;
+using Backlight = GpioOutputH11;
+using TearingEffect = GpioInputC8;
+
+/// Register select is FMC_A0, which is HADDR[1] on a 16-bit bus
+inline volatile uint16_t * const CommandRegister = reinterpret_cast<volatile uint16_t *>(0x6400'0000);
+inline volatile uint16_t * const DataRegister = reinterpret_cast<volatile uint16_t *>(0x6400'0002);
+
+/// Adapts the byte-oriented modm::St7789 driver to the 16-bit parallel bus:
+/// Command parameters use one bus cycle per byte, pixel data one per RGB565 pixel.
+struct Interface
+{
+	using Reset = lcd::Reset;
+	using data_t = std::span<const uint8_t>;
+
+	static void initialize() { Reset::setOutput(modm::Gpio::High); }
+	static void switchToDataMode() {}
+	static void end() {}
+
+	static void
+	beginCommand(uint8_t command)
+	{
+		*CommandRegister = command;
+		pixelData = (command == 0x2C); // WriteDisplayData
+		highByte.reset();
+	}
+	template< typename Command > requires std::is_enum_v<Command>
+	static void beginCommand(Command command) { beginCommand(uint8_t(command)); }
+
+	static void sendCommand(uint8_t command) { beginCommand(command); }
+	template< typename Command > requires std::is_enum_v<Command>
+	static void sendCommand(Command command) { beginCommand(uint8_t(command)); }
+
+	template< typename Command, typename Data >
+	static void
+	sendCommand(Command command, Data &&data)
+	{
+		beginCommand(uint8_t(command));
+		continueData(std::forward<Data>(data));
+	}
+
+	static void
+	continueData(uint8_t data)
+	{
+		if (not pixelData) { *DataRegister = data; return; }
+		if (not highByte) { highByte = data; return; }
+		*DataRegister = (*highByte << 8) | data;
+		highByte.reset();
+	}
+	static void continueData(data_t data) { for (uint8_t byte : data) continueData(byte); }
+	template< typename Data >
+	static void continueData(const Data &data)
+	{ continueData(data_t{reinterpret_cast<const uint8_t *>(&data), sizeof(data)}); }
+
+	template< typename Data >
+	static void sendData(Data &&data) { continueData(std::forward<Data>(data)); }
+
+	/// Fast path: write RGB565 pixels into the window set by `setClipping()`.
+	static void
+	writePixels(const uint16_t *pixels, size_t count)
+	{
+		*CommandRegister = 0x2C; // WriteDisplayData
+		while (count--) *DataRegister = *pixels++;
+	}
+
+	static uint16_t
+	readData()
+	{ return *DataRegister; }
+
+private:
+	static inline bool pixelData{false};
+	static inline std::optional<uint8_t> highByte;
+};
+/// @}
+}
+
+/// The capacitive touch panel controller on I2C3
+namespace ft6
+{
+/// @ingroup modm_board_disco_f723ie
+/// @{
+using Scl = GpioA8;
+using Sda = GpioH8;
+using I2cMaster = I2cMaster3;
+using Touch = modm::Ft6x06< I2cMaster >;
+constexpr uint8_t TouchAddress = 0x38;
+/// @}
+}
+
+/// @ingroup modm_board_disco_f723ie
+/// @{
+using Display = modm::St7789<lcd::Interface, 240, 240>;
+
+inline void
+initializeTouchscreen()
+{
+	ft6::I2cMaster::connect<ft6::Scl::Scl, ft6::Sda::Sda>();
+	ft6::I2cMaster::initialize<SystemClock, 360_kHz>();
+}
+
+/// Resets and initializes the LCD and turns on the backlight
+void
+initializeDisplay();
+
+Display&
+getDisplay();
+
 /// @}
 
 namespace usb_fs

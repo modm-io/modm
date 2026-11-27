@@ -18,21 +18,21 @@ template<int16_t Width, int16_t Height>
 void
 MonochromeGraphicDisplayHorizontal<Width, Height>::setPixel(int16_t x, int16_t y)
 {
-	if ((x < Width) and (y < Height)) { this->buffer[y][x / 8] |= (1 << (x % 8)); }
+	if ((uint16_t(x) < Width) and (uint16_t(y) < Height)) { this->buffer[y][x / 8] |= (1 << (x % 8)); }
 }
 
 template<int16_t Width, int16_t Height>
 void
 MonochromeGraphicDisplayHorizontal<Width, Height>::clearPixel(int16_t x, int16_t y)
 {
-	if ((x < Width) and (y < Height)) { this->buffer[y][x / 8] &= ~(1 << (x % 8)); }
+	if ((uint16_t(x) < Width) and (uint16_t(y) < Height)) { this->buffer[y][x / 8] &= ~(1 << (x % 8)); }
 }
 
 template<int16_t Width, int16_t Height>
 bool
 MonochromeGraphicDisplayHorizontal<Width, Height>::getPixel(int16_t x, int16_t y) const
 {
-	if ((x < Width) and (y < Height))
+	if ((uint16_t(x) < Width) and (uint16_t(y) < Height))
 		return (this->buffer[y][x / 8] & (1 << (x % 8)));
 	else
 		return false;

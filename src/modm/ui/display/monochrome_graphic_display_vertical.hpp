@@ -17,6 +17,7 @@
 #define MODM_MONOCHROME_GRAPHIC_DISPLAY_VERTICAL_HPP
 
 #include <stdlib.h>
+#include <algorithm>
 
 #include "monochrome_graphic_display.hpp"
 

@@ -1,0 +1,7 @@
+<library>
+  <extends>modm:nucleo-h533re</extends>
+  <modules>
+    <module>modm:build:scons</module>
+    <module>modm:driver:ssd1306</module>
+  </modules>
+</library>
