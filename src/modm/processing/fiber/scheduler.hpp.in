@@ -260,12 +260,6 @@ public:
 	}
 };
 
-%% if multicore
-constinit inline Scheduler Scheduler::main[{{num_cores}}];
-%% elif not is_hosted
-constinit inline Scheduler Scheduler::main;
-%% endif
-
 } // namespace modm::fiber
 
 #endif // MODM_FIBER_SCHEDULER_HPP

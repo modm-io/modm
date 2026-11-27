@@ -10,6 +10,21 @@
 // ----------------------------------------------------------------------------
 
 #include "scheduler.hpp"
+#include <modm/architecture/utils.hpp>
+
+%% if multicore or not is_hosted
+namespace modm::fiber
+{
+// The scheduler is accessed on every context switch, so it is placed into the
+// fastest RAM, which does not need to be DMA-able. Not inline, since an inline
+// variable in a named section conflicts with other variables in that section.
+%% if multicore
+modm_fastdata constinit Scheduler Scheduler::main[{{num_cores}}];
+%% else
+modm_fastdata constinit Scheduler Scheduler::main;
+%% endif
+}
+%% endif
 
 /// @cond
 namespace modm::this_fiber

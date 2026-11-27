@@ -83,7 +83,7 @@ def build(env):
     env.template("context.h.in")
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
-    env.copy("scheduler.cpp")
+    env.template("scheduler.cpp.in")
     env.template("task.hpp.in")
     env.template("task_impl.hpp.in")
 
