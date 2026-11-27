@@ -106,6 +106,3 @@ samd21e15c-uf
 samd21e15c-uu
 samd21e16c-uf
 samd21e16c-uu
-# Undocumented and inconsistent header and device file
-stm32g411
-stm32g414
