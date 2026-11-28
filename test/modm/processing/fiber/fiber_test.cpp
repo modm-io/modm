@@ -510,6 +510,58 @@ FiberTest::testStackUsage()
 #endif
 }
 
+#if defined(__ARM_FP) && !defined(MODM_OS_HOSTED)
+extern "C" void modm_used
+fiber_test_yield()
+{
+	modm::this_fiber::yield();
+}
+
+// Writes s16-s31, yields and returns the number of changed registers
+static uint32_t
+fpu_yield_check(uint32_t seed)
+{
+	register uint32_t s asm("r4") = seed;
+	register uint32_t e asm("r5") = 0;
+#define S(n) "add ip, %[s], #" #n "\n\t vmov s" #n ", ip\n\t"
+#define C(n) "vmov ip, s" #n "\n\t sub ip, ip, %[s]\n\t cmp ip, #" #n "\n\t it ne\n\t addne %[e], %[e], #1\n\t"
+	asm volatile
+	(
+		S(16) S(17) S(18) S(19) S(20) S(21) S(22) S(23) S(24) S(25) S(26) S(27) S(28) S(29) S(30) S(31)
+		"bl fiber_test_yield \n\t"
+		C(16) C(17) C(18) C(19) C(20) C(21) C(22) C(23) C(24) C(25) C(26) C(27) C(28) C(29) C(30) C(31)
+		: [s] "+r" (s), [e] "+r" (e)
+		:: "r0", "r1", "r2", "r3", "ip", "lr", "cc", "memory", "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8", "s9", "s10", "s11", "s12", "s13", "s14", "s15", "s16", "s17", "s18", "s19", "s20", "s21", "s22", "s23", "s24", "s25", "s26", "s27", "s28", "s29", "s30", "s31"
+	);
+#undef S
+#undef C
+	return e;
+}
+#endif
+
+void
+FiberTest::testFpuRegisters()
+{
+#if defined(__ARM_FP) && !defined(MODM_OS_HOSTED)
+	static modm::fiber::Stack<> stack3;
+	uint32_t errors{0};
+	modm::fiber::Task fiber1(stack1, [&]
+	{
+		for (uint32_t ii = 0; ii < 100; ii++) errors += fpu_yield_check(0x1000 + ii);
+	});
+	modm::fiber::Task fiber2(stack2, [&]
+	{
+		for (uint32_t ii = 0; ii < 100; ii++) modm::this_fiber::yield();
+	});
+	modm::fiber::Task fiber3(stack3, [&]
+	{
+		for (uint32_t ii = 0; ii < 100; ii++) errors += fpu_yield_check(0x2000'0000 + ii * 0x100);
+	});
+	modm::fiber::Scheduler::run();
+	TEST_ASSERT_EQUALS(errors, 0u);
+#endif
+}
+
 // =============================== THREAD LOCAL ===============================
 #ifdef MODM_CONTEXT_TLS
 static constinit thread_local uint32_t tls_data{0x1234'5678};	// .tdata

@@ -63,6 +63,9 @@ public:
 	testStackUsage();
 
 	void
+	testFpuRegisters();
+
+	void
 	testThreadLocal();
 
 	void
