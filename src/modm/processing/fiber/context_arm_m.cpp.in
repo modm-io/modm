@@ -75,7 +75,8 @@ constexpr size_t StackWordsStorage = 2;
 constexpr size_t StackWordsRegisters = {{ 9 + 16 if with_fpu else 9 }};
 constexpr size_t StackWordsAll = StackWordsStorage + StackWordsRegisters;
 constexpr size_t StackSizeWord = sizeof(uintptr_t);
-constexpr uintptr_t StackWatermark = 0xf00d'cafe;
+// A repeated byte fits into a Thumb-2 immediate, so the switch compares it directly
+constexpr uintptr_t StackWatermark = 0xa5a5'a5a5;
 
 void modm_naked
 modm_context_entry()
@@ -243,8 +244,12 @@ modm_context_jump(modm_context_t*, modm_context_t*)
 		"bls 1f					\n\t"	// If SP <= bottom, stack overflow
 
 		"ldr r3, [r3]			\n\t"	// Load stack bottom
+%% if is_cm0
 		"ldr r2, =%0			\n\t"	// Load StackWatermark value
 		"cmp r2, r3				\n\t"	// Check if stack watermark is still at the bottom
+%% else
+		"cmp r3, %0				\n\t"	// Check if stack watermark is still at the bottom
+%% endif
 		"bne 1f					\n\t"	// If not, stack overflow
 %% endif
 %#
