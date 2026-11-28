@@ -80,7 +80,7 @@ def build(env):
         if env[":target"].identifier.family != "darwin":
             env.collect(":build:library", "pthread")
 
-    env.template("context.h")
+    env.template("context.h.in")
     env.template("stack.hpp.in")
     env.template("scheduler.hpp.in")
     env.copy("scheduler.cpp")
